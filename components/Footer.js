@@ -36,6 +36,19 @@ export default function Footer() {
               <li><Link href="/categoria/negocios">Negócios</Link></li>
               <li><Link href="/categoria/saude">Saúde</Link></li>
               <li><Link href="/categoria/esportes">Esportes</Link></li>
+              <li><Link href="/categoria/cultura">Cultura & Lazer</Link></li>
+            </ul>
+          </div>
+
+          {/* PORTAL */}
+          <div className="footer-col">
+            <h4>Portal</h4>
+            <ul>
+              <li><Link href="/sobre">Sobre nós</Link></li>
+              <li><Link href="/contato">Anuncie</Link></li>
+              <li><Link href="/contato">Colabore conosco</Link></li>
+              <li><Link href="/contato">Contato</Link></li>
+              <li><Link href="/privacidade">Política de Privacidade</Link></li>
             </ul>
           </div>
 
@@ -45,7 +58,7 @@ export default function Footer() {
             <ul>
               <li><a href="mailto:contato@miamibrasileiro.com">📧 contato@miamibrasileiro.com</a></li>
               <li><a href="mailto:anuncie@miamibrasileiro.com">📣 anuncie@miamibrasileiro.com</a></li>
-              <li><span>🍍 Miami, FL – EUA</span></li>
+              <li><span>📍 Miami, FL – EUA</span></li>
             </ul>
           </div>
 
