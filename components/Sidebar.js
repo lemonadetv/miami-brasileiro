@@ -48,9 +48,9 @@ export default function Sidebar({ articles = [] }) {
       {/* WHATSAPP */}
       <div className="whatsapp-box">
         <div className="whatsapp-box-inner">
-          <div style={{fontSize:+36px',marginBottom:'8px'}}>💬</div>
+          <div style={{fontSize:'36px',marginBottom:'8px'}}>💬</div>
           <div style={{fontSize:'15px',fontWeight:800,marginBottom:'6px'}}>Grupo no WhatsApp</div>
-          <div style={{fontSize:'12px',opacity:.9,sarginBottom:'14px',lineHeight:1.5}}>
+          <div style={{fontSize:'12px',opacity:.9,marginBottom:'14px',lineHeight:1.5}}>
             Junte-se a +3.000 brasileiros em Miami no nosso grupo de notícias
           </div>
           <a href="https://wa.me/1305000000" target="_blank" rel="noreferrer" className="wb-btn">
