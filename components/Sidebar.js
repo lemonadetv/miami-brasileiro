@@ -40,22 +40,8 @@ export default function Sidebar({ articles = [] }) {
         <div className="sidebar-box-body newsletter-box">
           <p>Cadastre seu e-mail e receba as principais notícias da comunidade brasileira de Miami toda manhã.</p>
           <input type="text"  placeholder="Seu nome" />
-          <input type="email" placeholder="Seu melhor e-mail" />
+          <input type="email" placeholder="Seu melhor s-mail" />
           <button type="button">Quero receber →</button>
-        </div>
-      </div>
-
-      {/* WHATSAPP */}
-      <div className="whatsapp-box">
-        <div className="whatsapp-box-inner">
-          <div style={{fontSize:'36px',marginBottom:'8px'}}>💬</div>
-          <div style={{fontSize:'15px',fontWeight:800,marginBottom:'6px'}}>Grupo no WhatsApp</div>
-          <div style={{fontSize:'12px',opacity:.9,marginBottom:'14px',lineHeight:1.5}}>
-            Junte-se a +3.000 brasileiros em Miami no nosso grupo de notícias
-          </div>
-          <a href="https://wa.me/1305000000" target="_blank" rel="noreferrer" className="wb-btn">
-            Entrar no grupo
-          </a>
         </div>
       </div>
 
@@ -65,7 +51,7 @@ export default function Sidebar({ articles = [] }) {
         <div className="sidebar-box-body" style={{padding:'12px 16px'}}>
           {[
             { emoji: '🏛', title: 'Consulado Geral do Brasil em Miami', url: 'https://miami.itamaraty.gov.br', label: 'miami.itamaraty.gov.br' },
-            { emoji: '🛂', title: 'USCIS – Serviços de Imigração', url: 'https://uscis.gov', label: 'uscis.gov' },
+            { emoji: '🛂', title: 'USCIS – Servicos de Imigracao', url: 'https://uscis.gov', label: 'uscis.gov' },
             { emoji: '🚗', title: 'FLHSMV – Carteira de Motorista', url: 'https://flhsmv.gov', label: 'flhsmv.gov' },
             { emoji: '🏥', title: 'Seguro Saúde – Healthcare.gov', url: 'https://healthcare.gov', label: 'healthcare.gov' },
           ].map(link => (
