@@ -1,17 +1,14 @@
 // app/api/buscar-noticias/route.js
-// Motor de automacao do portal Miami Brasileira
-// Chamado pelo Vercel Cron 1x por dia
-
 import Anthropic from '@anthropic-ai/sdk'
 
 const ANTHROPIC = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const QUERIES = [
-  { query: 'brazil miami florida community events', category: 'Comunidade' },
-  { query: 'immigration brazil usa green card visa 2026', category: 'Imigracao' },
-  { query: 'brazil business entrepreneur florida startup', category: 'Negocios' },
-  { query: 'brazil health insurance florida healthcare medicaid', category: 'Saude' },
-  { query: 'brazil soccer copa mundo miami sports', category: 'Esportes' },
+  { query: 'brazil miami florida community events 2026', category: 'Comunidade' },
+  { query: 'immigration brazil usa green card visa uscis 2026', category: 'Imigracao' },
+  { query: 'brazil business entrepreneur florida startup miami', category: 'Negocios' },
+  { query: 'brazil health insurance florida medicaid healthcare', category: 'Saude' },
+  { query: 'brazil soccer copa mundo miami sports inter miami', category: 'Esportes' },
 ]
 
 const FALLBACK_IMAGES = {
@@ -22,49 +19,49 @@ const FALLBACK_IMAGES = {
   Esportes:   'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=70',
 }
 
-const LINKS_UTEIS = {
+const LINKS_CATEGORIA = {
   Imigracao: [
-    { titulo: 'USCIS - Servicos de Imigracao dos EUA', url: 'https://www.uscis.gov', desc: 'Site oficial para petições de visto e green card' },
-    { titulo: 'Consulado Geral do Brasil em Miami', url: 'https://miami.itamaraty.gov.br', desc: 'Servicos consulares para brasileiros na Florida' },
-    { titulo: 'Immigration Court Information', url: 'https://www.justice.gov/eoir', desc: 'Informacoes sobre tribunais de imigracao' },
+    '[USCIS - Peticoes e Status](https://www.uscis.gov) - Site oficial para acompanhar processos de imigracao',
+    '[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Servicos consulares para brasileiros na Florida',
+    '[Immigration Court - EOIR](https://www.justice.gov/eoir) - Informacoes sobre tribunais de imigracao',
+    '[National Immigrant Justice Center](https://immigrantjustice.org) - Assistencia juridica gratuita para imigrantes',
   ],
   Comunidade: [
-    { titulo: 'City of Miami - Servicos ao Cidadao', url: 'https://www.miamigov.com', desc: 'Servicos municipais de Miami' },
-    { titulo: 'Miami-Dade County', url: 'https://www.miamidade.gov', desc: 'Servicos do condado de Miami-Dade' },
-    { titulo: 'Consulado Geral do Brasil em Miami', url: 'https://miami.itamaraty.gov.br', desc: 'Apoio a comunidade brasileira' },
+    '[City of Miami - Servicos](https://www.miamigov.com) - Servicos municipais e eventos da cidade',
+    '[Miami-Dade County](https://www.miamidade.gov) - Servicos do condado incluindo moradia e assistencia social',
+    '[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Apoio a comunidade brasileira',
+    '[211 Broward/Miami-Dade](https://www.211broward.org) - Linha de apoio a servicos sociais na Florida',
   ],
   Saude: [
-    { titulo: 'Healthcare.gov - Planos de Saude', url: 'https://www.healthcare.gov', desc: 'Marketplace de seguros saude dos EUA' },
-    { titulo: 'Medicaid Florida', url: 'https://www.myflorida.com/apps/medicaid', desc: 'Programa de saude para baixa renda na Florida' },
-    { titulo: 'Jackson Health System Miami', url: 'https://jacksonhealth.org', desc: 'Principal rede hospitalar publica de Miami' },
+    '[Healthcare.gov](https://www.healthcare.gov) - Compare e contrate planos de saude (ACA/Obamacare)',
+    '[Florida Medicaid](https://www.myflorida.com/apps/medicaid) - Saude para baixa renda na Florida',
+    '[Jackson Health System](https://jacksonhealth.org) - Principal rede hospitalar publica de Miami',
+    '[Community Health of South Florida](https://www.chisouthfl.org) - Clinicas de baixo custo em Miami',
   ],
   Negocios: [
-    { titulo: 'Florida Department of State - Empresa', url: 'https://dos.fl.gov/sunbiz', desc: 'Registrar empresa na Florida (Sunbiz)' },
-    { titulo: 'Small Business Administration', url: 'https://www.sba.gov', desc: 'Suporte federal para pequenas empresas' },
-    { titulo: 'Miami-Dade Beacon Council', url: 'https://www.beaconcouncil.com', desc: 'Desenvolvimento economico em Miami-Dade' },
+    '[Sunbiz - Registro de Empresa na Florida](https://dos.fl.gov/sunbiz) - Abra sua LLC ou corporacao',
+    '[Small Business Administration](https://www.sba.gov) - Emprestimos e suporte federal para PMEs',
+    '[Miami-Dade Beacon Council](https://www.beaconcouncil.com) - Desenvolvimento economico e conexoes',
+    '[SCORE Miami](https://miami.score.org) - Mentoria gratuita para empreendedores',
   ],
   Esportes: [
-    { titulo: 'Inter Miami CF', url: 'https://www.intermiamicf.com', desc: 'Clube de futebol de Miami na MLS' },
-    { titulo: 'FIFA World Cup 2026', url: 'https://www.fifa.com/en/tournaments/mens/worldcup', desc: 'Copa do Mundo 2026 - jogos em Miami' },
-    { titulo: 'Miami Heat - NBA', url: 'https://www.nba.com/heat', desc: 'Time de basquete de Miami' },
+    '[Inter Miami CF - Ingressos](https://www.intermiamicf.com) - Jogos do time de futebol de Miami na MLS',
+    '[Copa do Mundo 2026 - Miami](https://www.fifa.com) - Informacoes sobre jogos do Mundial em Miami',
+    '[Miami Heat - NBA](https://www.nba.com/heat) - Time de basquete de Miami',
+    '[Miami Marlins - MLB](https://www.mlb.com/marlins) - Baseball em Miami',
   ],
 }
 
 function generateSlug(title) {
-  return title
-    .toLowerCase()
+  return title.toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .slice(0, 80)
+    .replace(/[^a-z0-9\s-]/g, '').trim()
+    .replace(/\s+/g, '-').slice(0, 80)
 }
 
 async function fetchNewsFromAPI(query) {
-  const url = 'https://newsapi.org/v2/everything?' +
-    'q=' + encodeURIComponent(query) +
+  const url = 'https://newsapi.org/v2/everything?q=' + encodeURIComponent(query) +
     '&language=en&sortBy=publishedAt&pageSize=3&apiKey=' + process.env.NEWS_API_KEY
-
   try {
     const res = await fetch(url)
     const data = await res.json()
@@ -76,41 +73,53 @@ async function fetchNewsFromAPI(query) {
 }
 
 async function rewriteWithClaude(article, category) {
-  const links = LINKS_UTEIS[category] || []
-  const linksText = links.map(function(l) { return '- ' + l.titulo + ': ' + l.url }).join('\n')
+  const links = (LINKS_CATEGORIA[category] || []).join('\n')
 
-  const prompt = 'Voce e uma jornalista brasileira especializada em cobrir noticias para a comunidade brasileira em Miami, Florida.\n\n' +
-    'Baseado na noticia abaixo (em ingles), escreva um artigo COMPLETO E DETALHADO em PORTUGUES BRASILEIRO.\n' +
-    'O artigo precisa ter NO MINIMO 600 palavras, ser bem explicado e pratico para quem mora em Miami.\n\n' +
-    'NOTICIA ORIGINAL:\n' +
-    'Titulo: ' + article.title + '\n' +
-    'Descricao: ' + (article.description || '') + '\n' +
-    'Conteudo: ' + (article.content || article.description || '') + '\n\n' +
-    'INSTRUCOES IMPORTANTES:\n' +
-    '1. TITULO: Em portugues, chamativo para brasileiros em Miami (max 100 caracteres)\n' +
-    '2. RESUMO: 2-3 frases claras sobre o que e e por que importa para brasileiros em Miami\n' +
-    '3. CONTEUDO: Artigo LONGO e DETALHADO com:\n' +
-    '   - Contexto completo do assunto\n' +
-    '   - Impacto pratico para brasileiros que moram em Miami e na Florida\n' +
-    '   - Explicacao de termos tecnicos em portugues simples\n' +
-    '   - Como isso afeta o dia a dia da comunidade\n' +
-    '   - Dicas praticas, prazos importantes, documentos necessarios quando relevante\n' +
-    '   - Comparacao com o Brasil quando ajuda a entender melhor\n' +
-    '   - Onde buscar ajuda ou mais informacoes\n' +
-    '   - SECAO FINAL: "Links e Recursos Uteis" com estes links formatados assim:\n' +
-    '     [Nome do recurso](URL) - Descricao breve\n' +
-    linksText + '\n\n' +
-    'FORMATO DE RESPOSTA (JSON puro, sem markdown):\n' +
-    '{\n' +
-    '  "titulo": "Titulo aqui",\n' +
-    '  "resumo": "Resumo aqui",\n' +
-    '  "conteudo": "Conteudo completo aqui com paragrafos separados por \\n\\n"\n' +
-    '}'
+  const prompt = `Voce e uma jornalista brasileira experiente que escreve para o portal "Miami Brasileira", voltado para a comunidade brasileira em Miami e na Florida.
+
+NOTICIA ORIGINAL (em ingles):
+Titulo: ${article.title}
+Descricao: ${article.description || ''}
+Conteudo: ${article.content || article.description || ''}
+Fonte: ${article.source?.name || ''}
+
+ESTILO DE ESCRITA (siga rigorosamente):
+- Comece com uma cena ou situacao real que o leitor brasileiro em Miami vai se identificar. Ex: "Voce acabou de chegar em Miami e precisa de..." ou "Imagine que voce esta tentando..."
+- Escreva em portugues brasileiro natural e acolhedor, como se estivesse conversando com um amigo
+- Use **negrito** para destacar informacoes importantes, valores em dolares, prazos e nomes de programas
+- Use subtitulos com ### para organizar o artigo
+- Use listas numeradas ou com hifen para passos, dicas e opcoes
+- Mencione valores em dolares e comparacoes praticas quando relevante
+- Explique termos em ingles em portugues (ex: "o Renters Insurance, ou seguro do inquilino")
+- Mincione o impacto direto para brasileiros em Miami e na Florida
+- Tom: informativo mas humanizado, nunca frio ou tecnico demais
+
+ESTRUTURA DO ARTIGO:
+1. Paragrafo de abertura (cenario/contexto para o leitor - 2-3 frases)
+2. O que e / O que aconteceu (explicacao clara)
+3. ### Subtitulo relevante com detalhes praticos
+4. Lista de pontos importantes (numerada ou com hifens)
+5. ### Como isso afeta voce (impacto para brasileiros em Miami)
+6. Informacoes praticas (valores, prazos, onde ir, o que fazer)
+7. ### Links e Recursos Uteis
+${links}
+
+REQUISITOS:
+- Minimo de 600 palavras no campo "conteudo"
+- Use markdown: ### para subtitulos, **texto** para negrito, [Link](url) para links, - para listas
+- Os links da secao "Links e Recursos Uteis" devem aparecer como: [Nome do recurso](URL) - descricao
+
+Responda SOMENTE com JSON valido (sem markdown ao redor):
+{
+  "titulo": "titulo em portugues chamativo (max 100 chars)",
+  "resumo": "resumo de 2-3 frases explicando o que e e por que importa para brasileiros em Miami",
+  "conteudo": "artigo completo em markdown"
+}`
 
   try {
     const msg = await ANTHROPIC.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2500,
+      max_tokens: 3000,
       messages: [{ role: 'user', content: prompt }]
     })
 
@@ -126,98 +135,77 @@ async function rewriteWithClaude(article, category) {
 
 async function saveToGitHub(articles) {
   const token = process.env.GITHUB_TOKEN
-  const repo = process.env.GITHUB_REPO || 'lemonadetv/miami-brasileira'
+  const repo = process.env.GITHUB_REPO || 'lemonadetv/miami-brasileiro'
   const path = 'data/articles.json'
   const apiUrl = 'https://api.github.com/repos/' + repo + '/contents/' + path
 
   let sha = null
   try {
-    const getRes = await fetch(apiUrl, {
-      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' }
-    })
-    if (getRes.ok) sha = (await getRes.json()).sha
-  } catch (e) {}
+    const r = await fetch(apiUrl, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' } })
+    if (r.ok) sha = (await r.json()).sha
+  } catch(e) {}
 
   const content = Buffer.from(JSON.stringify(articles, null, 2)).toString('base64')
   const body = { message: '[BOT] Atualizacao automatica - ' + new Date().toISOString(), content }
   if (sha) body.sha = sha
 
-  const putRes = await fetch(apiUrl, {
+  const r = await fetch(apiUrl, {
     method: 'PUT',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      Accept: 'application/vnd.github.v3+json',
-      'Content-Type': 'application/json'
-    },
+    headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   })
-
-  if (!putRes.ok) {
-    const err = await putRes.json()
-    throw new Error('GitHub PUT falhou: ' + JSON.stringify(err))
-  }
+  if (!r.ok) throw new Error('GitHub PUT falhou: ' + (await r.text()))
   console.log('[OK] articles.json salvo')
 }
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
-  const secret = searchParams.get('secret')
   const isVercelCron = request.headers.get('x-vercel-cron') === '1'
-
-  if (!isVercelCron && process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+  if (!isVercelCron && process.env.CRON_SECRET && searchParams.get('secret') !== process.env.CRON_SECRET) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  console.log('[BOT] Iniciando busca de noticias...')
+  console.log('[BOT] Iniciando busca...')
   const allArticles = []
 
-  for (var qi = 0; qi < QUERIES.length; qi++) {
-    var q = QUERIES[qi]
-    console.log('[API] Buscando: ' + q.category)
+  for (let qi = 0; qi < QUERIES.length; qi++) {
+    const q = QUERIES[qi]
+    console.log('[API] ' + q.category)
     const rawArticles = await fetchNewsFromAPI(q.query)
 
-    for (var ri = 0; ri < Math.min(rawArticles.length, 2); ri++) {
-      var raw = rawArticles[ri]
+    for (let ri = 0; ri < Math.min(rawArticles.length, 2); ri++) {
+      const raw = rawArticles[ri]
       if (!raw.title || raw.title === '[Removed]') continue
 
-      console.log('[WRITE] Reescrevendo: ' + raw.title.slice(0, 60))
       const rewritten = await rewriteWithClaude(raw, q.category)
       if (!rewritten) continue
 
       const slug = generateSlug(rewritten.titulo || raw.title)
-      const image = raw.urlToImage || FALLBACK_IMAGES[q.category] || FALLBACK_IMAGES.Comunidade
-
       allArticles.push({
         id: slug + '-' + Date.now().toString(36),
-        slug: slug,
+        slug,
         title: rewritten.titulo || raw.title,
         excerpt: rewritten.resumo || raw.description || '',
         content: rewritten.conteudo || '',
         category: q.category,
-        image: image,
-        source: raw.source && raw.source.name ? raw.source.name : 'NewsAPI',
+        image: raw.urlToImage || FALLBACK_IMAGES[q.category],
+        source: raw.source?.name || 'Agencias',
         sourceUrl: raw.url || '',
         publishedAt: raw.publishedAt || new Date().toISOString(),
-        createdAt: new Date().toISOString(),
         featured: false
       })
 
-      await new Promise(function(r) { setTimeout(r, 800) })
+      await new Promise(r => setTimeout(r, 800))
     }
   }
 
-  if (allArticles.length === 0) {
-    return Response.json({ success: false, message: 'Nenhum artigo gerado' }, { status: 500 })
-  }
-
-  if (allArticles.length > 0) allArticles[0].featured = true
+  if (allArticles.length === 0) return Response.json({ success: false, message: 'Nenhum artigo' }, { status: 500 })
+  allArticles[0].featured = true
 
   try {
     await saveToGitHub(allArticles)
-    console.log('[OK] Total: ' + allArticles.length + ' artigos salvos')
-    return Response.json({ success: true, count: allArticles.length, articles: allArticles.map(function(a) { return a.slug }) })
+    return Response.json({ success: true, count: allArticles.length })
   } catch (e) {
-    console.error('[ERR] Salvar GitHub:', e.message)
     return Response.json({ success: false, error: e.message }, { status: 500 })
   }
 }
