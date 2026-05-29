@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Header from '../../../components/Header'
 import Footer from '../../../components/Footer'
 import Sidebar from '../../../components/Sidebar'
+import ShareButtons from '../../../components/ShareButtons'
 import Link from 'next/link'
 import {
   getAllArticles,
@@ -134,21 +135,7 @@ export default function ArtigoPage({ params }) {
               )}
 
               {/* Compartilhar */}
-              <div className="article-share">
-                <span className="share-label">Compartilhar:</span>
-                <button
-                  className="share-btn share-fb"
-                  onClick={() => window.open(`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`)}
-                >
-                  📘 Facebook
-                </button>
-                <button
-                  className="share-btn share-wa"
-                  onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(article.title + ' ' + window.location.href)}`)}
-                >
-                  💬 WhatsApp
-                </button>
-              </div>
+              <ShareButtons title={article.title} />
 
             </div>
           </article>
