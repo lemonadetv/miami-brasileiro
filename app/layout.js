@@ -1,11 +1,11 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Miami Brasileiro – O Portal da Comunidade Brasileira em Miami',
-  description: 'Portal de notícias da comunidade brasileira em Miami e Sul da Flórida. Imigração, negócios, saúde, esportes e muito mais.',
-  keywords: 'brasileiros miami, comunidade brasileira florida, imigracao eua, noticias miami',
+  title: 'Miami Brasileira – O Portal da Comunidade Brasileira em Miami',
+  description: 'Portal de noticias da comunidade brasileira em Miami e Sul da Florida. Imigracao, negocios, saude, esportes e muito mais.',
+  keywords: 'brasileiras miami, comunidade brasileira florida, imigracao eua, noticias miami',
   openGraph: {
-    title: 'Miami Brasileiro',
+    title: 'Miami Brasileira',
     description: 'Portal de notícias da comunidade brasileira em Miami e Sul da Flórida.',
     locale: 'pt_BR',
     type: 'website',
