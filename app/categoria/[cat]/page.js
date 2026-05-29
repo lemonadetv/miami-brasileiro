@@ -7,60 +7,59 @@ import { getAllArticles, getArticlesByCategory, formatDateShort, readingTime } f
 import { notFound } from 'next/navigation'
 
 const CATS = {
-  'comunidade': { label: 'Comunidade',   icon: '🤝', color: '#00897B', desc: 'Noticias e eventos da comunidade brasileira em Miami e Sul da Florida' },
-  'imigracao':  { label: 'Imigração',    icon: '✈️', color: '#F4622A', desc: 'Vistos, green card, USCIS, asilo e tudo sobre imigracao nos EUA' },
-  'negocios':   { label: 'Negócios',     icon> '💼', color: '#7C3AED', desc: 'Empreendedorismo, finanças e oportunidades de negocio na Florida' },
-  'saude':      { label: 'Saúde',        icon: '🏥', color: '#15803D', desc: 'Saude, planos medicos, seguros e bem-estar para brasileiros nos EUA' },
-  'esportes':   { label: 'Esportes',     icon: '⚽', color: '#DC2626', desc: 'Futebol, Copa do Mundo, MMA e esportes com a visao brasileira' },
+  comunidade: { label: 'Comunidade', color: '#00897B', desc: 'Noticias e eventos da comunidade brasileira em Miami e Sul da Florida' },
+  imigracao:  { label: 'Imigracao',  color: '#F4622A', desc: 'Vistos, green card, USCIS, asilo e tudo sobre imigracao nos EUA' },
+  negocios:   { label: 'Negocios',   color: '#7C3AED', desc: 'Empreendedorismo, financas e oportunidades de negocio na Florida' },
+  saude:      { label: 'Saude',      color: '#15803D', desc: 'Saude, planos medicos, seguros e bem-estar para brasileiros nos EUA' },
+  esportes:   { label: 'Esportes',   color: '#DC2626', desc: 'Futebol, Copa do Mundo, MMA e esportes com a visao brasileira' },
 }
 
 const CAT_MAP = {
-  'comunidade': 'Comunidade',
-  'imigracao':  'Imigração',
-  'negocios':   'Negócios',
-  'saude':      'Saúde',
-  'esportes':   'Esportes',
+  comunidade: 'Comunidade',
+  imigracao:  'Imigracao',
+  negocios:   'Negocios',
+  saude:      'Saude',
+  esportes:   'Esportes',
 }
 
 const FALLBACK = {
-  'Imigração': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=70',
-  'Comunidade': 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=70',
-  'Saúde':      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=70',
-  'Negócios':   'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=70',
-  'Esportes':   'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=70',
-  '_default':   'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=70',
+  Imigracao:  'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=70',
+  Comunidade: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=70',
+  Saude:      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=70',
+  Negocios:   'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=70',
+  Esportes:   'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=70',
+  _default:   'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=70',
 }
 function getImg(a) { return a.image || FALLBACK[a.category] || FALLBACK._default }
 
 export async function generateStaticParams() {
-  return Object.keys(CATS).map(cat => ({ cat }))
+  return Object.keys(CATS).map(function(cat) { return { cat: cat } })
 }
 
-export async function generateMetadata({ params }) {
-  const info = CATS[params.cat]
+export async function generateMetadata(props) {
+  var params = props.params
+  var info = CATS[params.cat]
   if (!info) return { title: 'Categoria' }
   return {
-    title: `${info.label} | Miami Brasileiro`,
+    title: info.label + ' | Miami Brasileiro',
     description: info.desc,
   }
 }
 
-export default function CategoriaPage({ params }) {
-  const info = CATS[params.cat]
+export default function CategoriaPage(props) {
+  var params = props.params
+  var info = CATS[params.cat]
   if (!info) notFound()
 
-  const catLabel = CAT_MAP[params.cat]
-  const articles = getArticlesByCategory(catLabel)
-  const allArticles = getAllArticles()
+  var catLabel = CAT_MAP[params.cat]
+  var articles = getArticlesByCategory(catLabel)
+  var allArticles = getAllArticles()
 
   return (
     <>
       <Header />
       <div className="cat-page">
-        <div className="cat-page-header">
-          <div className="cat-page-icon" style={{ background: info.color + '20' }}>
-            {info.icon}
-          </div>
+        <div className="cat-page-header" style={{ borderLeft: '6px solid ' + info.color }}>
           <div className="cat-page-info">
             <h1 style={{ color: info.color }}>{info.label}</h1>
             <p>{info.desc}</p>
@@ -78,24 +77,30 @@ export default function CategoriaPage({ params }) {
               <>
                 <div className="section-header">
                   <div className="section-bar" style={{ background: info.color }} />
-                  <h2>{articles.length} matéria{articles.length !== 1 ? 's' : ''} em {info.label}</h2>
+                  <h2>{articles.length} materia{articles.length !== 1 ? 's' : ''} em {info.label}</h2>
                 </div>
                 <div className="article-grid">
-                  {articles.map(a => (
-                    <Link key={a.id} href={`/artigo/${a.id}`} className="article-card">
-                      <img src={getImg(a)} alt={a.title} />
-                      <div className="card-body">
-                        <div className="card-tag">{a.category}</div>
-                        <h3>{a.title}</h3>
-                        {a.excerpt && <p style={{ fontSize: 12, color: '#6B7280', marginTop: 6, lineHeight: 1.4 }}>{a.excerpt.slice(0, 90)}...</p>}
-                        <div className="card-meta" style={{ marginTop: 8 }}>
-                          <span>{formatDateShort(a.publishedAt)}</span>
-                          <div className="dot" />
-                          <span>{readingTime(a.content)}</span>
+                  {articles.map(function(a) {
+                    return (
+                      <Link key={a.id} href={'/artigo/' + a.id} className="article-card">
+                        <img src={getImg(a)} alt={a.title} />
+                        <div className="card-body">
+                          <div className="card-tag">{a.category}</div>
+                          <h3>{a.title}</h3>
+                          {a.excerpt && (
+                            <p style={{ fontSize: 12, color: '#6B7280', marginTop: 6, lineHeight: 1.4 }}>
+                              {a.excerpt.slice(0, 90)}...
+                            </p>
+                          )}
+                          <div className="card-meta" style={{ marginTop: 8 }}>
+                            <span>{formatDateShort(a.publishedAt)}</span>
+                            <div className="dot" />
+                            <span>{readingTime(a.content)}</span>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    )
+                  })}
                 </div>
               </>
             )}
