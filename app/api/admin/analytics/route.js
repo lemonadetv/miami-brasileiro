@@ -1,13 +1,7 @@
-// app/api/admin/analytics/route.js
 import { NextResponse } from 'next/server'
 import { getSessionToken } from '../../../../lib/auth'
 import { cookies } from 'next/headers'
-
-function checkAuth() {
-  const c = cookies().get('admin_session')
-  return c?.value === getSessionToken()
-}
-
+function checkAuth() { const c = cookies().get('admin_session'); return c?.value === getSessionToken() }
 export async function GET(request) {
   if (!checkAuth()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { searchParams } = new URL(request.url)
@@ -18,18 +12,11 @@ export async function GET(request) {
   try {
     const token = process.env.VERCEL_TOKEN || ''
     if (!token) return NextResponse.json({ pageviews: {} })
-    const res = await fetch(
-      `https://vercel.com/api/web/insights?projectId=miami-brasileiro&from=${from}&to=${now}&environment=production&filter=%7B%22path%22%3A%7B%22type%22%3A%22startsWith%22%2C%22value%22%3A%22%2Fartigo%22%7D%7D`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+    const res = await fetch(`https://vercel.com/api/web/insights?projectId=miami-brasileiro&from=${from}&to=${now}`, { headers: { Authorization: `Bearer ${token}` } })
     if (!res.ok) return NextResponse.json({ pageviews: {} })
     const data = await res.json()
     const pageviews = {}
-    if (data && data.data) {
-      data.data.forEach(function(item) {
-        if (item.path && item.total) pageviews[item.path] = item.total
-      })
-    }
+    if (data && data.data) data.data.forEach(item => { if (item.path && item.total) pageviews[item.path] = item.total })
     return NextResponse.json({ pageviews, period })
   } catch (e) {
     return NextResponse.json({ pageviews: {}, error: e.message })
