@@ -1,8 +1,6 @@
 {
   "crons": [
-    {
-      "path": "/api/buscar-noticias",
-      "schedule": "0 12 * * *"
-    }
+    { "path": "/api/buscar-noticias", "schedule": "0 12 * * *" },
+    { "path": "/api/buscar-noticias", "schedule": "0 18 * * *" }
   ]
 }
