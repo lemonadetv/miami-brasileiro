@@ -1,4 +1,5 @@
 import './globals.css'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata = {
   title: 'Miami Brasileira – O Portal da Comunidade Brasileira em Miami',
@@ -6,13 +7,12 @@ export const metadata = {
   keywords: 'brasileiras miami, comunidade brasileira florida, imigracao eua, noticias miami',
   openGraph: {
     title: 'Miami Brasileira',
-    description: 'Portal de notícias da comunidade brasileira em Miami e Sul da Flórida.',
+    description: 'Portal de noticias da comunidade brasileira em Miami e Sul da Florida.',
     locale: 'pt_BR',
     type: 'website',
   },
 }
 
-// Atualiza a página a cada 1 hora (revalidação incremental)
 export const revalidate = 3600
 
 export default function RootLayout({ children }) {
@@ -25,7 +25,10 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
