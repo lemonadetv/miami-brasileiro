@@ -7,15 +7,24 @@ import ShareButtons from '../../../components/ShareButtons'
 import Link from 'next/link'
 import { getAllArticles, getArticleBySlug, formatDate, readingTime } from '../../../lib/articles'
 
-// Safe content renderer - no dangerouslySetInnerHTML
 function ArticleContent({ content }) {
   if (!content) return null
   const blocks = content.split('\n\n').filter(function(b) { return b.trim().length > 0 })
-  
+
   return (
     <div className="article-content">
       {blocks.map(function(block, i) {
         const b = block.trim()
+        // Inline image: ![alt](url)
+        const imgMatch = b.match(/^!\[([^\]]*)\]\((https?:\/\/[^\)]+)\)$/)
+        if (imgMatch) {
+          return (
+            <figure key={i} style={{ margin: '28px 0', borderRadius: 8, overflow: 'hidden' }}>
+              <img src={imgMatch[2]} alt={imgMatch[1]} style={{ width: '100%', maxHeight: 400, objectFit: 'cover', display: 'block' }} />
+              {imgMatch[1] && <figcaption style={{ fontSize: 12, color: '#9CA3AF', padding: '8px 0', textAlign: 'center', fontStyle: 'italic' }}>{imgMatch[1]}</figcaption>}
+            </figure>
+          )
+        }
         // H2
         if (b.startsWith('## ')) {
           return <h2 key={i} style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, margin: '32px 0 14px', color: '#111827', borderTop: '2px solid #F3F4F6', paddingTop: 8 }}>{b.slice(3)}</h2>
@@ -24,7 +33,7 @@ function ArticleContent({ content }) {
         if (b.startsWith('### ')) {
           return <h3 key={i} style={{ fontSize: 18, fontWeight: 700, margin: '26px 0 12px', color: '#111827' }}>{b.slice(4)}</h3>
         }
-        // Bold-only line (heading)
+        // Bold-only heading
         if (b.startsWith('**') && b.endsWith('**') && b.length > 4) {
           const inner = b.slice(2, -2)
           if (!inner.includes('**')) {
@@ -37,8 +46,7 @@ function ArticleContent({ content }) {
           return (
             <ol key={i} style={{ margin: '0 0 22px 24px', lineHeight: 1.9 }}>
               {lines.map(function(line, j) {
-                const text = line.replace(/^\d+\.\s*/, '').replace(/\*\*([^*]+)\*\*/g, '$1')
-                return <li key={j}>{text}</li>
+                return <li key={j}>{line.replace(/^\d+\.\s*/, '').replace(/\*\*([^*]+)\*\*/g, '$1')}</li>
               })}
             </ol>
           )
@@ -49,8 +57,7 @@ function ArticleContent({ content }) {
           return (
             <ul key={i} style={{ margin: '0 0 22px 24px', lineHeight: 1.9 }}>
               {lines.map(function(line, j) {
-                const text = line.replace(/^[-*]\s*/, '').replace(/\*\*([^*]+)\*\*/g, '$1')
-                return <li key={j}>{text}</li>
+                return <li key={j}>{line.replace(/^[-*]\s*/, '').replace(/\*\*([^*]+)\*\*/g, '$1')}</li>
               })}
             </ul>
           )
@@ -59,19 +66,17 @@ function ArticleContent({ content }) {
         if (b.startsWith('> ')) {
           return <blockquote key={i} style={{ borderLeft: '4px solid #F4622A', margin: '28px 0', padding: '14px 20px', background: 'rgba(244,98,42,.05)', borderRadius: '0 6px 6px 0', fontStyle: 'italic', fontSize: 18, color: '#374151' }}>{b.slice(2)}</blockquote>
         }
-        // Link lines [text](url)
-        if (b.match(/^\[.+\]\(https?:\/\/.+\)/)) {
-          const match = b.match(/^\[([^\]]+)\]\((https?:\/\/[^\)]+)\)(.*)$/)
-          if (match) {
-            return (
-              <p key={i} style={{ marginBottom: 12 }}>
-                <a href={match[2]} target="_blank" rel="noreferrer" style={{ color: '#00897B', textDecoration: 'underline', fontWeight: 600 }}>{match[1]}</a>
-                {match[3] && <span style={{ color: '#6B7280' }}>{match[3]}</span>}
-              </p>
-            )
-          }
+        // Link line [text](url) - desc
+        const linkMatch = b.match(/^\[([^\]]+)\]\((https?:\/\/[^\)]+)\)(.*)$/)
+        if (linkMatch) {
+          return (
+            <p key={i} style={{ marginBottom: 10 }}>
+              <a href={linkMatch[2]} target="_blank" rel="noreferrer" style={{ color: '#00897B', textDecoration: 'underline', fontWeight: 600 }}>{linkMatch[1]}</a>
+              {linkMatch[3] && <span style={{ color: '#6B7280' }}>{linkMatch[3]}</span>}
+            </p>
+          )
         }
-        // Regular paragraph - strip markdown
+        // Regular paragraph
         const text = b.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
         if (!text.trim()) return null
         return <p key={i} style={{ marginBottom: 22, fontSize: 17, lineHeight: 1.9, color: '#1F2937' }}>{text}</p>
@@ -95,13 +100,7 @@ export async function generateMetadata(props) {
   return {
     title: article.title + ' | Miami Brasileira',
     description: article.excerpt,
-    openGraph: {
-      title: article.title,
-      description: article.excerpt,
-      type: 'article',
-      publishedTime: article.publishedAt,
-      locale: 'pt_BR',
-    },
+    openGraph: { title: article.title, description: article.excerpt, type: 'article', publishedTime: article.publishedAt, locale: 'pt_BR' },
   }
 }
 
@@ -119,9 +118,7 @@ export default function ArtigoPage(props) {
       <div className="article-page">
         <div className="article-page-grid">
           <article className="article-body">
-            {article.image && (
-              <img src={article.image} alt={article.title} className="article-hero-img" />
-            )}
+            {article.image && <img src={article.image} alt={article.title} className="article-hero-img" />}
             <div className="article-inner">
               <div className="article-breadcrumb">
                 <Link href="/">Inicio</Link> &rsaquo;&nbsp;
@@ -138,16 +135,12 @@ export default function ArtigoPage(props) {
                 <span>{article.source || 'Miami Brasileira'}</span>
                 <span>{readingTime(article.content)}</span>
               </div>
-              {article.excerpt && (
-                <p className="article-excerpt">{article.excerpt}</p>
-              )}
+              {article.excerpt && <p className="article-excerpt">{article.excerpt}</p>}
               <ArticleContent content={article.content} />
               {article.sourceUrl && article.sourceUrl !== '#' && (
                 <div className="article-source-box">
                   <span>Baseado em <strong>{article.source}</strong></span>
-                  <a href={article.sourceUrl} target="_blank" rel="noreferrer nofollow" className="article-source-link">
-                    Ver fonte &rarr;
-                  </a>
+                  <a href={article.sourceUrl} target="_blank" rel="noreferrer nofollow" className="article-source-link">Ver fonte &rarr;</a>
                 </div>
               )}
               <ShareButtons title={article.title} />
