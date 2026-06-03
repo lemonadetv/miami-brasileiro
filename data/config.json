@@ -1,13 +1,38 @@
 {
-  "siteName": "Miami Brasileiro",
+  "siteName": "Miami Brasileira",
   "tagline": "O portal da sua comunidade",
   "description": "Portal de noticias da comunidade brasileira em Miami e Sul da Florida",
   "primaryColor": "#00897B",
   "accentColor": "#F4622A",
-  "socialFacebook": "https://facebook.com/miamibrasileiro",
-  "socialInstagram": "https://instagram.com/miamibrasileiro",
-  "socialYoutube": "https://youtube.com/@miamibrasileiro",
+  "socialFacebook": "https://facebook.com/miamibrasileira",
+  "socialInstagram": "https://instagram.com/miamibrasileira",
+  "socialYoutube": "https://youtube.com/@miamibrasileira",
   "socialWhatsapp": "https://wa.me/13050000000",
-  "contactEmail": "contato@miamibrasileiro.com",
-  "adEmail": "anuncie@miamibrasileiro.com"
+  "socialTwitter": "",
+  "socialTiktok": "",
+  "contactEmail": "contato@miamibrasileira.com",
+  "adEmail": "anuncie@miamibrasileira.com",
+  "footerAbout": "O portal de noticias da comunidade brasileira em Miami e Sul da Florida. Imigracao, negocios, saude, esportes e muito mais.",
+  "footerLinks": [
+    {
+      "label": "Consulado do Brasil em Miami",
+      "url": "https://miami.itamaraty.gov.br"
+    },
+    {
+      "label": "USCIS - Imigracao EUA",
+      "url": "https://www.uscis.gov"
+    },
+    {
+      "label": "FLHSMV - Carteira de Motorista",
+      "url": "https://www.flhsmv.gov"
+    },
+    {
+      "label": "Sunbiz - Abrir Empresa",
+      "url": "https://dos.fl.gov/sunbiz"
+    },
+    {
+      "label": "Healthcare.gov - Planos de Saude",
+      "url": "https://www.healthcare.gov"
+    }
+  ]
 }
