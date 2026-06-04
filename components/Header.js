@@ -16,92 +16,70 @@ const CATEGORIAS = [
 const WMO_ICONS = {
   0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',
   51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',
-  71:'❄️',73:'❄️',75:'❄️',80:'🌦',81:'🌦',82:'🌦',
-  95:'⛈',96:'⛈',99:'⛈',
+  71:'❄️',80:'🌦',81:'🌦',82:'🌦',95:'⛈',96:'⛈',99:'⛈'
 }
 const WMO_DESC = {
   0:'Ceu limpo',1:'Poucas nuvens',2:'Parcialmente nublado',3:'Nublado',
-  45:'Neblina',48:'Neblina',51:'Garoa leve',53:'Garoa',55:'Garoa forte',
-  61:'Chuva fraca',63:'Chuva moderada',65:'Chuva forte',
-  71:'Neve',73:'Neve',75:'Neve forte',80:'Pancadas',81:'Pancadas',82:'Pancadas fortes',
-  95:'Tempestade',96:'Tempestade',99:'Tempestade',
+  45:'Neblina',51:'Garoa',61:'Chuva',80:'Pancadas',95:'Tempestade'
 }
 
 export default function Header() {
   const pathname = usePathname()
-  const [rates, setRates] = useState({ usd: null, eur: null })
-  const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: 'Carregando...' })
+  const [usdRate, setUsdRate] = useState(null)
+  const [eurRate, setEurRate] = useState(null)
+  const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: '' })
   const [social, setSocial] = useState({ facebook: '', instagram: '', youtube: '' })
-  const [tickerArticles, setTickerArticles] = useState([])
+  const [tickerItems, setTickerItems] = useState([
+    { text: 'Renters Insurance na Florida: o seguro que todo brasileiro precisa ter', href: '/categoria/comunidade' },
+    { text: 'Green card pelo EB-5: o que mudou em 2026 e como brasileiros podem aproveitar', href: '/categoria/imigracao' },
+    { text: 'Como abrir uma LLC na Florida em 2026: guia passo a passo', href: '/categoria/negocios' },
+    { text: 'Copa do Mundo 2026 em Miami: tudo que voce precisa saber', href: '/categoria/esportes' },
+    { text: 'Plano de saude na Florida: como escolher o melhor para sua familia', href: '/categoria/saude' },
+  ])
 
   useEffect(function() {
-    // Exchange rates (Frankfurter = ECB official rates, free)
-    function fetchRates() {
-      fetch('https://api.frankfurter.app/latest?from=USD&to=BRL')
-        .then(function(r) { return r.json() })
-        .then(function(d) {
-          const usd = d.rates && d.rates.BRL ? d.rates.BRL.toFixed(2) : null
-          fetch('https://api.frankfurter.app/latest?from=EUR&to=BRL')
-            .then(function(r2) { return r2.json() })
-            .then(function(d2) {
-              const eur = d2.rates && d2.rates.BRL ? d2.rates.BRL.toFixed(2) : null
-              setRates({ usd, eur })
-            }).catch(function() {})
-        }).catch(function() {})
-    }
-    fetchRates()
-    const rateInterval = setInterval(fetchRates, 3600000)
+    // Exchange rates - Frankfurter API (ECB official, free, CORS enabled)
+    Promise.all([
+      fetch('https://api.frankfurter.app/latest?from=USD&to=BRL').then(function(r) { return r.json() }),
+      fetch('https://api.frankfurter.app/latest?from=EUR&to=BRL').then(function(r) { return r.json() })
+    ]).then(function(results) {
+      var usdData = results[0]
+      var eurData = results[1]
+      if (usdData && useData.rates && usdData.rates.BRL) setUsdRate(usdData.rates.BRL.toFixed(2))
+      if (eurData && eurData.rates && eurData.rates.BRL) setEurRate(eurData.rates.BRL.toFixed(2))
+    }).catch(function(err) {
+      console.log('Rates error:', err)
+    })
 
-    // Weather - OpenMeteo free API, no key needed
-    fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,weathercode&temperature_unit=fahrenheit&forecast_days=1')
+    // Weather - OpenMeteo
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,weathercode&temperature_unit=fahrenheit')
       .then(function(r) { return r.json() })
       .then(function(d) {
-        if (d.current) {
-          const c = d.current
-          const tempF = Math.round(c.temperature_2m)
-          const tempC = Math.round((tempF - 32) * 5 / 9)
-          const code = c.weathercode || 0
-          setWeather({
-            temp: tempC,
-            tempF: tempF,
-            icon: WMO_ICONS[code] || '🌤',
-            desc: WMO_DESC[code] || 'Tempo variavel',
-            code
-          })
+        if (d && d.current) {
+          var tempC = Math.round((d.current.temperature_2m - 32) * 5 / 9)
+          var code = d.current.weathercode || 0
+          setWeather({ temp: tempC, icon: WMO_ICONS[code] || '🌤', desc: WMO_DESC[code] || '' })
         }
       }).catch(function() {})
 
-    // Site config for social links
-    fetch('/api/site-config')
-      .then(function(r) { return r.json() })
-      .then(function(d) {
-        setSocial({ facebook: d.socialFacebook || '', instagram: d.socialInstagram || '', youtube: d.socialYoutube || '' })
-      }).catch(function() {})
-
-    // Fetch articles for ticker
-    fetch('/api/admin/artigos', { credentials: 'include' })
-      .then(function(r) { return r.ok ? r.json() : [] })
-      .then(function(d) { if (Array.isArray(d) && d.length > 0) setTickerArticles(d.slice(0, 8)) })
+    // Social links
+    fetch('/api/site-config').then(function(r) { return r.json() })
+      .then(function(d) { setSocial({ facebook: d.socialFacebook || '', instagram: d.socialInstagram || '', youtube: d.socialYoutube || '' }) })
       .catch(function() {})
 
-    return function() { clearInterval(rateInterval) }
+    // Real article headlines for ticker
+    fetch('/api/admin/artigos', { credentials: 'include' })
+      .then(function(r) { return r.ok ? r.json() : null })
+      .then(function(d) {
+        if (Array.isArray(d) && d.length > 3) {
+          setTickerItems(d.slice(0, 8).map(function(a) { return { text: a.title, href: '/artigo/' + a.id } }))
+        }
+      }).catch(function() {})
   }, [])
 
-  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-  const dataFormatada = hoje.charAt(0).toUpperCase() + hoje.slice(1)
-
-  // Ticker items: real articles if available, else defaults
-  const defaultTicker = [
-    { text: 'Novos criterios do EB-5 abrem oportunidade historica para brasileiros', href: '/categoria/imigracao' },
-    { text: 'Como abrir uma LLC na Florida: guia passo a passo para brasileiros', href: '/categoria/negocios' },
-    { text: 'Copa do Mundo 2026 em Miami: tudo que voce precisa saber', href: '/categoria/esportes' },
-    { text: 'Plano de saude na Florida: como escolher o melhor para sua familia', href: '/categoria/saude' },
-    { text: 'Carteira de motorista na Florida: passo a passo para brasileiros', href: '/categoria/comunidade' },
-  ]
-  const tickerItems = tickerArticles.length > 0
-    ? tickerArticles.map(function(a) { return { text: a.title, href: '/artigo/' + a.id } })
-    : defaultTicker
-  const doubled = [...tickerItems, ...tickerItems]
+  var hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  var dataFormatada = hoje.charAt(0).toUpperCase() + hoje.slice(1)
+  var doubled = tickerItems.concat(tickerItems)
 
   return (
     <>
@@ -144,28 +122,28 @@ export default function Header() {
 
       <div className="weather-bar">
         <div className="weather-inner">
-          <a href="https://forecast.weather.gov/MapClick.php?CityName=Miami&state=FL" target="_blank" rel="noreferrer" className="weather-item" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-            <span style={{ fontSize: 16 }}>{weather.icon}</span>
+          <a href="https://forecast.weather.gov/MapClick.php?CityName=Miami&state=FL" target="_blank" rel="noreferrer" className="weather-item" style={{ textDecoration: 'none' }}>
+            <span>{weather.icon || '🌤'}</span>
             <span>Miami</span>
-            <strong>{weather.temp !== null ? weather.temp + 'C' : '--C'}</strong>
-            <span className="weather-label">{weather.desc}</span>
-          </a>
-          <a href="https://forecast.weather.gov/MapClick.php?CityName=Fort+Lauderdale&state=FL" target="_blank" rel="noreferrer" className="weather-item" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-            <span style={{ fontSize: 16 }}>🌤</span>
-            <span>Fort Lauderdale</span>
-            <strong>{weather.temp !== null ? (weather.temp - 1) + 'C' : '--C'}</strong>
+            <strong>{weather.temp !== null ? weather.temp + '°C' : '--°C'}</strong>
+            {weather.desc && <span className="weather-label">{weather.desc}</span>}
           </a>
           <div className="weather-item">
-            <span style={{ fontSize: 14 }}>💧</span>
-            <span>Umidade</span>
-            <strong>72%</strong>
+            <span>☁️</span>
+            <span>Fort Lauderdale</span>
+            <strong>{weather.temp !== null ? (weather.temp - 1) + '°C' : '--°C'}</strong>
           </div>
-          <div className="date-bar" style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <span title="Dolar americano">
-              <span style={{ fontSize: 13 }}>🇺🇸</span> USD/BRL: {rates.usd ? 'R$ ' + rates.usd : '...'}
+          <div className="date-bar">
+            <span className="rate-item">
+              <span className="rate-icon">$</span>
+              <span className="rate-label">USD</span>
+              <strong className="rate-val">{usdRate ? 'R$ ' + usdRate : 'R$ ...'}</strong>
             </span>
-            <span title="Euro">
-              <span style={{ fontSize: 13 }}>🇪🇺</span> EUR/BRL: {rates.eur ? 'R$ ' + rates.eur : '...'}
+            <span className="rate-sep">|</span>
+            <span className="rate-item">
+              <span className="rate-icon">€</span>
+              <span className="rate-label">EUR</span>
+              <strong className="rate-val">{eurRate ? 'R$ ' + eurRate : 'R$ ...'}</strong>
             </span>
           </div>
         </div>
@@ -177,9 +155,9 @@ export default function Header() {
           <div className="ticker-track">
             {doubled.map(function(item, i) {
               return (
-                <a key={i} href={item.href} style={{ padding: '0 36px', borderRight: '1px solid rgba(255,255,255,.3)', color: 'white', textDecoration: 'none', flexShrink: 0, display: 'inline-flex', alignItems: 'center' }}>
+                <Link key={i} href={item.href} className="ticker-link">
                   {item.text}
-                </a>
+                </Link>
               )
             })}
           </div>
