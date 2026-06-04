@@ -13,79 +13,63 @@ const CATEGORIAS = [
   { label: 'Contato',    href: '/contato' },
 ]
 
-const WMO_ICONS = {
-  0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',
-  51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',
-  71:'❄️',80:'🌦',81:'🌦',82:'🌦',95:'⛈',96:'⛈',99:'⛈'
-}
-const WMO_DESC = {
-  0:'Ceu limpo',1:'Poucas nuvens',2:'Parcialmente nublado',3:'Nublado',
-  45:'Neblina',51:'Garoa',61:'Chuva',80:'Pancadas',95:'Tempestade'
+const WMO = {
+  icons: {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'},
+  desc:  {0:'Ceu limpo',1:'Poucas nuvens',2:'Parc. nublado',3:'Nublado',45:'Neblina',51:'Garoa',61:'Chuva',80:'Pancadas',95:'Tempestade'},
 }
 
 export default function Header() {
   const pathname = usePathname()
-  const [usdRate, setUsdRate] = useState(null)
-  const [eurRate, setEurRate] = useState(null)
+  const [rates, setRates] = useState({ usd: null, eur: null, usdChange: null, eurChange: null })
   const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: '' })
   const [social, setSocial] = useState({ facebook: '', instagram: '', youtube: '' })
   const [tickerItems, setTickerItems] = useState([
-    { text: 'Renters Insurance na Florida: o seguro que todo brasileiro precisa ter', href: '/categoria/comunidade' },
-    { text: 'Green card pelo EB-5: o que mudou em 2026 e como brasileiros podem aproveitar', href: '/categoria/imigracao' },
-    { text: 'Como abrir uma LLC na Florida em 2026: guia passo a passo', href: '/categoria/negocios' },
-    { text: 'Copa do Mundo 2026 em Miami: tudo que voce precisa saber', href: '/categoria/esportes' },
-    { text: 'Plano de saude na Florida: como escolher o melhor para sua familia', href: '/categoria/saude' },
+    { text: 'Como alugar apartamento em Miami sem historico americano', href: '/categoria/comunidade' },
+    { text: 'Green card pelo EB-5: o que mudou para brasileiros em 2026', href: '/categoria/imigracao' },
+    { text: 'Copa do Mundo 2026 em Miami: ingressos e o que esperar', href: '/categoria/esportes' },
+    { text: 'Plano de saude na Florida: como escolher o melhor plano', href: '/categoria/saude' },
+    { text: 'Como abrir uma LLC na Florida em 2026: guia completo', href: '/categoria/negocios' },
   ])
 
   useEffect(function() {
-    // Exchange rates - Frankfurter API (ECB official, free, CORS enabled)
-    Promise.all([
-      fetch('https://api.frankfurter.app/latest?from=USD&to=BRL').then(function(r) { return r.json() }),
-      fetch('https://api.frankfurter.app/latest?from=EUR&to=BRL').then(function(r) { return r.json() })
-    ]).then(function(results) {
-      var usdData = results[0]
-      var eurData = results[1]
-      if (usdData && useData.rates && usdData.rates.BRL) setUsdRate(usdData.rates.BRL.toFixed(2))
-      if (eurData && eurData.rates && eurData.rates.BRL) setEurRate(eurData.rates.BRL.toFixed(2))
-    }).catch(function(err) {
-      console.log('Rates error:', err)
-    })
-
-    // Weather - OpenMeteo
+    fetch('/api/rates')
+      .then(function(r) { return r.json() })
+      .then(function(d) { setRates(d) })
+      .catch(function() {})
     fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,weathercode&temperature_unit=fahrenheit')
       .then(function(r) { return r.json() })
       .then(function(d) {
         if (d && d.current) {
-          var tempC = Math.round((d.current.temperature_2m - 32) * 5 / 9)
-          var code = d.current.weathercode || 0
-          setWeather({ temp: tempC, icon: WMO_ICONS[code] || '🌤', desc: WMO_DESC[code] || '' })
+          var c = d.current
+          var tempC = Math.round((c.temperature_2m - 32) * 5 / 9)
+          var code = c.weathercode || 0
+          var baseCode = [45,48,51,53,55,61,63,65,71,73,75,80,81,82,95,96,99].includes(code) ? code : Math.floor(code/10)*10 || code
+          setWeather({ temp: tempC, icon: WMO.icons[code] || WMO.icons[baseCode] || '🌤', desc: WMO.desc[code] || WMO.desc[baseCode] || '' })
         }
       }).catch(function() {})
-
-    // Social links
     fetch('/api/site-config').then(function(r) { return r.json() })
-      .then(function(d) { setSocial({ facebook: d.socialFacebook || '', instagram: d.socialInstagram || '', youtube: d.socialYoutube || '' }) })
+      .then(function(d) { setSocial({ facebook: d.socialFacebook||'', instagram: d.socialInstagram||'', youtube: d.socialYoutube||'' }) })
       .catch(function() {})
-
-    // Real article headlines for ticker
     fetch('/api/admin/artigos', { credentials: 'include' })
       .then(function(r) { return r.ok ? r.json() : null })
       .then(function(d) {
         if (Array.isArray(d) && d.length > 3) {
-          setTickerItems(d.slice(0, 8).map(function(a) { return { text: a.title, href: '/artigo/' + a.id } }))
+          setTickerItems(d.slice(0,8).map(function(a) { return { text: a.title, href: '/artigo/'+a.id } }))
         }
       }).catch(function() {})
   }, [])
 
-  var hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-  var dataFormatada = hoje.charAt(0).toUpperCase() + hoje.slice(1)
+  var hoje = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+  var data = hoje.charAt(0).toUpperCase() + hoje.slice(1)
   var doubled = tickerItems.concat(tickerItems)
+  var usdUp = rates.usdChange && parseFloat(rates.usdChange) > 0
+  var eurUp = rates.eurChange && parseFloat(rates.eurChange) > 0
 
   return (
     <>
       <div className="topbar">
         <div className="topbar-inner">
-          <span>🌎 Miami &amp; Sul da Florida &nbsp;&middot;&nbsp; {dataFormatada}</span>
+          <span>🌎 Miami &amp; Sul da Florida &nbsp;&middot;&nbsp; {data}</span>
           <div className="topbar-social">
             {social.facebook && <a href={social.facebook} target="_blank" rel="noreferrer">📘 Facebook</a>}
             {social.instagram && <a href={social.instagram} target="_blank" rel="noreferrer">📸 Instagram</a>}
@@ -93,7 +77,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-
       <header>
         <div className="header-inner">
           <Link href="/" className="logo">
@@ -105,60 +88,49 @@ export default function Header() {
               <div className="tagline">O portal da sua comunidade</div>
             </div>
           </Link>
-
           <nav>
-            {CATEGORIAS.map(function(cat) {
-              return (
-                <Link key={cat.href} href={cat.href} className={pathname === cat.href ? 'active' : ''}>
-                  {cat.label}
-                </Link>
-              )
+            {CATEGORIAS.map(function(c) {
+              return <Link key={c.href} href={c.href} className={pathname===c.href?'active':''}>{c.label}</Link>
             })}
           </nav>
-
           <Link href="/contato" className="btn-anuncie">📣 Anuncie</Link>
         </div>
       </header>
-
       <div className="weather-bar">
         <div className="weather-inner">
-          <a href="https://forecast.weather.gov/MapClick.php?CityName=Miami&state=FL" target="_blank" rel="noreferrer" className="weather-item" style={{ textDecoration: 'none' }}>
-            <span>{weather.icon || '🌤'}</span>
+          <a href="https://forecast.weather.gov/MapClick.php?CityName=Miami&state=FL" target="_blank" rel="noreferrer" className="weather-item" style={{ textDecoration:'none' }}>
+            <span style={{ fontSize:16 }}>{weather.icon}</span>
             <span>Miami</span>
-            <strong>{weather.temp !== null ? weather.temp + '°C' : '--°C'}</strong>
+            <strong>{weather.temp!==null ? weather.temp+'°C' : '--°C'}</strong>
             {weather.desc && <span className="weather-label">{weather.desc}</span>}
           </a>
           <div className="weather-item">
-            <span>☁️</span>
-            <span>Fort Lauderdale</span>
-            <strong>{weather.temp !== null ? (weather.temp - 1) + '°C' : '--°C'}</strong>
+            <span style={{ fontSize:16 }}>{weather.icon}</span>
+            <span>Ft. Lauderdale</span>
+            <strong>{weather.temp!==null ? (weather.temp-1)+'C' : '--C'}</strong>
           </div>
           <div className="date-bar">
-            <span className="rate-item">
-              <span className="rate-icon">$</span>
-              <span className="rate-label">USD</span>
-              <strong className="rate-val">{usdRate ? 'R$ ' + usdRate : 'R$ ...'}</strong>
+            <span className="rate-pill" style={{ color: usdUp ? '#15803D' : '#DC2626' }}>
+              <span className="rate-flag">🇺🇸</span>
+              <span className="rate-code">USD</span>
+              <strong>{rates.usd ? 'R$ '+rates.usd : '...'}</strong>
+              {rates.usdChange && <span style={{ fontSize:10 }}>{usdUp?'▲':'▼'}{Math.abs(rates.usdChange)}%</span>}
             </span>
-            <span className="rate-sep">|</span>
-            <span className="rate-item">
-              <span className="rate-icon">€</span>
-              <span className="rate-label">EUR</span>
-              <strong className="rate-val">{eurRate ? 'R$ ' + eurRate : 'R$ ...'}</strong>
+            <span className="rate-pill" style={{ color: eurUp ? '#15803D' : '#DC2626' }}>
+              <span className="rate-flag">🇪🇺</span>
+              <span className="rate-code">EUR</span>
+              <strong>{rates.eur ? 'R$ '+rates.eur : '...'}</strong>
+              {rates.eurChange && <span style={{ fontSize:10 }}>{eurUp?'▲':'▼'}{Math.abs(rates.eurChange)}%</span>}
             </span>
           </div>
         </div>
       </div>
-
       <div className="ticker">
         <div className="ticker-label">🔴 AGORA</div>
         <div className="ticker-wrapper">
           <div className="ticker-track">
             {doubled.map(function(item, i) {
-              return (
-                <Link key={i} href={item.href} className="ticker-link">
-                  {item.text}
-                </Link>
-              )
+              return <Link key={i} href={item.href} className="ticker-link">{item.text}</Link>
             })}
           </div>
         </div>
