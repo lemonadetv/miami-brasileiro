@@ -1,172 +1,195 @@
-// app/page.js
+// app/page.js - Layout inspirado no UOL
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Sidebar from '../components/Sidebar'
 import Link from 'next/link'
 import { getAllArticles, getFeaturedArticle, getArticlesByCategory, formatDateShort, readingTime } from '../lib/articles'
 
-const FALLBACK = {
-  'Imigração': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=70',
-  'Comunidade': 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=70',
-  'Saúde':      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=70',
-  'Negócios':   'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&q=70',
-  'Esportes':   'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=70',
-  '_default':   'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=70',
+const CAT_CONFIG = {
+  'Imigracao':  { color: '#F4622A', bg: '#FFF7ED', label: 'Imigracao' },
+  'Comunidade': { color: '#00897B', bg: '#F0FDF4', label: 'Comunidade' },
+  'Saude':      { color: '#15803D', bg: '#F0FDF4', label: 'Saude' },
+  'Negocios':   { color: '#7C3AED', bg: '#F5F3FF', label: 'Negocios' },
+  'Esportes':   { color: '#DC2626', bg: '#FEF2F2', label: 'Esportes' },
 }
-function getImg(a) { return a.image || FALLBACK[a.category] || FALLBACK._default }
+function catColor(c) { return (CAT_CONFIG[c] || {}).color || '#00897B' }
 
-const CAT_CLASS = {
-  'Imigração': 'cat-imigracao',
-  'Comunidade': 'cat-comunidade',
-  'Saúde': 'cat-saude',
-  'Negócios': 'cat-negocios',
-  'Esportes': 'cat-esportes',
+function getImg(a) {
+  return a.image || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=70'
 }
-function catCls(c) { return CAT_CLASS[c] || 'cat-default' }
+
+// Big featured card
+function FeaturedCard({ article }) {
+  if (!article) return null
+  return (
+    <Link href={'/artigo/' + article.id} className="featured-main-card">
+      <img src={getImg(article)} alt={article.title} />
+      <div className="fmc-overlay" />
+      <div className="fmc-content">
+        <span className="fmc-cat" style={{ background: catColor(article.category) }}>{article.category}</span>
+        <h2 className="fmc-title">{article.title}</h2>
+        {article.excerpt && <p className="fmc-excerpt">{article.excerpt.slice(0, 100)}...</p>}
+        <div className="fmc-meta">{formatDateShort(article.publishedAt)} &middot; {readingTime(article.content)}</div>
+      </div>
+    </Link>
+  )
+}
+
+// Stack item (sidebar of featured)
+function StackItem({ article }) {
+  return (
+    <Link href={'/artigo/' + article.id} className="stack-item">
+      <img src={getImg(article)} alt={article.title} />
+      <div className="si-info">
+        <span className="si-cat" style={{ color: catColor(article.category) }}>{article.category}</span>
+        <h4 className="si-title">{article.title}</h4>
+        <div className="si-meta">{formatDateShort(article.publishedAt)}</div>
+      </div>
+    </Link>
+  )
+}
+
+// Compact card for grids
+function CompactCard({ article }) {
+  return (
+    <Link href={'/artigo/' + article.id} className="compact-card">
+      <img src={getImg(article)} alt={article.title} />
+      <div className="cc-body">
+        <span className="cc-cat" style={{ background: catColor(article.category) }}>{article.category}</span>
+        <h3 className="cc-title">{article.title}</h3>
+        <div className="cc-meta">{formatDateShort(article.publishedAt)} &middot; {readingTime(article.content)}</div>
+      </div>
+    </Link>
+  )
+}
+
+// Horizontal list item
+function HorizItem({ article }) {
+  return (
+    <Link href={'/artigo/' + article.id} className="horiz-item">
+      <img src={getImg(article)} alt={article.title} />
+      <div className="hi-info">
+        <h4 className="hi-title">{article.title}</h4>
+        <div className="hi-meta">{formatDateShort(article.publishedAt)}</div>
+      </div>
+    </Link>
+  )
+}
+
+// Category block (UOL style)
+function CatBlock({ category, articles, seeAllHref }) {
+  if (!articles.length) return null
+  const cfg = CAT_CONFIG[category] || { color: '#00897B', bg: '#F9FAFB' }
+  const main = articles[0]
+  const rest = articles.slice(1, 4)
+  return (
+    <div className="cat-block" style={{ borderTopColor: cfg.color }}>
+      <div className="cat-block-header" style={{ background: cfg.bg }}>
+        <span className="cat-block-title" style={{ color: cfg.color }}>{category.toUpperCase()}</span>
+        <Link href={seeAllHref} className="cat-block-see-all" style={{ color: cfg.color }}>Ver todas &rarr;</Link>
+      </div>
+      <div className="cat-block-body">
+        <Link href={'/artigo/' + main.id} className="cat-main-story">
+          <img src={getImg(main)} alt={main.title} />
+          <h3>{main.title}</h3>
+          {main.excerpt && <p>{main.excerpt.slice(0, 80)}...</p>}
+          <div className="cat-meta">{formatDateShort(main.publishedAt)} &middot; {readingTime(main.content)}</div>
+        </Link>
+        <div className="cat-side-list">
+          {rest.map(function(a) {
+            return (
+              <Link key={a.id} href={'/artigo/' + a.id} className="cat-side-item">
+                <img src={getImg(a)} alt={a.title} />
+                <div>
+                  <h4>{a.title}</h4>
+                  <span>{formatDateShort(a.publishedAt)}</span>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function HomePage() {
-  const all      = getAllArticles()
-  const featured = getFeaturedArticle()
-  const rest     = all.filter(a => a.id !== featured?.id)
-  const mosaic   = rest.slice(2, 10)
+  const all       = getAllArticles()
+  const featured  = getFeaturedArticle()
+  const rest      = all.filter(function(a) { return a.id !== (featured && featured.id) })
 
-  const imigracao = getArticlesByCategory('Imigração').slice(0, 2)
-  const negocios  = getArticlesByCategory('Negócios').slice(0, 4)
-  const esportes  = getArticlesByCategory('Esportes').slice(0, 3)
+  // Section data
+  const heroStack    = rest.slice(0, 4)
+  const grid4        = rest.slice(4, 8)
+  const grid4b       = rest.slice(8, 12)
+
+  const imigracao    = getArticlesByCategory('Imigracao').slice(0, 4)
+  const negocios     = getArticlesByCategory('Negocios').slice(0, 4)
+  const saude        = getArticlesByCategory('Saude').slice(0, 4)
+  const esportes     = getArticlesByCategory('Esportes').slice(0, 4)
+  const comunidade   = getArticlesByCategory('Comunidade').slice(0, 4)
 
   return (
     <>
       <Header />
       <div className="page">
 
-        {featured && (
-          <div className="hero-strip" style={{ marginBottom: 28 }}>
-            <Link href={`/artigo/${featured.id}`} className="hero-main-card">
-              <img src={getImg(featured)} alt={featured.title} />
-              <div className="hero-overlay" />
-              <div className="hero-main-content">
-                <span className={`cat-tag ${catCls(featured.category)}`}>{featured.category}</span>
-                <h1>{featured.title}</h1>
-                <div className="hero-meta">{formatDateShort(featured.publishedAt)} &middot; {readingTime(featured.content)}</div>
-              </div>
-            </Link>
-            <div className="hero-side-col">
-              {rest.slice(0, 2).map(a => (
-                <Link key={a.id} href={`/artigo/${a.id}`} className="hero-side-card">
-                  <img src={getImg(a)} alt={a.title} />
-                  <div className="hero-side-content">
-                    <span className={`cat-tag ${catCls(a.category)}`}>{a.category}</span>
-                    <h3>{a.title}</h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="hero-side-col">
-              {rest.slice(2, 4).map(a => (
-                <Link key={a.id} href={`/artigo/${a.id}`} className="hero-side-card">
-                  <img src={getImg(a)} alt={a.title} />
-                  <div className="hero-side-content">
-                    <span className={`cat-tag ${catCls(a.category)}`}>{a.category}</span>
-                    <h3>{a.title}</h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
+        {/* ===== HERO BLOCK (UOL style: big left + stack right) ===== */}
+        <div className="hero-block">
+          <FeaturedCard article={featured} />
+          <div className="hero-stack">
+            {heroStack.map(function(a) { return <StackItem key={a.id} article={a} /> })}
           </div>
-        )}
+        </div>
 
-        <div className="main-grid">
-          <div>
+        <div className="page-columns">
+          <div className="page-main">
 
-            {mosaic.length > 0 && (
-              <div className="category-section">
+            {/* ===== ULTIMAS: 4-COLUMN GRID ===== */}
+            {grid4.length > 0 && (
+              <div className="section-wrap">
                 <div className="section-header">
                   <div className="section-bar" />
-                  <h2>Últimas Notícias</h2>
-                  <Link href="/categoria/comunidade" className="see-all">Ver todas &rarr;</Link>
+                  <h2>Ultimas Noticias</h2>
+                  <Link href="/" className="see-all">Ver mais &rarr;</Link>
                 </div>
-                <div className="mosaic-grid">
-                  {mosaic.map(a => (
-                    <Link key={a.id} href={`/artigo/${a.id}`} className="mosaic-card">
-                      <img src={getImg(a)} alt={a.title} />
-                      <div className="mc-body">
-                        <div className={`cat-tag ${catCls(a.category)}`}>{a.category}</div>
-                        <h3>{a.title}</h3>
-                        <div className="mc-meta">{formatDateShort(a.publishedAt)} &middot; {readingTime(a.content)}</div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="grid-4">
+                  {grid4.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
                 </div>
               </div>
             )}
 
-            {imigracao.length > 0 && (
-              <div className="category-section">
+            {/* ===== IMIGRACAO BLOCK ===== */}
+            <CatBlock category="Imigracao" articles={imigracao} seeAllHref="/categoria/imigracao" />
+
+            {/* ===== NEGOCIOS BLOCK ===== */}
+            <CatBlock category="Negocios" articles={negocios} seeAllHref="/categoria/negocios" />
+
+            {/* ===== SECOND GRID ===== */|
+            {grid4b.length > 0 && (
+              <div className="section-wrap">
                 <div className="section-header">
-                  <div className="section-bar" style={{ background: 'var(--orange)' }} />
-                  <h2>Imigração</h2>
-                  <Link href="/categoria/imigracao" className="see-all">Ver todas &rarr;</Link>
+                  <div className="section-bar" style={{ background: '#15803D' }} />
+                  <h2>Saude &amp; Comunidade</h2>
                 </div>
-                <div className="cat-grid-2">
-                  {imigracao.map(a => (
-                    <Link key={a.id} href={`/artigo/${a.id}`} className="featured-wide">
-                      <img src={getImg(a)} alt={a.title} />
-                      <div className="info">
-                        <div className="tag">Imigração</div>
-                        <h3>{a.title}</h3>
-                        <div className="meta">{formatDateShort(a.publishedAt)}</div>
-                      </div>
-                    </Link>
-                  ))}
+                <div className="grid-4">
+                  {grid4b.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
                 </div>
               </div>
             )}
 
-            {negocios.length > 0 && (
-              <div className="category-section">
-                <div className="section-header">
-                  <div className="section-bar" style={{ background: '#7C3AED' }} />
-                  <h2>Negócios</h2>
-                  <Link href="/categoria/negocios" className="see-all">Ver todas &rarr;</Link>
-                </div>
-                <div className="article-grid">
-                  {negocios.map(a => (
-                    <Link key={a.id} href={`/artigo/${a.id}`} className="article-card">
-                      <img src={getImg(a)} alt={a.title} />
-                      <div className="card-body">
-                        <div className="card-tag">Negócios</div>
-                        <h3>{a.title}</h3>
-                        <div className="card-meta"><span>{formatDateShort(a.publishedAt)}</span><div className="dot" /><span>{readingTime(a.content)}</span></div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* ===== SAUDE BLOCK ===== */}
+            <CatBlock category="Saude" articles={saude} seeAllHref="/categoria/saude" />
 
-            {esportes.length > 0 && (
-              <div className="category-section">
-                <div className="section-header">
-                  <div className="section-bar" style={{ background: '#DC2626' }} />
-                  <h2>Esportes</h2>
-                  <Link href="/categoria/esportes" className="see-all">Ver todas &rarr;</Link>
-                </div>
-                <div className="cat-grid-2">
-                  {esportes.map(a => (
-                    <Link key={a.id} href={`/artigo/${a.id}`} className="featured-wide">
-                      <img src={getImg(a)} alt={a.title} />
-                      <div className="info">
-                        <div className="tag">Esportes</div>
-                        <h3>{a.title}</h3>
-                        <div className="meta">{formatDateShort(a.publishedAt)}</div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* ===== ESPORTES BLOCK ===== */}
+            <CatBlock category="Esportes" articles={esportes} seeAllHref="/categoria/esportes" />
+
+            {/* ===== COMUNIDADE BLOCK ===== */}
+            <CatBlock category="Comunidade" articles={comunidade} seeAllHref="/categoria/comunidade" />
 
           </div>
+
+          {/* ===== SIDEBAR ===== */}
           <Sidebar articles={all} />
         </div>
       </div>
