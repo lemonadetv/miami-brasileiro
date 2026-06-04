@@ -18,7 +18,6 @@ function getImg(a) {
   return a.image || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=70'
 }
 
-// Big featured card
 function FeaturedCard({ article }) {
   if (!article) return null
   return (
@@ -35,7 +34,6 @@ function FeaturedCard({ article }) {
   )
 }
 
-// Stack item (sidebar of featured)
 function StackItem({ article }) {
   return (
     <Link href={'/artigo/' + article.id} className="stack-item">
@@ -49,7 +47,6 @@ function StackItem({ article }) {
   )
 }
 
-// Compact card for grids
 function CompactCard({ article }) {
   return (
     <Link href={'/artigo/' + article.id} className="compact-card">
@@ -63,20 +60,6 @@ function CompactCard({ article }) {
   )
 }
 
-// Horizontal list item
-function HorizItem({ article }) {
-  return (
-    <Link href={'/artigo/' + article.id} className="horiz-item">
-      <img src={getImg(article)} alt={article.title} />
-      <div className="hi-info">
-        <h4 className="hi-title">{article.title}</h4>
-        <div className="hi-meta">{formatDateShort(article.publishedAt)}</div>
-      </div>
-    </Link>
-  )
-}
-
-// Category block (UOL style)
 function CatBlock({ category, articles, seeAllHref }) {
   if (!articles.length) return null
   const cfg = CAT_CONFIG[category] || { color: '#00897B', bg: '#F9FAFB' }
@@ -117,79 +100,34 @@ export default function HomePage() {
   const all       = getAllArticles()
   const featured  = getFeaturedArticle()
   const rest      = all.filter(function(a) { return a.id !== (featured && featured.id) })
-
-  // Section data
-  const heroStack    = rest.slice(0, 4)
-  const grid4        = rest.slice(4, 8)
-  const grid4b       = rest.slice(8, 12)
-
-  const imigracao    = getArticlesByCategory('Imigracao').slice(0, 4)
-  const negocios     = getArticlesByCategory('Negocios').slice(0, 4)
-  const saude        = getArticlesByCategory('Saude').slice(0, 4)
-  const esportes     = getArticlesByCategory('Esportes').slice(0, 4)
-  const comunidade   = getArticlesByCategory('Comunidade').slice(0, 4)
-
+  const heroStack = rest.slice(0, 4)
+  const grid4     = rest.slice(4, 8)
+  const grid4b    = rest.slice(8, 12)
+  const imigracao = getArticlesByCategory('Imigracao').slice(0, 4)
+  const negocios  = getArticlesByCategory('Negocios').slice(0, 4)
+  const saude     = getArticlesByCategory('Saude').slice(0, 4)
+  const esportes  = getArticlesByCategory('Esportes').slice(0, 4)
+  const comunidade = getArticlesByCategory('Comunidade').slice(0, 4)
   return (
     <>
       <Header />
       <div className="page">
-
-        {/* ===== HERO BLOCK (UOL style: big left + stack right) ===== */}
         <div className="hero-block">
           <FeaturedCard article={featured} />
           <div className="hero-stack">
             {heroStack.map(function(a) { return <StackItem key={a.id} article={a} /> })}
           </div>
         </div>
-
         <div className="page-columns">
           <div className="page-main">
-
-            {/* ===== ULTIMAS: 4-COLUMN GRID ===== */}
-            {grid4.length > 0 && (
-              <div className="section-wrap">
-                <div className="section-header">
-                  <div className="section-bar" />
-                  <h2>Ultimas Noticias</h2>
-                  <Link href="/" className="see-all">Ver mais &rarr;</Link>
-                </div>
-                <div className="grid-4">
-                  {grid4.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
-                </div>
-              </div>
-            )}
-
-            {/* ===== IMIGRACAO BLOCK ===== */}
+            {grid4.length > 0 && (<div className="section-wrap"><div className="section-header"><div className="section-bar" /><h2>Ultimas Noticias</h2><Link href="/" className="see-all">Ver mais &rarr;</Link></div><div className="grid-4">{arid4.map(function(a) { return <CompactCard key={a.id} article={a} /> })}</div></div>)}
             <CatBlock category="Imigracao" articles={imigracao} seeAllHref="/categoria/imigracao" />
-
-            {/* ===== NEGOCIOS BLOCK ===== */}
             <CatBlock category="Negocios" articles={negocios} seeAllHref="/categoria/negocios" />
-
-            {/* ===== SECOND GRID ===== */|
-            {grid4b.length > 0 && (
-              <div className="section-wrap">
-                <div className="section-header">
-                  <div className="section-bar" style={{ background: '#15803D' }} />
-                  <h2>Saude &amp; Comunidade</h2>
-                </div>
-                <div className="grid-4">
-                  {grid4b.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
-                </div>
-              </div>
-            )}
-
-            {/* ===== SAUDE BLOCK ===== */}
+            {grid4b.length > 0 && (<div className="section-wrap"><div className="section-header"><div className="section-bar" style={{ background: '#15803D' }} /><h2>Saude &amp; Comunidade</h2></div><div className="grid-4">{grid4b.map(function(a) { return <CompactCard key={a.id} article={a} /> })}</div></div>)}
             <CatBlock category="Saude" articles={saude} seeAllHref="/categoria/saude" />
-
-            {/* ===== ESPORTES BLOCK ===== */}
             <CatBlock category="Esportes" articles={esportes} seeAllHref="/categoria/esportes" />
-
-            {/* ===== COMUNIDADE BLOCK ===== */}
             <CatBlock category="Comunidade" articles={comunidade} seeAllHref="/categoria/comunidade" />
-
           </div>
-
-          {/* ===== SIDEBAR ===== */}
           <Sidebar articles={all} />
         </div>
       </div>
