@@ -161,7 +161,7 @@ function ArticleContent({ content, category }) {
   const normalized = content
     .replace(/\n(#{2,3} )/g, '\n\n$1')
     .replace(/\n(\[[^\]]+\]\(https?:)/g, '\n\n$1')
-    .replace(/—/g, ' - ')
+    .replace(/â/g, ' - ')
 
   const blocks = normalized.split('\n\n').filter(b => b.trim().length > 0)
 
@@ -229,7 +229,7 @@ function ArticleContent({ content, category }) {
           )
         }
 
-        // Bullet list — check if has prices or percentages first
+        // Bullet list â check if has prices or percentages first
         if (b.startsWith('- ') || b.startsWith('* ')) {
           const lines = b.split('\n').filter(Boolean)
           const priceCount = lines.filter(l => extractPrice(l) !== null).length
@@ -296,8 +296,6 @@ function ArticleContent({ content, category }) {
           return (
             <a key={i} href={lm[2]} target="_blank" rel="noreferrer"
                style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 16px', margin:'8px 0', background:'#F0FDF4', border:'1px solid #D1FAE5', borderRadius:8, textDecoration:'none' }}
-               onMouseOver={function(e){ e.currentTarget.style.background='#DCFCE7' }}
-               onMouseOut={function(e){ e.currentTarget.style.background='#F0FDF4' }}>
               <Icon type="link" color="#065F46" size={20} />
               <div style={{ flex:1 }}>
                 <div style={{ fontWeight:700, color:'#065F46', fontSize:15 }}>{lm[1]}</div>
