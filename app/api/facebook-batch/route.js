@@ -6,11 +6,23 @@ async function postOne(article, PAGE_ID, PAGE_TOKEN, siteUrl) {
   try {
     const articleUrl = siteUrl + '/artigo/' + article.slug
     const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
-    const message = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
-    const res = await fetch('https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed', {
+    const caption = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
+
+    const imageUrl = article.image || null
+    let endpoint, body
+
+    if (imageUrl) {
+      endpoint = 'https://graph.facebook.com/v19.0/' + PAGE_ID + '/photos'
+      body = { url: imageUrl, caption: caption, access_token: PAGE_TOKEN }
+    } else {
+      endpoint = 'https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed'
+      body = { message: caption, link: articleUrl, access_token: PAGE_TOKEN }
+    }
+
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, link: articleUrl, access_token: PAGE_TOKEN })
+      body: JSON.stringify(body)
     })
     const data = await res.json()
     return { slug: article.slug, title: article.title, success: !data.error, post_id: data.id || null, error: data.error || null }
@@ -41,8 +53,7 @@ export async function POST(request) {
     )
     const articles = await ghRes.json()
 
-    // Postar em paralelo em lotes de 10 para evitar rate limit
-    const BATCH_SIZE = 10
+    const BATCH_SIZE = 5
     const results = []
     for (let i = 0; i < articles.length; i += BATCH_SIZE) {
       const batch = articles.slice(i, i + BATCH_SIZE)
