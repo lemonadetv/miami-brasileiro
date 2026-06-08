@@ -212,6 +212,8 @@ const tools = [
   { key: 'car', icon: '🚗', label: 'Veiculos', sublabel: 'Compra & Lease' },
 ]
 
+export { MortgageCalc, InvestmentCalc, CarCalc }
+
 export default function Toolbox() {
   const [open, setOpen] = useState(null)
   return (
