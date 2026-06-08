@@ -7,9 +7,38 @@ import ShareButtons from '../../../components/ShareButtons'
 import Link from 'next/link'
 import { getAllArticles, getArticleBySlug, formatDate, readingTime } from '../../../lib/articles'
 
+// Parse inline markdown: **bold** and [text](url)
+function parseInline(text) {
+  const result = []
+  const re = /(\*\*([^*]+)\*\*|\[([^\]]+)\]\((https?:\/\/[^\)]+)\))/g
+  let last = 0, m, k = 0
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) result.push(text.slice(last, m.index))
+    if (m[0].startsWith('**')) {
+      result.push(<strong key={k++}>{m[2]}</strong>)
+    } else {
+      result.push(
+        <a key={k++} href={m[4]} target="_blank" rel="noreferrer"
+           style={{ color: '#00897B', textDecoration: 'underline', fontWeight: 600 }}>
+          {m[3]}
+        </a>
+      )
+    }
+    last = re.lastIndex
+  }
+  if (last < text.length) result.push(text.slice(last))
+  return result
+}
+
 function ArticleContent({ content }) {
   if (!content) return null
-  const blocks = content.split('\n\n').filter(function(b) { return b.trim().length > 0 })
+
+  // Normalize: ensure headings and standalone links start new blocks
+  const normalized = content
+    .replace(/\n(#{2,3} )/g, '\n\n$1')
+    .replace(/\n(\[[^\]]+\]\(https?:)/g, '\n\n$1')
+
+  const blocks = normalized.split('\n\n').filter(function(b) { return b.trim().length > 0 })
 
   return (
     <div className="article-content">
@@ -27,11 +56,11 @@ function ArticleContent({ content }) {
         }
         // H2
         if (b.startsWith('## ')) {
-          return <h2 key={i} style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, margin: '32px 0 14px', color: '#111827', borderTop: '2px solid #F3F4F6', paddingTop: 8 }}>{b.slice(3)}</h2>
+          return <h2 key={i} style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, margin: '32px 0 14px', color: '#111827', borderTop: '2px solid #F3F4F6', paddingTop: 8 }}>{b.split('\n')[0].slice(3)}</h2>
         }
         // H3
         if (b.startsWith('### ')) {
-          return <h3 key={i} style={{ fontSize: 18, fontWeight: 700, margin: '26px 0 12px', color: '#111827' }}>{b.slice(4)}</h3>
+          return <h3 key={i} style={{ fontSize: 18, fontWeight: 700, margin: '26px 0 12px', color: '#111827' }}>{b.split('\n')[0].slice(4)}</h3>
         }
         // Bold-only heading
         if (b.startsWith('**') && b.endsWith('**') && b.length > 4) {
@@ -46,7 +75,7 @@ function ArticleContent({ content }) {
           return (
             <ol key={i} style={{ margin: '0 0 22px 24px', lineHeight: 1.9 }}>
               {lines.map(function(line, j) {
-                return <li key={j}>{line.replace(/^\d+\.\s*/, '').replace(/\*\*([^*]+)\*\*/g, '$1')}</li>
+                return <li key={j}>{parseInline(line.replace(/^\d+\.\s*/, ''))}</li>
               })}
             </ol>
           )
@@ -57,7 +86,7 @@ function ArticleContent({ content }) {
           return (
             <ul key={i} style={{ margin: '0 0 22px 24px', lineHeight: 1.9 }}>
               {lines.map(function(line, j) {
-                return <li key={j}>{line.replace(/^[-*]\s*/, '').replace(/\*\*([^*]+)\*\*/g, '$1')}</li>
+                return <li key={j}>{parseInline(line.replace(/^[-*]\s*/, ''))}</li>
               })}
             </ul>
           )
@@ -66,7 +95,7 @@ function ArticleContent({ content }) {
         if (b.startsWith('> ')) {
           return <blockquote key={i} style={{ borderLeft: '4px solid #F4622A', margin: '28px 0', padding: '14px 20px', background: 'rgba(244,98,42,.05)', borderRadius: '0 6px 6px 0', fontStyle: 'italic', fontSize: 18, color: '#374151' }}>{b.slice(2)}</blockquote>
         }
-        // Link line [text](url) - desc
+        // Standalone link line: [text](url) optional trailing text
         const linkMatch = b.match(/^\[([^\]]+)\]\((https?:\/\/[^\)]+)\)(.*)$/)
         if (linkMatch) {
           return (
@@ -76,10 +105,10 @@ function ArticleContent({ content }) {
             </p>
           )
         }
-        // Regular paragraph
-        const text = b.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-        if (!text.trim()) return null
-        return <p key={i} style={{ marginBottom: 22, fontSize: 17, lineHeight: 1.9, color: '#1F2937' }}>{text}</p>
+        // Regular paragraph — render inline markdown (bold + links)
+        const inlineContent = parseInline(b)
+        if (!inlineContent.length) return null
+        return <p key={i} style={{ marginBottom: 22, fontSize: 17, lineHeight: 1.9, color: '#1F2937' }}>{inlineContent}</p>
       })}
     </div>
   )
