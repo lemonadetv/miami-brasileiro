@@ -161,7 +161,7 @@ function ArticleContent({ content, category }) {
   const normalized = content
     .replace(/\n(#{2,3} )/g, '\n\n$1')
     .replace(/\n(\[[^\]]+\]\(https?:)/g, '\n\n$1')
-    .replace(/Ã¢ÂÂ/g, ' - ')
+    .replace(/—/g, ' - ')
 
   const blocks = normalized.split('\n\n').filter(b => b.trim().length > 0)
 
@@ -229,7 +229,7 @@ function ArticleContent({ content, category }) {
           )
         }
 
-        // Bullet list Ã¢ÂÂ check if has prices or percentages first
+        // Bullet list — check if has prices or percentages first
         if (b.startsWith('- ') || b.startsWith('* ')) {
           const lines = b.split('\n').filter(Boolean)
           const priceCount = lines.filter(l => extractPrice(l) !== null).length
