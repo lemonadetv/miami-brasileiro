@@ -2,6 +2,23 @@ import { NextResponse } from 'next/server'
 
 export const maxDuration = 60
 
+async function postOne(article, PAGE_ID, PAGE_TOKEN, siteUrl) {
+  try {
+    const articleUrl = siteUrl + '/artigo/' + article.slug
+    const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
+    const message = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
+    const res = await fetch('https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, link: articleUrl, access_token: PAGE_TOKEN })
+    })
+    const data = await res.json()
+    return { slug: article.slug, title: article.title, success: !data.error, post_id: data.id || null, error: data.error || null }
+  } catch (err) {
+    return { slug: article.slug, success: false, error: err.message }
+  }
+}
+
 export async function POST(request) {
   try {
     const body = await request.json()
@@ -24,35 +41,13 @@ export async function POST(request) {
     )
     const articles = await ghRes.json()
 
+    // Postar em paralelo em lotes de 10 para evitar rate limit
+    const BATCH_SIZE = 10
     const results = []
-
-    for (const article of articles) {
-      try {
-        const articleUrl = siteUrl + '/artigo/' + article.slug
-        const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
-        const message = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
-
-        const res = await fetch('https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message, link: articleUrl, access_token: PAGE_TOKEN })
-        })
-
-        const data = await res.json()
-        results.push({
-          slug: article.slug,
-          title: article.title,
-          success: !data.error,
-          post_id: data.id || null,
-          error: data.error || null
-        })
-
-        // 500ms entre posts para nao exceder rate limit
-        await new Promise(r => setTimeout(r, 500))
-
-      } catch (err) {
-        results.push({ slug: article.slug, success: false, error: err.message })
-      }
+    for (let i = 0; i < articles.length; i += BATCH_SIZE) {
+      const batch = articles.slice(i, i + BATCH_SIZE)
+      const batchResults = await Promise.all(batch.map(a => postOne(a, PAGE_ID, PAGE_TOKEN, siteUrl)))
+      results.push(...batchResults)
     }
 
     const successCount = results.filter(r => r.success).length
@@ -66,4 +61,4 @@ export async function POST(request) {
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
-      }
+}
