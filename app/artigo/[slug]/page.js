@@ -65,7 +65,7 @@ function headingIcon(text, color) {
 
 // ---- Parse price from a list line ----
 function extractPrice(line) {
-  const m = line.match(/\$\s*([\d,]+(?:\.\d++?)/)
+  const m = line.match(/\$\s*([\d,]+(?:\.\d+)?)/)
   return m ? parseFloat(m[1].replace(/,/g,'')) : null
 }
 
