@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { MortgageCalc, InvestmentCalc, CarCalc } from '../app/components/Toolbox'
 
 const CATEGORIAS = [
   { label: 'Inicio',     href: '/' },
@@ -23,6 +24,7 @@ export default function Header() {
   const [rates, setRates] = useState({ usd: null, eur: null, usdChange: null, eurChange: null })
   const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: '' })
   const [social, setSocial] = useState({ facebook: '', instagram: '', youtube: '' })
+  const [toolboxOpen, setToolboxOpen] = useState(null)
   const [tickerItems, setTickerItems] = useState([
     { text: 'Como alugar apartamento em Miami sem historico americano', href: '/categoria/comunidade' },
     { text: 'Green card pelo EB-5: o que mudou para brasileiros em 2026', href: '/categoria/imigracao' },
@@ -109,6 +111,17 @@ export default function Header() {
             <span>Ft. Lauderdale</span>
             <strong>{weather.temp!==null ? (weather.temp-1)+'C' : '--C'}</strong>
           </div>
+          <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 8px'}}>
+            <div style={{fontSize:9,color:'#aaa',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:3,fontWeight:700}}>Use nossas ferramentas de calculos</div>
+            <div style={{display:'flex',gap:5}}>
+              {[{k:'mortgage',i:'🏠',l:'Financiamento'},{k:'investment',i:'📈',l:'Investimentos'},{k:'car',i:'🚗',l:'Veiculos'}].map(function(t){return(
+                <button key={t.k} onClick={function(){setToolboxOpen(t.k);}}
+                  style={{background:'#f5f5f5',border:'1px solid #e0e0e0',borderRadius:6,padding:'3px 9px',cursor:'pointer',fontSize:11,fontWeight:600,color:'#333',display:'flex',alignItems:'center',gap:4}}>
+                  <span>{t.i}</span><span>{t.l}</span>
+                </button>
+              )})}
+            </div>
+          </div>
           <div className="date-bar">
             <span className="rate-pill" style={{ color: usdUp ? '#15803D' : '#DC2626' }}>
               <span className="rate-flag">🇺🇸</span>
@@ -136,5 +149,8 @@ export default function Header() {
         </div>
       </div>
     </>
+      {toolboxOpen==='mortgage'&&<MortgageCalc onClose={function(){setToolboxOpen(null);}}/>}
+      {toolboxOpen==='investment'&&<InvestmentCalc onClose={function(){setToolboxOpen(null);}}/>}
+      {toolboxOpen==='car'&&<CarCalc onClose={function(){setToolboxOpen(null);}}/>}
   )
 }
