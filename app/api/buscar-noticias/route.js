@@ -49,7 +49,27 @@ async function fetchNews(query) {
 
 async function rewrite(article, category) {
   const links = LINKS_UTEIS[category] || ''
-  const prompt = `Voce e jornalista brasileira que escreve para o portal Miami Brasileira, voltado para brasileiros em Miami.\n\nNOTICIA (ingles):\nTitulo: ${article.title}\nDescricao: ${article.description || ''}\n\nEscreva um artigo em PORTUGUES BRASILEIRO seguindo EXATAMENTE este estilo:\n- Comece com um cenario real que o leitor vai se identificar ("Imagine a cena...", "Voce ja passou por...")\n- Tom acolhedor e direto, como conversa com amigo bem informado\n- Use **negrito** para termos importantes e valores em dolares\n- Use ### para subtitulos e - para listas\n- Explique termos em ingles sempre que aparecerem\n- Minimo 500 palavras\n- Termine com:\n\n### Links e Recursos Uteis\n${links}\n\nResponda APENAS com JSON:\n{"titulo":"...","resumo":"2-3 frases sobre o que e e por que importa","conteudo":"artigo completo em markdown"}`
+  const prompt = `Voce e jornalista brasileira que escreve para o portal Miami Brasileira, voltado para brasileiros em Miami.
+
+NOTICIA (ingles):
+Titulo: ${article.title}
+Descricao: ${article.description || ''}
+
+Escreva um artigo em PORTUGUES BRASILEIRO seguindo EXATAMENTE este estilo:
+- Comece com um cenario real que o leitor vai se identificar ("Imagine a cena...", "Voce ja passou por...")
+- Tom acolhedor e direto, como conversa com amigo bem informado
+- Use **negrito** para termos importantes e valores em dolares
+- Use ### para subtitulos e - para listas
+- Explique termos em ingles sempre que aparecerem
+- Minimo 500 palavras
+- Termine com:
+
+### Links e Recursos Uteis
+${links}
+
+Responda APENAS com JSON:
+{"titulo":"...","resumo":"2-3 frases sobre o que e e por que importa","conteudo":"artigo completo em markdown"}`
+
   try {
     const msg = await ANTHROPIC.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -101,23 +121,29 @@ async function postToFacebook(article) {
     const siteUrl = 'https://miamibrasileira.com'
     const articleUrl = siteUrl + '/artigo/' + article.slug
     const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
-    const message = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
-    const res = await fetch('https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed', {
+    const caption = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
+
+    const imageUrl = article.image || null
+    let endpoint, body
+
+    if (imageUrl) {
+      endpoint = 'https://graph.facebook.com/v19.0/' + PAGE_ID + '/photos'
+      body = { url: imageUrl, caption: caption, access_token: PAGE_TOKEN }
+    } else {
+      endpoint = 'https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed'
+      body = { message: caption, link: articleUrl, access_token: PAGE_TOKEN }
+    }
+
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, link: articleUrl, access_token: PAGE_TOKEN })
+      body: JSON.stringify(body)
     })
     const data = await res.json()
-    if (data.error) {
-      console.error('[FB ERR]', article.slug, data.error.message)
-      return null
-    }
+    if (data.error) { console.error('[FB ERR]', article.slug, data.error.message); return null }
     console.log('[FB OK]', article.slug, '->', data.id)
     return data.id
-  } catch(e) {
-    console.error('[FB ERR]', article.slug, e.message)
-    return null
-  }
+  } catch(e) { console.error('[FB ERR]', article.slug, e.message); return null }
 }
 
 export async function GET(request) {
@@ -134,8 +160,7 @@ export async function GET(request) {
     const q = QUERIES[i]
     console.log('[API] ' + q.category)
     const raws = await fetchNews(q.query)
-    
-    // Process just 1 article per category for speed
+
     for (let j = 0; j < Math.min(raws.length, 1); j++) {
       const raw = raws[j]
       if (!raw.title || raw.title === '[Removed]') continue
@@ -166,14 +191,13 @@ export async function GET(request) {
     return Response.json({ success: false, message: 'Nenhum artigo gerado' }, { status: 500 })
   }
 
-  // Mark first as featured
   newArticles[0].featured = true
 
   try {
     await saveToGitHub(newArticles)
     console.log('[OK] Saved ' + newArticles.length + ' articles')
 
-    // Auto-post to Facebook (fire and forget, nao bloqueia resposta)
+    // Auto-post to Facebook with photo
     for (const article of newArticles) {
       await postToFacebook(article)
       await new Promise(r => setTimeout(r, 3000))
