@@ -120,10 +120,31 @@ export default function HomePage() {
         </div>
         <div className="page-columns">
           <div className="page-main">
-            {grid4.length > 0 && (<div className="section-wrap"><div className="section-header"><div className="section-bar" /><h2>Ultimas Noticias</h2><Link href="/" className="see-all">Ver mais &rarr;</Link></div><div className="grid-4">{arid4.map(function(a) { return <CompactCard key={a.id} article={a} /> })}</div></div>)}
+            {grid4.length > 0 && (
+              <div className="section-wrap">
+                <div className="section-header">
+                  <div className="section-bar" />
+                  <h2>Ultimas Noticias</h2>
+                  <Link href="/" className="see-all">Ver mais &rarr;</Link>
+                </div>
+                <div className="grid-4">
+                  {grid4.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
+                </div>
+              </div>
+            )}
             <CatBlock category="Imigracao" articles={imigracao} seeAllHref="/categoria/imigracao" />
             <CatBlock category="Negocios" articles={negocios} seeAllHref="/categoria/negocios" />
-            {grid4b.length > 0 && (<div className="section-wrap"><div className="section-header"><div className="section-bar" style={{ background: '#15803D' }} /><h2>Saude &amp; Comunidade</h2></div><div className="grid-4">{grid4b.map(function(a) { return <CompactCard key={a.id} article={a} /> })}</div></div>)}
+            {grid4b.length > 0 && (
+              <div className="section-wrap">
+                <div className="section-header">
+                  <div className="section-bar" style={{ background: '#15803D' }} />
+                  <h2>Saude &amp; Comunidade</h2>
+                </div>
+                <div className="grid-4">
+                  {grid4b.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
+                </div>
+              </div>
+            )}
             <CatBlock category="Saude" articles={saude} seeAllHref="/categoria/saude" />
             <CatBlock category="Esportes" articles={esportes} seeAllHref="/categoria/esportes" />
             <CatBlock category="Comunidade" articles={comunidade} seeAllHref="/categoria/comunidade" />
