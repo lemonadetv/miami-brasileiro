@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+export const maxDuration = 60
+
 export async function POST(request) {
   try {
     const body = await request.json()
@@ -45,7 +47,8 @@ export async function POST(request) {
           error: data.error || null
         })
 
-        await new Promise(r => setTimeout(r, 2000))
+        // 500ms entre posts para nao exceder rate limit
+        await new Promise(r => setTimeout(r, 500))
 
       } catch (err) {
         results.push({ slug: article.slug, success: false, error: err.message })
