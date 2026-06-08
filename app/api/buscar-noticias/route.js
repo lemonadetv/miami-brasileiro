@@ -20,11 +20,11 @@ const FALLBACK_IMAGES = {
 }
 
 const LINKS_UTEIS = {
-  Comunidade: '\n\n[City of Miami](https://www.miamigov.com) - Servicos municipais\n\n[Miami-Dade County](https://www.miamidade.gov) - Servicos do condado\n\n[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Apoio consular',
-  Imigracao:  '\n\n[USCIS](https://www.uscis.gov) - Servicos de imigracao\n\n[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Documentos e apostilas\n\n[AILA - Advogados de Imigracao](https://www.aila.org) - Encontre um especialista',
-  Negocios:   '\n\n[Sunbiz - Empresa na Florida](https://dos.fl.gov/sunbiz) - Registre sua LLC\n\n[SBA](https://www.sba.gov) - Suporte federal para PMEs\n\n[SCORE Miami](https://miami.score.org) - Mentoria gratuita',
-  Saude:      '\n\n[Healthcare.gov](https://www.healthcare.gov) - Compare planos de saude\n\n[Florida Medicaid](https://www.myflorida.com/apps/medicaid) - Saude para baixa renda\n\n[Jackson Health](https://jacksonhealth.org) - Hospital publico de Miami',
-  Esportes:   '\n\n[Inter Miami CF](https://www.intermiamicf.com) - Futebol em Miami\n\n[Copa do Mundo 2026 Miami](https://www.fifa.com) - Informacoes do Mundial\n\n[Miami Heat](https://www.nba.com/heat) - NBA em Miami',
+  Comunidade: '\n[City of Miami](https://www.miamigov.com) - Servicos municipais\n[Miami-Dade County](https://www.miamidade.gov) - Servicos do condado\n[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Apoio consular',
+  Imigracao:  '\n[USCIS](https://www.uscis.gov) - Servicos de imigracao\n[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Documentos e apostilas\n[AILA - Advogados de Imigracao](https://www.aila.org) - Encontre um especialista',
+  Negocios:   '\n[Sunbiz - Empresa na Florida](https://dos.fl.gov/sunbiz) - Registre sua LLC\n[SBA](https://www.sba.gov) - Suporte federal para PMEs\n[SCORE Miami](https://miami.score.org) - Mentoria gratuita',
+  Saude:      '\n[Healthcare.gov](https://www.healthcare.gov) - Compare planos de saude\n[Florida Medicaid](https://www.myflorida.com/apps/medicaid) - Saude para baixa renda\n[Jackson Health](https://jacksonhealth.org) - Hospital publico de Miami',
+  Esportes:   '\n[Inter Miami CF](https://www.intermiamicf.com) - Futebol em Miami\n[Copa do Mundo 2026 Miami](https://www.fifa.com) - Informacoes do Mundial\n[Miami Heat](https://www.nba.com/heat) - NBA em Miami',
 }
 
 function generateSlug(title) {
@@ -47,55 +47,9 @@ async function fetchNews(query) {
   }
 }
 
-async function loadExistingArticles(token, repo) {
-  try {
-    const url = 'https://api.github.com/repos/' + repo + '/contents/data/articles.json'
-    const r = await fetch(url, {
-      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' }
-    })
-    if (!r.ok) return { articles: [], sha: null }
-    const data = await r.json()
-    const content = JSON.parse(Buffer.from(data.content, 'base64').toString('utf-8'))
-    return { articles: Array.isArray(content) ? content : [], sha: data.sha }
-  } catch(e) {
-    console.error('[ERR] loadExisting:', e.message)
-    return { articles: [], sha: null }
-  }
-}
-
 async function rewrite(article, category) {
   const links = LINKS_UTEIS[category] || ''
-  const prompt = `Voce e jornalista brasileira que escreve para o portal Miami Brasileira, voltado para brasileiros em Miami.
-
-NOTICIA (ingles):
-Titulo: ${article.title}
-Descricao: ${article.description || ''}
-
-Escreva um artigo em PORTUGUES BRASILEIRO com estas regras:
-
-ESTILO:
-- Comece com uma situacao real que o leitor vai se identificar ("Imagine a cena...", "Voce ja passou por...")
-- Tom direto e acolhedor, como conversa com um amigo que entende do assunto
-- Frases curtas. Paragrafos de no maximo 3 linhas
-- Use **negrito** para termos importantes e valores em dolares
-- Use ### para subtitulos e - para listas quando necessario
-- Explique termos em ingles quando aparecerem
-- Minimo 500 palavras
-
-PROIBIDO:
-- Traco longo ou em dash: — (substitua por virgula, dois pontos ou ponto final)
-- "Alem disso", "Vale destacar que", "E importante ressaltar", "Neste contexto", "Tendo em vista", "Cabe mencionar", "De acordo com especialistas"
-- Tom formal ou academico
-- Palavras repetidas no mesmo paragrafo
-
-Termine com:
-
-### Links Uteis
-${links}
-
-Responda APENAS com JSON:
-{"titulo":"...","resumo":"2-3 frases sobre o que e e por que importa para brasileiros em Miami","conteudo":"artigo completo em markdown"}`
-
+  const prompt = `Voce e jornalista brasileira que escreve para o portal Miami Brasileira, voltado para brasileiros em Miami.\n\nNOTICIA (ingles):\nTitulo: ${article.title}\nDescricao: ${article.description || ''}\n\nEscreva um artigo em PORTUGUES BRASILEIRO seguindo EXATAMENTE este estilo:\n- Comece com um cenario real que o leitor vai se identificar ("Imagine a cena...", "Voce ja passou por...")\n- Tom acolhedor e direto, como conversa com amigo bem informado\n- Use **negrito** para termos importantes e valores em dolares\n- Use ### para subtitulos e - para listas\n- Explique termos em ingles sempre que aparecerem\n- Minimo 500 palavras\n- Termine com:\n\n### Links e Recursos Uteis\n${links}\n\nResponda APENAS com JSON:\n{"titulo":"...","resumo":"2-3 frases sobre o que e e por que importa","conteudo":"artigo completo em markdown"}`
   try {
     const msg = await ANTHROPIC.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -112,8 +66,17 @@ Responda APENAS com JSON:
   }
 }
 
-async function saveToGitHub(articles, sha, token, repo) {
+async function saveToGitHub(articles) {
+  const token = process.env.GITHUB_TOKEN
+  const repo = process.env.GITHUB_REPO || 'lemonadetv/miami-brasileiro'
   const url = 'https://api.github.com/repos/' + repo + '/contents/data/articles.json'
+
+  let sha = null
+  try {
+    const r = await fetch(url, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' } })
+    if (r.ok) sha = (await r.json()).sha
+  } catch(e) {}
+
   const content = Buffer.from(JSON.stringify(articles, null, 2)).toString('base64')
   const body = { message: '[BOT] Atualizacao automatica ' + new Date().toISOString(), content }
   if (sha) body.sha = sha
@@ -130,6 +93,33 @@ async function saveToGitHub(articles, sha, token, repo) {
   return true
 }
 
+async function postToFacebook(article) {
+  try {
+    const PAGE_ID = process.env.FACEBOOK_PAGE_ID
+    const PAGE_TOKEN = process.env.FACEBOOK_PAGE_TOKEN
+    if (!PAGE_ID || !PAGE_TOKEN) return null
+    const siteUrl = 'https://miamibrasileira.com'
+    const articleUrl = siteUrl + '/artigo/' + article.slug
+    const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
+    const message = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
+    const res = await fetch('https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, link: articleUrl, access_token: PAGE_TOKEN })
+    })
+    const data = await res.json()
+    if (data.error) {
+      console.error('[FB ERR]', article.slug, data.error.message)
+      return null
+    }
+    console.log('[FB OK]', article.slug, '->', data.id)
+    return data.id
+  } catch(e) {
+    console.error('[FB ERR]', article.slug, e.message)
+    return null
+  }
+}
+
 export async function GET(request) {
   const isVercelCron = request.headers.get('x-vercel-cron') === '1'
   const { searchParams } = new URL(request.url)
@@ -137,44 +127,22 @@ export async function GET(request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const token = process.env.GITHUB_TOKEN
-  const repo = process.env.GITHUB_REPO || 'lemonadetv/miami-brasileiro'
-
   console.log('[BOT] Start at ' + new Date().toISOString())
-
-  // Load existing articles and track used images
-  const { articles: existing, sha } = await loadExistingArticles(token, repo)
-  const usedImages = new Set(existing.map(function(a) { return a.image }).filter(Boolean))
-
   const newArticles = []
 
   for (let i = 0; i < QUERIES.length; i++) {
     const q = QUERIES[i]
     console.log('[API] ' + q.category)
     const raws = await fetchNews(q.query)
-
+    
     // Process just 1 article per category for speed
     for (let j = 0; j < Math.min(raws.length, 1); j++) {
       const raw = raws[j]
       if (!raw.title || raw.title === '[Removed]') continue
 
-      // Skip if we already have this source URL
-      const alreadyHave = existing.some(function(a) { return a.sourceUrl === raw.url })
-      if (alreadyHave) {
-        console.log('[SKIP] Already have: ' + raw.title.slice(0, 50))
-        continue
-      }
-
       console.log('[WRITE] ' + raw.title.slice(0, 50))
       const result = await rewrite(raw, q.category)
       if (!result) continue
-
-      // Pick image: prefer article image if not already used
-      let image = FALLBACK_IMAGES[q.category]
-      if (raw.urlToImage && !usedImages.has(raw.urlToImage)) {
-        image = raw.urlToImage
-        usedImages.add(raw.urlToImage)
-      }
 
       const slug = generateSlug(result.titulo || raw.title) + '-' + Date.now().toString(36)
       newArticles.push({
@@ -184,37 +152,36 @@ export async function GET(request) {
         excerpt: result.resumo || raw.description || '',
         content: result.conteudo || '',
         category: q.category,
-        image: image,
+        image: raw.urlToImage || FALLBACK_IMAGES[q.category],
         source: raw.source?.name || 'Agencias',
         sourceUrl: raw.url || '',
-        publishedAt: new Date().toISOString(),
+        publishedAt: raw.publishedAt || new Date().toISOString(),
         featured: false
       })
-      await new Promise(function(r) { setTimeout(r, 500) })
+      await new Promise(r => setTimeout(r, 500))
     }
   }
 
   if (newArticles.length === 0) {
-    return Response.json({ success: false, message: 'Nenhum artigo novo gerado' })
+    return Response.json({ success: false, message: 'Nenhum artigo gerado' }, { status: 500 })
   }
 
-  // Mark first new as featured
+  // Mark first as featured
   newArticles[0].featured = true
 
-  // Merge: new articles first, keep max 60
-  const merged = [...newArticles, ...existing].slice(0, 60)
-
   try {
-    await saveToGitHub(merged, sha, token, repo)
-    console.log('[OK] Saved ' + newArticles.length + ' new + ' + existing.length + ' existing = ' + merged.length + ' total')
-    return Response.json({
-      success: true,
-      new: newArticles.length,
-      total: merged.length,
-      articles: newArticles.map(function(a) { return a.slug })
-    })
+    await saveToGitHub(newArticles)
+    console.log('[OK] Saved ' + newArticles.length + ' articles')
+
+    // Auto-post to Facebook (fire and forget, nao bloqueia resposta)
+    for (const article of newArticles) {
+      await postToFacebook(article)
+      await new Promise(r => setTimeout(r, 3000))
+    }
+
+    return Response.json({ success: true, count: newArticles.length, articles: newArticles.map(a => a.slug) })
   } catch(e) {
     console.error('[ERR] Save:', e.message)
     return Response.json({ success: false, error: e.message }, { status: 500 })
   }
-}
+  }
