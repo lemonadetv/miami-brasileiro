@@ -148,9 +148,9 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </>
       {toolboxOpen==='mortgage'&&<MortgageCalc onClose={function(){setToolboxOpen(null);}}/>}
       {toolboxOpen==='investment'&&<InvestmentCalc onClose={function(){setToolboxOpen(null);}}/>}
       {toolboxOpen==='car'&&<CarCalc onClose={function(){setToolboxOpen(null);}}/>}
+    </>
   )
 }
