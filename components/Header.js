@@ -110,17 +110,6 @@ export default function Header() {
             <span style={{ fontSize:16 }}>{weather.icon}</span>
             <span>Ft. Lauderdale</span>
             <strong>{weather.temp!==null ? (weather.temp-1)+'C' : '--C'}</strong>
-          <div style={{marginLeft:'auto',display:'flex',flexDirection:'column',alignItems:'flex-end',justifyContent:'center',paddingLeft:12}}>
-            <div style={{fontSize:9,color:'#aaa',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:3,fontWeight:700,whiteSpace:'nowrap'}}>Use nossas ferramentas</div>
-            <div style={{display:'flex',gap:5}}>
-              {[{k:'mortgage',i:'🏠',l:'Financiamento'},{k:'investment',i:'📈',l:'Investimentos'},{k:'car',i:'🚗',l:'Veiculos'}].map(function(t){return(
-                <button key={t.k} onClick={function(){setToolboxOpen(t.k);}}
-                  style={{background:'#f0f0f0',border:'1px solid #ddd',borderRadius:6,padding:'2px 8px',cursor:'pointer',fontSize:11,fontWeight:600,color:'#333',display:'flex',alignItems:'center',gap:3,whiteSpace:'nowrap'}}>
-                  <span>{t.i}</span><span>{t.l}</span>
-                </button>
-              )})}
-            </div>
-          </div>
           </div>
           <div className="date-bar">
             <span className="rate-pill" style={{ color: usdUp ? '#15803D' : '#DC2626' }}>
@@ -137,6 +126,15 @@ export default function Header() {
             </span>
           </div>
         </div>
+      </div>
+      <div style={{background:'#f8f9fa',borderBottom:'1px solid #ebebeb',padding:'5px 16px',display:'flex',alignItems:'center',justifyContent:'center',gap:8,flexWrap:'wrap'}}>
+        <span style={{fontSize:9,color:'#aaa',textTransform:'uppercase',letterSpacing:'0.07em',fontWeight:700,marginRight:4}}>Use nossas ferramentas</span>
+        {[{k:'mortgage',i:'🏠',l:'Financiamento'},{k:'investment',i:'📈',l:'Investimentos'},{k:'car',i:'🚗',l:'Veiculos'}].map(function(t){return(
+          <button key={t.k} onClick={function(){setToolboxOpen(t.k);}}
+            style={{background:'#fff',border:'1px solid #ddd',borderRadius:6,padding:'3px 10px',cursor:'pointer',fontSize:11,fontWeight:600,color:'#333',display:'flex',alignItems:'center',gap:4}}>
+            <span>{t.i}</span><span>{t.l}</span>
+          </button>
+        )})}
       </div>
       <div className="ticker">
         <div className="ticker-label">🔴 AGORA</div>
