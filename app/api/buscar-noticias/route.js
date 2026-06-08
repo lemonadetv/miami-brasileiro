@@ -119,7 +119,7 @@ async function postToFacebook(article) {
     const PAGE_TOKEN = process.env.FACEBOOK_PAGE_TOKEN
     if (!PAGE_ID || !PAGE_TOKEN) return null
     const siteUrl = 'https://miami-brasileiro.vercel.app'
-    const articleUrl = siteUrl + '/artigo/' + article.slug
+    const articleUrl = siteUrl + '/artigo/' + article.id
     const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
     const caption = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
     const imageUrl = article.image || null
