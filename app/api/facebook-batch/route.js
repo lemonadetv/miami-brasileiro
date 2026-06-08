@@ -4,7 +4,7 @@ export const maxDuration = 60
 
 async function postOne(article, PAGE_ID, PAGE_TOKEN, siteUrl) {
   try {
-    const articleUrl = siteUrl + '/artigo/' + article.slug
+    const articleUrl = siteUrl + '/artigo/' + article.id
     const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
     const caption = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
 
