@@ -110,17 +110,17 @@ export default function Header() {
             <span style={{ fontSize:16 }}>{weather.icon}</span>
             <span>Ft. Lauderdale</span>
             <strong>{weather.temp!==null ? (weather.temp-1)+'C' : '--C'}</strong>
-          </div>
-          <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'0 8px'}}>
-            <div style={{fontSize:9,color:'#aaa',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:3,fontWeight:700}}>Use nossas ferramentas de calculos</div>
+          <div style={{marginLeft:'auto',display:'flex',flexDirection:'column',alignItems:'flex-end',justifyContent:'center',paddingLeft:12}}>
+            <div style={{fontSize:9,color:'#aaa',textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:3,fontWeight:700,whiteSpace:'nowrap'}}>Use nossas ferramentas</div>
             <div style={{display:'flex',gap:5}}>
               {[{k:'mortgage',i:'🏠',l:'Financiamento'},{k:'investment',i:'📈',l:'Investimentos'},{k:'car',i:'🚗',l:'Veiculos'}].map(function(t){return(
                 <button key={t.k} onClick={function(){setToolboxOpen(t.k);}}
-                  style={{background:'#f5f5f5',border:'1px solid #e0e0e0',borderRadius:6,padding:'3px 9px',cursor:'pointer',fontSize:11,fontWeight:600,color:'#333',display:'flex',alignItems:'center',gap:4}}>
+                  style={{background:'#f0f0f0',border:'1px solid #ddd',borderRadius:6,padding:'2px 8px',cursor:'pointer',fontSize:11,fontWeight:600,color:'#333',display:'flex',alignItems:'center',gap:3,whiteSpace:'nowrap'}}>
                   <span>{t.i}</span><span>{t.l}</span>
                 </button>
               )})}
             </div>
+          </div>
           </div>
           <div className="date-bar">
             <span className="rate-pill" style={{ color: usdUp ? '#15803D' : '#DC2626' }}>
