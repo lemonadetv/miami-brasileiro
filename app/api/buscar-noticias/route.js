@@ -118,14 +118,12 @@ async function postToFacebook(article) {
     const PAGE_ID = process.env.FACEBOOK_PAGE_ID
     const PAGE_TOKEN = process.env.FACEBOOK_PAGE_TOKEN
     if (!PAGE_ID || !PAGE_TOKEN) return null
-    const siteUrl = 'https://miamibrasileira.com'
+    const siteUrl = 'https://miami-brasileiro.vercel.app'
     const articleUrl = siteUrl + '/artigo/' + article.slug
     const excerpt = article.excerpt ? article.excerpt.slice(0, 220) + '...' : ''
     const caption = '\uD83D\uDCF0 ' + article.title + '\n\n' + excerpt + '\n\n\uD83D\uDC49 Leia mais: ' + articleUrl
-
     const imageUrl = article.image || null
     let endpoint, body
-
     if (imageUrl) {
       endpoint = 'https://graph.facebook.com/v19.0/' + PAGE_ID + '/photos'
       body = { url: imageUrl, caption: caption, access_token: PAGE_TOKEN }
@@ -133,12 +131,7 @@ async function postToFacebook(article) {
       endpoint = 'https://graph.facebook.com/v19.0/' + PAGE_ID + '/feed'
       body = { message: caption, link: articleUrl, access_token: PAGE_TOKEN }
     }
-
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    })
+    const res = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     const data = await res.json()
     if (data.error) { console.error('[FB ERR]', article.slug, data.error.message); return null }
     console.log('[FB OK]', article.slug, '->', data.id)
@@ -160,7 +153,8 @@ export async function GET(request) {
     const q = QUERIES[i]
     console.log('[API] ' + q.category)
     const raws = await fetchNews(q.query)
-
+    
+    // Process just 1 article per category for speed
     for (let j = 0; j < Math.min(raws.length, 1); j++) {
       const raw = raws[j]
       if (!raw.title || raw.title === '[Removed]') continue
@@ -191,13 +185,14 @@ export async function GET(request) {
     return Response.json({ success: false, message: 'Nenhum artigo gerado' }, { status: 500 })
   }
 
+  // Mark first as featured
   newArticles[0].featured = true
 
   try {
     await saveToGitHub(newArticles)
     console.log('[OK] Saved ' + newArticles.length + ' articles')
 
-    // Auto-post to Facebook with photo
+    // Post each new article to Facebook
     for (const article of newArticles) {
       await postToFacebook(article)
       await new Promise(r => setTimeout(r, 3000))
@@ -208,4 +203,4 @@ export async function GET(request) {
     console.error('[ERR] Save:', e.message)
     return Response.json({ success: false, error: e.message }, { status: 500 })
   }
-  }
+      }
