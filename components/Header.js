@@ -5,13 +5,15 @@ import { useState, useEffect } from 'react'
 import { MortgageCalc, InvestmentCalc, CarCalc } from '../app/components/Toolbox'
 
 const CATEGORIAS = [
-  { label: 'Inicio',     href: '/' },
-  { label: 'Comunidade', href: '/categoria/comunidade' },
-  { label: 'Imigracao',  href: '/categoria/imigracao' },
-  { label: 'Negocios',   href: '/categoria/negocios' },
-  { label: 'Saude',      href: '/categoria/saude' },
-  { label: 'Esportes',   href: '/categoria/esportes' },
-  { label: 'Contato',    href: '/contato' },
+  { label: 'Inicio',          href: '/' },
+  { label: 'Comunidade',      href: '/categoria/comunidade' },
+  { label: 'Imigracao',       href: '/categoria/imigracao' },
+  { label: 'Negocios',        href: '/categoria/negocios' },
+  { label: 'Saude',           href: '/categoria/saude' },
+  { label: 'Esportes',        href: '/categoria/esportes' },
+  { label: 'Cultura e Lazer', href: '/categoria/cultura-lazer' },
+  { label: 'Sobre Nos',       href: '/sobre' },
+  { label: 'Contato',         href: '/contato' },
 ]
 
 const WMO = {
@@ -23,7 +25,7 @@ export default function Header() {
   const pathname = usePathname()
   const [rates, setRates] = useState({ usd: null, eur: null, usdChange: null, eurChange: null })
   const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: '' })
-  const [social, setSocial] = useState({ facebook: '', instagram: '', youtube: '' })
+  const [social, setSocial] = useState({ facebook: 'https://www.facebook.com/miamibrasileira' })
   const [toolboxOpen, setToolboxOpen] = useState(null)
   const [tickerItems, setTickerItems] = useState([
     { text: 'Como alugar apartamento em Miami sem historico americano', href: '/categoria/comunidade' },
@@ -50,7 +52,7 @@ export default function Header() {
         }
       }).catch(function() {})
     fetch('/api/site-config').then(function(r) { return r.json() })
-      .then(function(d) { setSocial({ facebook: d.socialFacebook||'', instagram: d.socialInstagram||'', youtube: d.socialYoutube||'' }) })
+      .then(function(d) { setSocial({ facebook: d.socialFacebook||'https://www.facebook.com/miamibrasileira' }) })
       .catch(function() {})
     fetch('/api/admin/artigos', { credentials: 'include' })
       .then(function(r) { return r.ok ? r.json() : null })
@@ -73,9 +75,7 @@ export default function Header() {
         <div className="topbar-inner">
           <span>🌎 Miami &amp; Sul da Florida &nbsp;&middot;&nbsp; {data}</span>
           <div className="topbar-social">
-            {social.facebook && <a href={social.facebook} target="_blank" rel="noreferrer">📘 Facebook</a>}
-            {social.instagram && <a href={social.instagram} target="_blank" rel="noreferrer">📸 Instagram</a>}
-            {social.youtube && <a href={social.youtube} target="_blank" rel="noreferrer">▶ YouTube</a>}
+            <a href="https://www.facebook.com/miamibrasileira" target="_blank" rel="noreferrer">📘 Facebook</a>
           </div>
         </div>
       </div>
