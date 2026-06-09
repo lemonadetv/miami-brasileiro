@@ -26,7 +26,7 @@ export default function Footer() {
           {/* CATEGORIAS */}
           <div>
             <h4 className="footer-heading">Categorias</h4>
-            <ul className="footer-links">
+            <ul className="footer-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li><Link href="/categoria/comunidade">Comunidade</Link></li>
               <li><Link href="/categoria/imigracao">Imigracao</Link></li>
               <li><Link href="/categoria/negocios">Negocios</Link></li>
@@ -39,7 +39,7 @@ export default function Footer() {
           {/* PORTAL */}
           <div>
             <h4 className="footer-heading">Portal</h4>
-            <ul className="footer-links">
+            <ul className="footer-links" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li><Link href="/">Inicio</Link></li>
               <li><Link href="/sobre">Sobre Nos</Link></li>
               <li><Link href="/anuncie">Anuncie</Link></li>
