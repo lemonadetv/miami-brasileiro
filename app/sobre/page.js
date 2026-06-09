@@ -16,14 +16,14 @@ export default function SobrePage() {
       {/* Hero com foto de Miami */}
       <div style={{ position: 'relative', height: 420, overflow: 'hidden' }}>
         <img
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80"
+          src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1600&q=80"
           alt="Miami skyline ao entardecer"
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
         />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)', display: 'flex', alignItems: 'flex-end', padding: '48px' }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#009C3B', color: '#fff', padding: '5px 14px', borderRadius: 100, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', marginBottom: 12 }}>
-              🦩 NOSSO PORTAL
+              ð¦© NOSSO PORTAL
             </div>
             <h1 style={{ fontSize: 42, fontWeight: 800, color: '#fff', margin: 0, lineHeight: 1.1 }}>
               Sobre o Miami Brasileiro
@@ -105,7 +105,7 @@ export default function SobrePage() {
                 Com correspondentes em Miami, Fort Lauderdale e Orlando, cobrimos tudo o que importa para a comunidade brasileira na Florida e alem.
               </p>
               <Link href="/contato" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#009C3B', color: '#fff', padding: '12px 24px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                Fale com a Redacao →
+                Fale com a Redacao â
               </Link>
             </div>
           </div>
