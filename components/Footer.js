@@ -11,7 +11,7 @@ export default function Footer() {
           {/* SOBRE */}
           <div>
             <div className="footer-logo">
-              <div className="icon">🦩</div>
+              <div className="icon">ð¦©</div>
               <div className="name">Miami Brasileiro</div>
             </div>
             <p className="footer-about">
@@ -19,7 +19,7 @@ export default function Footer() {
               Informacao confiavel, em portugues, para voce navegar a vida nos EUA.
             </p>
             <Link href="/sobre" style={{ display:'inline-block', marginTop: 8, color:'#009C3B', fontWeight:600, fontSize:14 }}>
-              Sobre Nos →
+              Sobre Nos â
             </Link>
           </div>
 
@@ -57,7 +57,7 @@ export default function Footer() {
             </Link>
             <div style={{ marginTop:16 }}>
               <a href="https://www.facebook.com/miamibrasileira" target="_blank" rel="noreferrer" style={{ color:'#009C3B', fontSize:13, fontWeight:600 }}>
-                📘 Facebook
+                ð Facebook
               </a>
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© {ano} Miami Brasileiro. Todos os direitos reservados.</span>
+        <span>Â© {ano} Miami Brasileiro. Todos os direitos reservados.</span>
       </div>
     </footer>
   )
