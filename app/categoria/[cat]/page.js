@@ -11,7 +11,8 @@ const CATS = {
   imigracao:  { label: 'Imigracao',  color: '#F4622A', desc: 'Vistos, green card, USCIS, asilo e tudo sobre imigracao nos EUA' },
   negocios:   { label: 'Negocios',   color: '#7C3AED', desc: 'Empreendedorismo, financas e oportunidades de negocio na Florida' },
   saude:      { label: 'Saude',      color: '#15803D', desc: 'Saude, planos medicos, seguros e bem-estar para brasileiros nos EUA' },
-  esportes:   { label: 'Esportes',   color: '#DC2626', desc: 'Futebol, Copa do Mundo, MMA e esportes com a visao brasileira' },
+  esportes:       { label: 'Esportes',       color: '#DC2626', desc: 'Futebol, Copa do Mundo, MMA e esportes com a visao brasileira' },
+  'cultura-lazer': { label: 'Cultura e Lazer', color: '#e91e8c', desc: 'Dicas de cultura, lazer, entretenimento e diversao para brasileiros em Miami' },
 }
 
 const CAT_MAP = {
@@ -19,7 +20,8 @@ const CAT_MAP = {
   imigracao:  'Imigracao',
   negocios:   'Negocios',
   saude:      'Saude',
-  esportes:   'Esportes',
+  esportes:        'Esportes',
+  'cultura-lazer': 'Cultura e Lazer',
 }
 
 const FALLBACK = {
