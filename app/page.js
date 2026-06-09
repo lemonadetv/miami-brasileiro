@@ -107,6 +107,7 @@ export default function HomePage() {
   const negocios  = getArticlesByCategory('Negocios').slice(0, 4)
   const saude     = getArticlesByCategory('Saude').slice(0, 4)
   const esportes  = getArticlesByCategory('Esportes').slice(0, 4)
+  const cultura   = getArticlesByCategory('Cultura e Lazer').slice(0, 4)
   const comunidade = getArticlesByCategory('Comunidade').slice(0, 4)
   return (
     <>
@@ -147,6 +148,7 @@ export default function HomePage() {
             )}
             <CatBlock category="Saude" articles={saude} seeAllHref="/categoria/saude" />
             <CatBlock category="Esportes" articles={esportes} seeAllHref="/categoria/esportes" />
+            <CatBlock category="Cultura e Lazer" articles={cultura} seeAllHref="/categoria/cultura-e-lazer" />
             <CatBlock category="Comunidade" articles={comunidade} seeAllHref="/categoria/comunidade" />
           </div>
           <Sidebar articles={all} />
