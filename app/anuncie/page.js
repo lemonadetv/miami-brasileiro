@@ -8,7 +8,8 @@ export const metadata = {
 }
 
 export default function AnunciePage() {
-<>
+  return (
+    <>
       <Header />
       <div style={{ minHeight: '80vh', background: '#f8f9fa', padding: '60px 20px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
