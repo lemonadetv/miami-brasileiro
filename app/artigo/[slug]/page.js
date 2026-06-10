@@ -376,12 +376,6 @@ export default function ArtigoPage(props) {
                 <span>{readingTime(article.content)}</span>
               </div>
               {article.excerpt && <p className="article-excerpt">{article.excerpt}</p>}
-              <ArticleContent content={article.content} category={article.category} />
-              {article.sourceUrl && article.sourceUrl !== '#' && (
-                <div className="article-source-box">
-                  <span>Baseado em <strong>{article.source}</strong></span>
-                  <a href={article.sourceUrl} target="_blank" rel="noreferrer nofollow" className="article-source-link">Ver fonte &rarr;</a>
-                </div>
               )}
               <ShareButtons title={article.title} />
             </div>
@@ -392,7 +386,7 @@ export default function ArtigoPage(props) {
           <div style={{ marginTop:40 }}>
             <div className="section-header">
               <div className="section-bar" />
-              <h2>Noticias Relacionadas</h2>
+              <h2>Notícias Relacionadas</h2>
             </div>
             <div className="article-grid">
               {relacionados.map(function(art) {
