@@ -1,0 +1,32 @@
+name: Buscar Noticias 2x/dia
+on:
+  schedule:
+    - cron: '0 12 * * *'
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Instalar dependencias
+        run: npm install @anthropic-ai/sdk
+      - name: Rodar bot de noticias
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+          FACEBOOK_PAGE_TOKEN: ${{ secrets.FACEBOOK_PAGE_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+        run: node scripts/fetch-news.js
+      - name: Commit e push dos artigos
+        run: |
+          git config user.name "Miami Brasileiro Bot"
+          git config user.email "bot@miamibrasileira.com"
+          git add data/articles.json
+          git diff --staged --quiet || git commit -m "bot: adicionar artigos $(date +%Y-%m-%d-%H%M)"
+          git push
