@@ -1,6 +1,7 @@
 // scripts/fetch-news.js
 // Bot de noticias para Miami Brasileiro
 // Roda via GitHub Actions 2x/dia
+// Usa Google News RSS (gratuito, sem limite de quota)
 
 const Anthropic = require('@anthropic-ai/sdk')
 const fs = require('fs')
@@ -8,17 +9,16 @@ const path = require('path')
 const https = require('https')
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-const NEWS_API_KEY = process.env.NEWS_API_KEY
 const FB_TOKEN = process.env.FACEBOOK_PAGE_TOKEN
 const FB_PAGE_ID = process.env.FACEBOOK_PAGE_ID
 
 const QUERIES = [
-  { query: 'brazil miami florida community immigration 2026', category: 'Comunidade' },
-  { query: 'immigration visa green card uscis brazil usa 2026', category: 'Imigracao' },
-  { query: 'brazil business entrepreneur florida miami 2026', category: 'Negocios' },
-  { query: 'health insurance medicaid florida immigrants brazil 2026', category: 'Saude' },
-  { query: 'soccer brazil inter miami sports 2026', category: 'Esportes' },
-  { query: 'miami culture leisure restaurants events brazil 2026', category: 'Cultura e Lazer' },
+  { query: 'brazilians miami florida community news', category: 'Comunidade' },
+  { query: 'immigration visa green card brazil usa florida', category: 'Imigracao' },
+  { query: 'business entrepreneurs brazil miami florida', category: 'Negocios' },
+  { query: 'health insurance medicaid florida immigrants', category: 'Saude' },
+  { query: 'soccer brazil inter miami sports', category: 'Esportes' },
+  { query: 'miami culture restaurants events florida', category: 'Cultura e Lazer' },
 ]
 
 const CATEGORY_IMAGES = {
@@ -30,34 +30,73 @@ const CATEGORY_IMAGES = {
   'Cultura e Lazer': 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=800',
 }
 
-function fetchJson(url) {
+function fetchRSS(query) {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    const encoded = encodeURIComponent(query)
+    const reqOptions = {
+      hostname: 'news.google.com',
+      path: `/rss/search?q=${encoded}&hl=en-US&gl=US&ceid=US:en`,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NewsFetcher/1.0)' }
+    }
+    https.get(reqOptions, (res) => {
+      if (res.statusCode === 301 || res.statusCode === 302) {
+        const loc = res.headers.location
+        https.get(loc, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res2) => {
+          let data = ''
+          res2.on('data', chunk => data += chunk)
+          res2.on('end', () => resolve(parseRSS(data)))
+        }).on('error', reject)
+        return
+      }
       let data = ''
       res.on('data', chunk => data += chunk)
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)) }
-        catch (e) { reject(e) }
-      })
+      res.on('end', () => resolve(parseRSS(data)))
     }).on('error', reject)
   })
 }
 
-function postJson(hostname, path, data, token) {
+function parseRSS(xml) {
+  const items = []
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g
+  let match
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const block = match[1]
+    const extract = (tag) => {
+      const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'))
+      if (!m) return ''
+      return m[1]
+        .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+        .replace(/<[^>]*>/g, '')
+        .trim()
+    }
+    const title = extract('title')
+    const description = extract('description')
+    const source = extract('source')
+    if (title && !title.includes('<?xml')) {
+      items.push({ title, description, source })
+    }
+  }
+  return items.slice(0, 5)
+}
+
+function postJson(hostname, urlPath, bodyData) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify(data)
+    const body = JSON.stringify(bodyData)
     const options = {
-      hostname, path, method: 'POST',
+      hostname,
+      path: urlPath,
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(body),
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       }
     }
     const req = https.request(options, (res) => {
       let d = ''
       res.on('data', chunk => d += chunk)
-      res.on('end', () => { try { resolve(JSON.parse(d)) } catch(e) { resolve(d) } })
+      res.on('end', () => {
+        try { resolve(JSON.parse(d)) } catch (e) { resolve(d) }
+      })
     })
     req.on('error', reject)
     req.write(body)
@@ -65,37 +104,16 @@ function postJson(hostname, path, data, token) {
   })
 }
 
-async function fetchNews(query) {
-  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=5&apiKey=${NEWS_API_KEY}`
-  const data = await fetchJson(url)
-  if (!data.articles || data.articles.length === 0) return null
-  return data.articles[0]
-}
-
 function slugify(text) {
   return text.toLowerCase()
-    .normalize('NFD').replace(/[Ì-Í¯]/g, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim().replace(/\s+/g, '-')
     .substring(0, 80)
 }
 
 async function rewrite(article, category) {
-  const prompt = `Voce e um jornalista brasileiro especializado na comunidade brasileira em Miami e Sul da Florida.
-
-Reescreva o artigo abaixo em portugues brasileiro, adaptando o conteudo para ser relevante para brasileiros morando nos EUA.
-O artigo deve ser informativo, engajante e profissional.
-
-Artigo original:
-Titulo: ${article.title}
-Conteudo: ${article.description || article.content || ''}
-
-Responda APENAS com JSON valido neste formato exato:
-{
-  "title": "titulo em portugues (max 80 chars)",
-  "excerpt": "resumo de 1-2 frases em portugues (max 200 chars)",
-  "content": "artigo completo em markdown com 3-4 paragrafos"
-}`
+  const prompt = `Voce e um jornalista brasileiro especializado na comunidade brasileira em Miami e Sul da Florida.\n\nReescreva o artigo abaixo em portugues brasileiro, adaptando o conteudo para ser relevante para brasileiros morando nos EUA.\nO artigo deve ser informativo, engajante e profissional.\n\nArtigo original:\nTitulo: ${article.title}\nConteudo: ${article.description || ''}\n\nResponda APENAS com JSON valido neste formato exato:\n{\n  "title": "titulo em portugues (max 80 chars)",\n  "excerpt": "resumo de 1-2 frases em portugues (max 200 chars)",\n  "content": "artigo completo em markdown com 3-4 paragrafos"\n}`
 
   const msg = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -111,15 +129,20 @@ Responda APENAS com JSON valido neste formato exato:
 
 async function postToFacebook(article) {
   if (!FB_TOKEN || !FB_PAGE_ID) {
-    console.log('Facebook: sem credenciais, pulando')
+    console.log('  Facebook: sem credenciais, pulando')
     return
   }
   const message = `${article.title}\n\n${article.excerpt}\n\nLeia mais: https://miamibrasileiro.com/artigo/${article.slug}`
-  const result = await postJson('graph.facebook.com', `/v19.0/${FB_PAGE_ID}/feed`, {
-    message,
-    access_token: FB_TOKEN
-  })
-  console.log('Facebook post:', result)
+  try {
+    const result = await postJson(
+      'graph.facebook.com',
+      `/v19.0/${FB_PAGE_ID}/feed`,
+      { message, access_token: FB_TOKEN }
+    )
+    console.log('  Facebook:', JSON.stringify(result))
+  } catch (e) {
+    console.error('  Facebook erro:', e.message)
+  }
 }
 
 async function main() {
@@ -131,20 +154,29 @@ async function main() {
     console.log('articles.json nao encontrado, criando novo')
   }
 
-  const existingSlugs = new Set(articles.map(a => a.slug))
+  const existingTitles = new Set(articles.map(a => a.title))
   const newArticles = []
 
   for (const { query, category } of QUERIES) {
     try {
       console.log(`Buscando: ${category}...`)
-      const raw = await fetchNews(query)
-      if (!raw) { console.log(`  Sem resultados para ${category}`); continue }
+      const items = await fetchRSS(query)
+      if (!items || items.length === 0) {
+        console.log(`  Sem resultados RSS para ${category}`)
+        continue
+      }
+
+      const raw = items[0]
+      if (!raw.title) { console.log(`  Titulo vazio`); continue }
+      console.log(`  Encontrado: ${raw.title.substring(0, 70)}`)
 
       const rewritten = await rewrite(raw, category)
+      if (existingTitles.has(rewritten.title)) {
+        console.log(`  Duplicado, pulando`)
+        continue
+      }
+
       const slug = slugify(rewritten.title) + '-' + Date.now()
-
-      if (existingSlugs.has(slug)) { console.log(`  Duplicado: ${slug}`); continue }
-
       const article = {
         id: slug,
         slug,
@@ -152,15 +184,16 @@ async function main() {
         excerpt: rewritten.excerpt,
         content: rewritten.content,
         category,
-        image: raw.urlToImage || CATEGORY_IMAGES[category],
-        source: raw.source?.name || 'Redacao',
-        sourceUrl: raw.url || '',
+        image: CATEGORY_IMAGES[category],
+        source: raw.source || 'Google News',
+        sourceUrl: '',
         publishedAt: new Date().toISOString(),
         featured: false
       }
 
       newArticles.push(article)
-      console.log(`  OK: ${article.title}`)
+      existingTitles.add(rewritten.title)
+      console.log(`  Salvo: ${article.title}`)
 
       await postToFacebook(article)
 
@@ -172,7 +205,7 @@ async function main() {
   if (newArticles.length > 0) {
     const updated = [...newArticles, ...articles].slice(0, 100)
     fs.writeFileSync(articlesPath, JSON.stringify(updated, null, 2))
-    console.log(`\nSalvo: ${newArticles.length} novos artigos`)
+    console.log(`\nTotal salvo: ${newArticles.length} novos artigos`)
   } else {
     console.log('\nNenhum artigo novo encontrado')
   }
