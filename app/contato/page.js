@@ -1,16 +1,15 @@
 // app/contato/page.js
-import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 
 export const metadata = {
-  title: 'Contato | Miami Brasileiro',
-  description: 'Entre em contato com a redacao do Miami Brasileiro',
+  title: 'Contato | Miami Brasileira',
+  description: 'Entre em contato com a redacao do Miami Brasileira',
 }
 
 export default function ContatoPage() {
   return (
     <>
-      <Header />
+      
       <div style={{ minHeight: '80vh', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 20px' }}>
         <div style={{ background: '#fff', borderRadius: 16, padding: '48px', maxWidth: 600, width: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
@@ -22,7 +21,7 @@ export default function ContatoPage() {
           </div>
 
           <form action="https://formsubmit.co/contato@miamibrasileiro.com" method="POST">
-            <input type="hidden" name="_subject" value="Contato Miami Brasileiro" />
+            <input type="hidden" name="_subject" value="Contato Miami Brasileira" />
             <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_next" value="https://miami-brasileiro.vercel.app/contato" />
 
