@@ -1,6 +1,5 @@
 // app/artigo/[slug]/page.js
 import { notFound } from 'next/navigation'
-import Header from '../../../components/Header'
 import Footer from '../../../components/Footer'
 import Sidebar from '../../../components/Sidebar'
 import ShareButtons from '../../../components/ShareButtons'
@@ -354,7 +353,7 @@ export default function ArtigoPage(props) {
 
   return (
     <div>
-      <Header />
+      
       <div className="article-page">
         <div className="article-page-grid">
           <article className="article-body">
