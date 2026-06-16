@@ -12,7 +12,7 @@ export default function Footer() {
           <div>
             <div className="footer-logo">
               <div className="icon">🦩</div>
-              <div className="name">Miami Brasileiro</div>
+              <div className="name">Miami Brasileira</div>
             </div>
             <p className="footer-about">
               O portal de noticias da comunidade brasileira em Miami e Sul da Florida.
@@ -32,7 +32,7 @@ export default function Footer() {
               <li><Link href="/categoria/negocios">Negocios</Link></li>
               <li><Link href="/categoria/saude">Saude</Link></li>
               <li><Link href="/categoria/esportes">Esportes</Link></li>
-              <li><Link href="/categoria/cultura-lazer">Cultura e Lazer</Link></li>
+              <li><Link href="/categoria/cultura-e-lazer">Cultura e Lazer</Link></li>
             </ul>
           </div>
 
@@ -66,7 +66,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© {ano} Miami Brasileiro. Todos os direitos reservados.</span>
+        <span>© {ano} Miami Brasileira. Todos os direitos reservados.</span>
       </div>
     </footer>
   )
