@@ -1,160 +1,162 @@
-// app/page.js - Layout inspirado no UOL
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import Sidebar from '../components/Sidebar'
-import Link from 'next/link'
-import { getAllArticles, getFeaturedArticle, getArticlesByCategory, formatDateShort, readingTime } from '../lib/articles'
+import { promises as fs } from 'fs'
+import path from 'path'
+import HeroCarousel from '@/components/HeroCarousel'
+import Sidebar from '@/components/Sidebar'
 
-const CAT_CONFIG = {
-  'Imigracao':  { color: '#F4622A', bg: '#FFF7ED', label: 'Imigracao' },
-  'Comunidade': { color: '#00897B', bg: '#F0FDF4', label: 'Comunidade' },
-  'Saude':      { color: '#15803D', bg: '#F0FDF4', label: 'Saude' },
-  'Negocios':   { color: '#7C3AED', bg: '#F5F3FF', label: 'Negocios' },
-  'Esportes':   { color: '#DC2626', bg: '#FEF2F2', label: 'Esportes' },
-}
-function catColor(c) { return (CAT_CONFIG[c] || {}).color || '#00897B' }
-
-function getImg(a) {
-  return a.image || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=600&q=70'
+const CAT_COLORS = {
+  'Comunidade': '#00897B',
+  'Imigracao':  '#F4622A',
+  'Negocios':   '#7C3AED',
+  'Saude':      '#15803D',
+  'Esportes':   '#DC2626',
+  'Cultura e Lazer': '#D97706',
 }
 
-function FeaturedCard({ article }) {
-  if (!article) return null
+function timeAgo(dateStr) {
+  const d = new Date(dateStr)
+  const diff = Date.now() - d.getTime()
+  const h = Math.floor(diff / 3600000)
+  if (h < 1) return 'agora'
+  if (h < 24) return `${h}h atrás`
+  return `${Math.floor(h / 24)}d atrás`
+}
+
+async function getArticles() {
+  try {
+    const filePath = path.join(process.cwd(), 'data', 'articles.json')
+    const raw = await fs.readFile(filePath, 'utf-8')
+    const articles = JSON.parse(raw)
+    return articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+  } catch {
+    return []
+  }
+}
+
+function MsnCard({ art, imgHeight = 'h160' }) {
+  if (!art) return null
+  const color = CAT_COLORS[art.category] || '#555'
+  const reactions1 = ((art.slug || '').charCodeAt(0) % 40) + 5
+  const reactions2 = ((art.slug || '').charCodeAt(1) % 80) + 10
   return (
-    <Link href={'/artigo/' + article.id} className="featured-main-card">
-      <img src={getImg(article)} alt={article.title} />
-      <div className="fmc-overlay" />
-      <div className="fmc-content">
-        <span className="fmc-cat" style={{ background: catColor(article.category) }}>{article.category}</span>
-        <h2 className="fmc-title">{article.title}</h2>
-        {article.excerpt && <p className="fmc-excerpt">{article.excerpt.slice(0, 100)}...</p>}
-        <div className="fmc-meta">{formatDateShort(article.publishedAt)} &middot; {readingTime(article.content)}</div>
+    <a href={`/artigo/${art.slug}`} className="msn-card" style={{ textDecoration: 'none' }}>
+      <img src={art.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={art.title} className={`msn-card-img ${imgHeight}`} />
+      <div className="msn-card-body">
+        <div className="msn-card-source">
+          <span className="msn-card-cat" style={{ background: color }}>{art.category}</span>
+          <span className="dot" />
+          <span>{timeAgo(art.publishedAt)}</span>
+        </div>
+        <h3 className="msn-card-title">{art.title}</h3>
+        <div className="msn-card-footer">
+          <div className="msn-card-reactions">
+            <span>💬 {reactions1}</span>
+            <span>❤️ {reactions2}</span>
+          </div>
+        </div>
       </div>
-    </Link>
+    </a>
   )
 }
 
-function StackItem({ article }) {
+function MsnCardWide({ art }) {
+  if (!art) return null
+  const color = CAT_COLORS[art.category] || '#555'
   return (
-    <Link href={'/artigo/' + article.id} className="stack-item">
-      <img src={getImg(article)} alt={article.title} />
-      <div className="si-info">
-        <span className="si-cat" style={{ color: catColor(article.category) }}>{article.category}</span>
-        <h4 className="si-title">{article.title}</h4>
-        <div className="si-meta">{formatDateShort(article.publishedAt)}</div>
+    <a href={`/artigo/${art.slug}`} className="msn-card-wide" style={{ textDecoration: 'none' }}>
+      <img src={art.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={art.title} className="msn-card-wide-img" />
+      <div className="msn-card-wide-body">
+        <div>
+          <span style={{ fontSize: 9, fontWeight: 800, background: color, color: 'white', padding: '2px 6px', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '.5px' }}>{art.category}</span>
+        </div>
+        <div className="msn-card-wide-title" style={{ marginTop: 5 }}>{art.title}</div>
+        <div className="msn-card-wide-meta">{timeAgo(art.publishedAt)} · {art.source || 'Miami Brasileiro'}</div>
       </div>
-    </Link>
+    </a>
   )
 }
 
-function CompactCard({ article }) {
+function CatBlock({ title, color, articles }) {
+  if (!articles || articles.length === 0) return null
+  const [main, ...rest] = articles
+  const emoji = { 'Comunidade': '🏙️', 'Imigracao': '✈️', 'Negocios': '💼', 'Saude': '🏥', 'Esportes': '⚽', 'Cultura e Lazer': '🎭' }[title] || '📰'
+  const catSlug = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')
   return (
-    <Link href={'/artigo/' + article.id} className="compact-card">
-      <img src={getImg(article)} alt={article.title} />
-      <div className="cc-body">
-        <span className="cc-cat" style={{ background: catColor(article.category) }}>{article.category}</span>
-        <h3 className="cc-title">{article.title}</h3>
-        <div className="cc-meta">{formatDateShort(article.publishedAt)} &middot; {readingTime(article.content)}</div>
+    <div className="cat-block section-wrap">
+      <div className="section-hd">
+        <div className="section-hd-bar" style={{ background: color }} />
+        <span className="section-hd-title">{emoji} {title}</span>
+        <a href={`/categoria/${catSlug}`} className="section-hd-link">Ver todas →</a>
       </div>
-    </Link>
-  )
-}
-
-function CatBlock({ category, articles, seeAllHref }) {
-  if (!articles.length) return null
-  const cfg = CAT_CONFIG[category] || { color: '#00897B', bg: '#F9FAFB' }
-  const main = articles[0]
-  const rest = articles.slice(1, 4)
-  return (
-    <div className="cat-block" style={{ borderTopColor: cfg.color }}>
-      <div className="cat-block-header" style={{ background: cfg.bg }}>
-        <span className="cat-block-title" style={{ color: cfg.color }}>{category.toUpperCase()}</span>
-        <Link href={seeAllHref} className="cat-block-see-all" style={{ color: cfg.color }}>Ver todas &rarr;</Link>
-      </div>
-      <div className="cat-block-body">
-        <Link href={'/artigo/' + main.id} className="cat-main-story">
-          <img src={getImg(main)} alt={main.title} />
-          <h3>{main.title}</h3>
-          {main.excerpt && <p>{main.excerpt.slice(0, 80)}...</p>}
-          <div className="cat-meta">{formatDateShort(main.publishedAt)} &middot; {readingTime(main.content)}</div>
-        </Link>
-        <div className="cat-side-list">
-          {rest.map(function(a) {
-            return (
-              <Link key={a.id} href={'/artigo/' + a.id} className="cat-side-item">
-                <img src={getImg(a)} alt={a.title} />
-                <div>
-                  <h4>{a.title}</h4>
-                  <span>{formatDateShort(a.publishedAt)}</span>
-                </div>
-              </Link>
-            )
-          })}
+      <div className="cat-block-grid">
+        <a href={`/artigo/${main.slug}`} className="cat-block-main">
+          <img src={main.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={main.title} className="cat-block-main-img" />
+          <div className="cat-block-main-body">
+            <h3 className="cat-block-main-title">{main.title}</h3>
+            {main.excerpt && <p className="cat-block-main-excerpt">{main.excerpt.slice(0, 100)}...</p>}
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 8 }}>{timeAgo(main.publishedAt)}</div>
+          </div>
+        </a>
+        <div className="cat-block-list">
+          {rest.slice(0, 4).map((art, i) => (
+            <a key={art.slug || i} href={`/artigo/${art.slug}`} className="cat-list-item">
+              <img src={art.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={art.title} className="cat-list-img" />
+              <div>
+                <span className="cat-list-title">{art.title}</span>
+                <span className="cat-list-time">{timeAgo(art.publishedAt)}</span>
+              </div>
+            </a>
+          ))}
         </div>
       </div>
     </div>
   )
 }
 
-export default function HomePage() {
-  const all       = getAllArticles()
-  const featured  = getFeaturedArticle()
-  const rest      = all.filter(function(a) { return a.id !== (featured && featured.id) })
-  const heroStack = rest.slice(0, 4)
-  const grid4     = rest.slice(4, 8)
-  const grid4b    = rest.slice(8, 12)
-  const imigracao = getArticlesByCategory('Imigracao').slice(0, 4)
-  const negocios  = getArticlesByCategory('Negocios').slice(0, 4)
-  const saude     = getArticlesByCategory('Saude').slice(0, 4)
-  const esportes  = getArticlesByCategory('Esportes').slice(0, 4)
-  const cultura   = getArticlesByCategory('Cultura e Lazer').slice(0, 4)
-  const comunidade = getArticlesByCategory('Comunidade').slice(0, 4)
+export default async function Home() {
+  const articles = await getArticles()
+  const CATEGORIES = ['Comunidade', 'Imigracao', 'Negocios', 'Saude', 'Esportes', 'Cultura e Lazer']
+  const byCategory = {}
+  CATEGORIES.forEach(cat => { byCategory[cat] = articles.filter(a => a.category === cat) })
+  const gridArticles = CATEGORIES.flatMap(cat => byCategory[cat].slice(0, 2)).slice(0, 8)
+  const trending = articles.slice(0, 8)
+
   return (
-    <>
-      <Header />
-      <div className="page">
-        <div className="hero-block">
-          <FeaturedCard article={featured} />
-          <div className="hero-stack">
-            {heroStack.map(function(a) { return <StackItem key={a.id} article={a} /> })}
-          </div>
-        </div>
-        <div className="page-columns">
-          <div className="page-main">
-            {grid4.length > 0 && (
-              <div className="section-wrap">
-                <div className="section-header">
-                  <div className="section-bar" />
-                  <h2>Ultimas Noticias</h2>
-                  <Link href="/" className="see-all">Ver mais &rarr;</Link>
-                </div>
-                <div className="grid-4">
-                  {grid4.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
-                </div>
+    <div className="msn-page">
+      <HeroCarousel articles={articles} />
+      <div className="msn-layout">
+        <div className="msn-main">
+          {gridArticles.length > 0 && (
+            <div className="section-wrap">
+              <div className="section-hd">
+                <div className="section-hd-bar" style={{ background: 'var(--teal)' }} />
+                <span className="section-hd-title">📰 Em Destaque</span>
               </div>
-            )}
-            <CatBlock category="Imigracao" articles={imigracao} seeAllHref="/categoria/imigracao" />
-            <CatBlock category="Negocios" articles={negocios} seeAllHref="/categoria/negocios" />
-            {grid4b.length > 0 && (
-              <div className="section-wrap">
-                <div className="section-header">
-                  <div className="section-bar" style={{ background: '#15803D' }} />
-                  <h2>Saude &amp; Comunidade</h2>
-                </div>
-                <div className="grid-4">
-                  {grid4b.map(function(a) { return <CompactCard key={a.id} article={a} /> })}
-                </div>
+              <div className="msn-grid msn-grid-4">
+                {gridArticles.map((art, i) => (
+                  <MsnCard key={art.slug || i} art={art} imgHeight={i < 2 ? 'h200' : 'h140'} />
+                ))}
               </div>
-            )}
-            <CatBlock category="Saude" articles={saude} seeAllHref="/categoria/saude" />
-            <CatBlock category="Esportes" articles={esportes} seeAllHref="/categoria/esportes" />
-            <CatBlock category="Cultura e Lazer" articles={cultura} seeAllHref="/categoria/cultura-e-lazer" />
-            <CatBlock category="Comunidade" articles={comunidade} seeAllHref="/categoria/comunidade" />
-          </div>
-          <Sidebar articles={all} />
+            </div>
+          )}
+          {CATEGORIES.map(cat => (
+            <CatBlock key={cat} title={cat} color={CAT_COLORS[cat]} articles={byCategory[cat]} />
+          ))}
+          {articles.length > 0 && (
+            <div className="section-wrap">
+              <div className="section-hd">
+                <div className="section-hd-bar" style={{ background: 'var(--orange)' }} />
+                <span className="section-hd-title">🕐 Mais Recentes</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {articles.slice(0, 10).map((art, i) => (
+                  <MsnCardWide key={art.slug || i} art={art} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+        <Sidebar articles={trending} />
       </div>
-      <Footer />
-    </>
+    </div>
   )
-}
+    }
