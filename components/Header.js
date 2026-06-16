@@ -1,164 +1,147 @@
 'use client'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { MortgageCalc, InvestmentCalc, CarCalc } from '../app/components/Toolbox'
 
-const CATEGORIAS = [
-  { label: 'Inicio', href: '/' },
-  { label: 'Comunidade', href: '/categoria/comunidade' },
-  { label: 'Imigracao', href: '/categoria/imigracao' },
-  { label: 'Negocios', href: '/categoria/negocios' },
-  { label: 'Saude', href: '/categoria/saude' },
-  { label: 'Esportes', href: '/categoria/esportes' },
-  { label: 'Cultura e Lazer', href: '/categoria/cultura-lazer' },
-  { label: 'Sobre Nos', href: '/sobre' },
-  { label: 'Contato', href: '/contato' },
-  ]
+const CATEGORIES = [
+  { label: '🏠 Início', href: '/' },
+  { label: '🏙️ Comunidade', href: '/categoria/comunidade' },
+  { label: '✈️ Imigração', href: '/categoria/imigracao' },
+  { label: '💼 Negócios', href: '/categoria/negocios' },
+  { label: '🏥 Saúde', href: '/categoria/saude' },
+  { label: '⚽ Esportes', href: '/categoria/esportes' },
+  { label: '🎭 Cultura', href: '/categoria/cultura-e-lazer' },
+  { label: '🏆 Copa 2026', href: '/copa-2026', isCopa: true },
+]
 
-const WMO = {
-  icons: {0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',61:'🌧',80:'🌦',95:'⛈'},
-  desc: {0:'Ceu limpo',1:'Poucas nuvens',2:'Parc. nublado',3:'Nublado',45:'Neblina',51:'Garoa',61:'Chuva',80:'Pancadas',95:'Tempestade'},
+function weatherIcon(code) {
+  if (code === 0) return '☀️'
+  if ([1,2,3].includes(code)) return '⛅'
+  if ([45,48].includes(code)) return '🌫️'
+  if (code < 70) return '🌧️'
+  if (code < 80) return '❄️'
+  if (code < 90) return '🌦️'
+  return '⛈️'
 }
 
-function loadRates(setRates) {
-  fetch('/api/rates')
-  .then(function(r) { return r.json() })
-  .then(function(d) { setRates(d) })
-  .catch(function() {})
-}
+export default function Header({ articles = [] }) {
+  const [theme, setTheme] = useState('dark')
+  const [weather, setWeather] = useState(null)
+  const [rates, setRates] = useState({})
+  const [activePath, setActivePath] = useState('/')
 
-export default function Header() {
-  const pathname = usePathname()
-  const [rates, setRates] = useState({ usd: null, eur: null, usdChange: null, eurChange: null })
-  const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: '' })
-  const [social, setSocial] = useState({ facebook: 'https://www.facebook.com/miamibrasileira' })
-  const [toolboxOpen, setToolboxOpen] = useState(null)
-  const [tickerItems, setTickerItems] = useState([
-    { text: 'Como alugar apartamento em Miami sem historico americano', href: '/categoria/comunidade' },
-    { text: 'Green card pelo EB-5: o que mudou para brasileiros em 2026', href: '/categoria/imigracao' },
-    { text: 'Copa do Mundo 2026 em Miami: ingressos e o que esperar', href: '/categoria/esportes' },
-    { text: 'Plano de saude na Florida: como escolher o melhor plano', href: '/categoria/saude' },
-    { text: 'Como abrir uma LLC na Florida em 2026: guia completo', href: '/categoria/negocios' },
-    ])
+  useEffect(() => {
+    const saved = localStorage.getItem('mb-theme') || 'dark'
+    setTheme(saved)
+    document.documentElement.setAttribute('data-theme', saved)
+    setActivePath(window.location.pathname)
+  }, [])
 
-useEffect(function() {
-  loadRates(setRates)
-  var ratesInterval = setInterval(function() { loadRates(setRates) }, 600000)
+  useEffect(() => {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America%2FNew_York')
+      .then(r => r.json())
+      .then(d => setWeather(d.current))
+      .catch(() => {})
+    fetch('/api/rates')
+      .then(r => r.json())
+      .then(d => setRates(d))
+      .catch(() => {})
+  }, [])
 
-          fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,weathercode&temperature_unit=fahrenheit')
-  .then(function(r) { return r.json() })
-  .then(function(d) {
-    if (d && d.current) {
-      var c = d.current
-      var tempC = Math.round((c.temperature_2m - 32) * 5 / 9)
-      var code = c.weathercode || 0
-      var baseCode = [45,48,51,53,55,61,63,65,71,73,75,80,81,82,95,96,99].includes(code) ? code : Math.floor(code/10)*10 || code
-      setWeather({ temp: tempC, icon: WMO.icons[code] || WMO.icons[baseCode] || '🌤', desc: WMO.desc[code] || WMO.desc[baseCode] || '' })
-    }
-  }).catch(function() {})
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    document.documentElement.setAttribute('data-theme', next)
+    localStorage.setItem('mb-theme', next)
+  }
 
-          fetch('/api/site-config').then(function(r) { return r.json() })
-  .then(function(d) { setSocial({ facebook: d.socialFacebook||'https://www.facebook.com/miamibrasileira' }) })
-  .catch(function() {})
+  const fmtRate = (val) => {
+    if (!val) return '–'
+    return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
 
-                      fetch('/api/articles')
-  .then(function(r) { return r.ok ? r.json() : null })
-  .then(function(d) {
-    if (Array.isArray(d) && d.length > 0) {
-      setTickerItems(d.slice(0,8).map(function(a) { return { text: a.title, href: '/artigo/'+a.id } }))
-    }
-  }).catch(function() {})
+  const usdChg = rates.usd?.change ? parseFloat(rates.usd.change) : null
+  const eurChg = rates.eur?.change ? parseFloat(rates.eur.change) : null
 
-          return function() { clearInterval(ratesInterval) }
-}, [])
+  return (
+    <header className="msn-header">
+      <div className="msn-header-top">
+        <a href="/" className="msn-logo" style={{ textDecoration: 'none' }}>
+          <div className="msn-logo-icon">🇧🇷</div>
+          <span className="msn-logo-text">Miami <span>Brasileiro</span></span>
+        </a>
 
-var hoje = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
-  var data = hoje.charAt(0).toUpperCase() + hoje.slice(1)
-  var doubled = tickerItems.concat(tickerItems)
-  var usdUp = rates.usdChange && parseFloat(rates.usdChange) > 0
-  var eurUp = rates.eurChange && parseFloat(rates.eurChange) > 0
+        <div className="msn-search">
+          <span className="msn-search-icon">🔍</span>
+          <input type="search" placeholder="Buscar notícias…" aria-label="Buscar" />
+        </div>
 
-return (
-  <>
-  <div className="topbar">
-  <div className="topbar-inner">
-  <span>🌎 Miami &amp; Sul da Florida &nbsp;&middot;&nbsp; {data}</span>
-  <div className="topbar-social">
-  <a href="https://www.facebook.com/miamibrasileira" target="_blank" rel="noreferrer">📘 Facebook</a>
-  </div>
-  </div>
-  </div>
-  <header>
-  <div className="header-inner">
-  <Link href="/" className="logo">
-  <div className="logo-icon" style={{ background: 'linear-gradient(135deg, #009C3B 0%, #FFDF00 60%, #009C3B 100%)' }}>
-<span style={{ fontSize: 22 }}>🦩</span>
-  </div>
-<div className="logo-text">
-  <div className="name" style={{ color: '#009C3B' }}>Miami Brasileira</div>
-<div className="tagline">O portal da sua comunidade</div>
-  </div>
-  </Link>
-<nav>
-{CATEGORIAS.map(function(c) {
-  return <Link key={c.href} href={c.href} className={pathname===c.href?'active':''}>{c.label}</Link>
-})}
-</nav>
-<Link href="/contato" className="btn-anuncie">📣 Anuncie</Link>
-  </div>
-  </header>
-<div className="weather-bar">
-  <div className="weather-inner">
-  <a href="https://forecast.weather.gov/MapClick.php?CityName=Miami&state=FL" target="_blank" rel="noreferrer" className="weather-item" style={{ textDecoration:'none' }}>
-<span style={{ fontSize:16 }}>{weather.icon}</span>
-<span>Miami</span>
-<strong>{weather.temp!==null ? weather.temp+'°C' : '--°C'}</strong>
-{weather.desc && <span className="weather-label">{weather.desc}</span>}
-  </a>
- <div className="weather-item">
-  <span style={{ fontSize:16 }}>{weather.icon}</span>
-<span>Ft. Lauderdale</span>
-<strong>{weather.temp!==null ? (weather.temp-1)+'C' : '--C'}</strong>
-  </div>
-<div className="date-bar">
-  <span className="rate-pill" style={{ color: usdUp ? '#15803D' : '#DC2626' }}>
-  <span className="rate-flag">🇺🇸</span>
-<span className="rate-code">USD</span>
-<strong>{rates.usd ? 'R$ '+rates.usd : '...'}</strong>
-{rates.usdChange && <span style={{ fontSize:10 }}>{usdUp?'▲':'▼'}{Math.abs(rates.usdChange)}%</span>}
-</span>
-<span className="rate-pill" style={{ color: eurUp ? '#15803D' : '#DC2626' }}>
- <span className="rate-flag">🇪🇺</span>
-<span className="rate-code">EUR</span>
-<strong>{rates.eur ? 'R$ '+rates.eur : '...'}</strong>
-{rates.eurChange && <span style={{ fontSize:10 }}>{eurUp?'▲':'▼'}{Math.abs(rates.eurChange)}%</span>}
-                                 </span>
-  </div>
-  </div>
-  </div>
-<div style={{background:'#f8f9fa',borderBottom:'1px solid #ebebeb',padding:'5px 16px',display:'flex',alignItems:'center',justifyContent:'flex-start',gap:8,flexWrap:'wrap'}}>
-<span style={{fontSize:9,color:'#aaa',textTransform:'uppercase',letterSpacing:'0.07em',fontWeight:700,marginRight:4}}>Simuladores</span>
-{[{k:'mortgage',i:'🏠',l:'Financiamento'},{k:'investment',i:'📈',l:'Investimentos'},{k:'car',i:'🚗',l:'Veiculos'}].map(function(t){return(
-  <button key={t.k} onClick={function(){setToolboxOpen(t.k);}}
- style={{background:'#fff',border:'1px solid #ddd',borderRadius:6,padding:'3px 10px',cursor:'pointer',fontSize:11,fontWeight:600,color:'#333',display:'flex',alignItems:'center',gap:4}}>
-<span>{t.i}</span><span>{t.l}</span>
-  </button>
-)})}
-</div>
-<div className="ticker">
-  <div className="ticker-label">🔴 AGORA</div>
-<div className="ticker-wrapper">
-  <div className="ticker-track">
-{doubled.map(function(item, i) {
-  return <Link key={i} href={item.href} className="ticker-link">{item.text}</Link>
-             })}
-</div>
-                      </div>
-  </div>
-{toolboxOpen==='mortgage'&&<MortgageCalc onClose={function(){setToolboxOpen(null);}}/>}
-{toolboxOpen==='investment'&&<InvestmentCalc onClose={function(){setToolboxOpen(null);}}/>}
-{toolboxOpen==='car'&&<CarCalc onClose={function(){setToolboxOpen(null);}}/>}
-</>
- )
-}
+        <div className="msn-header-right">
+          {weather && (
+            <div className="msn-weather">
+              <span>{weatherIcon(weather.weather_code)}</span>
+              <span className="temp">{Math.round(weather.temperature_2m)}°F</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Miami</span>
+            </div>
+          )}
+          <div className="msn-rates">
+            {rates.usd && (
+              <div className="rate-pill">
+                <span className="flag">🇺🇸</span>
+                <span className="code">USD</span>
+                <span className="val">{fmtRate(rates.usd.brl)}</span>
+                {usdChg !== null && (
+                  <span className={`chg ${usdChg >= 0 ? 'rate-up' : 'rate-dn'}`}>
+                    {usdChg >= 0 ? '▲' : '▼'} {Math.abs(usdChg).toFixed(2)}%
+                  </span>
+                )}
+              </div>
+            )}
+            {rates.eur && (
+              <div className="rate-pill">
+                <span className="flag">🇪🇺</span>
+                <span className="code">EUR</span>
+                <span className="val">{fmtRate(rates.eur.brl)}</span>
+                {eurChg !== null && (
+                  <span className={`chg ${eurChg >= 0 ? 'rate-up' : 'rate-dn'}`}>
+                    {eurChg >= 0 ? '▲' : '▼'} {Math.abs(eurChg).toFixed(2)}%
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+          <button className="dark-toggle" onClick={toggleTheme} aria-label="Alternar tema" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+        </div>
+      </div>
+
+      <nav className="msn-nav" aria-label="Categorias">
+        <div className="msn-nav-inner">
+          {CATEGORIES.map(cat => (
+            <a
+              key={cat.href}
+              href={cat.href}
+              className={`msn-nav-link${cat.isCopa ? ' copa' : ''}${activePath === cat.href || (cat.href !== '/' && activePath.startsWith(cat.href)) ? ' active' : ''}`}
+            >
+              {cat.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      {articles.length > 0 && (
+        <div className="ticker" role="marquee" aria-label="Últimas notícias">
+          <div className="ticker-label">Ao Vivo</div>
+          <div className="ticker-wrapper">
+            <div className="ticker-track">
+              {[...articles.slice(0, 8), ...articles.slice(0, 8)].map((art, i) => (
+                <a key={i} href={`/artigo/${art.slug}`} className="ticker-link">
+                  {art.title}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
+  )
+      }
