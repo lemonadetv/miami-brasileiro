@@ -1,6 +1,7 @@
 import './globals.css'
 import './uol-extra.css'
 import { Analytics } from '@vercel/analytics/react'
+import Header from '../components/Header'
 
 export const metadata = {
   title: 'Miami Brasileira - O Portal da Comunidade Brasileira em Miami',
@@ -15,7 +16,11 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
       </head>
-      <body>{children}<Analytics /></body>
+      <body>
+        <Header />
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
