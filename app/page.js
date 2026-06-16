@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import HeroCarousel from '@/components/HeroCarousel'
-import Sidebar from '@/components/Sidebar'
+import HeroCarousel from '../components/HeroCarousel'
+import Sidebar from '../components/Sidebar'
 
 const CAT_COLORS = {
   'Comunidade': '#00897B',
@@ -17,8 +17,8 @@ function timeAgo(dateStr) {
   const diff = Date.now() - d.getTime()
   const h = Math.floor(diff / 3600000)
   if (h < 1) return 'agora'
-  if (h < 24) return `${h}h atrás`
-  return `${Math.floor(h / 24)}d atrás`
+  if (h < 24) return h + 'h atrás'
+  return Math.floor(h / 24) + 'd atrás'
 }
 
 async function getArticles() {
@@ -35,11 +35,9 @@ async function getArticles() {
 function MsnCard({ art, imgHeight = 'h160' }) {
   if (!art) return null
   const color = CAT_COLORS[art.category] || '#555'
-  const reactions1 = ((art.slug || '').charCodeAt(0) % 40) + 5
-  const reactions2 = ((art.slug || '').charCodeAt(1) % 80) + 10
   return (
-    <a href={`/artigo/${art.slug}`} className="msn-card" style={{ textDecoration: 'none' }}>
-      <img src={art.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={art.title} className={`msn-card-img ${imgHeight}`} />
+    <a href={"/artigo/" + art.slug} className="msn-card" style={{ textDecoration: 'none' }}>
+      <img src={art.image || '/placeholder.jpg'} alt={art.title} className={"msn-card-img " + imgHeight} />
       <div className="msn-card-body">
         <div className="msn-card-source">
           <span className="msn-card-cat" style={{ background: color }}>{art.category}</span>
@@ -47,12 +45,6 @@ function MsnCard({ art, imgHeight = 'h160' }) {
           <span>{timeAgo(art.publishedAt)}</span>
         </div>
         <h3 className="msn-card-title">{art.title}</h3>
-        <div className="msn-card-footer">
-          <div className="msn-card-reactions">
-            <span>💬 {reactions1}</span>
-            <span>❤️ {reactions2}</span>
-          </div>
-        </div>
       </div>
     </a>
   )
@@ -62,8 +54,8 @@ function MsnCardWide({ art }) {
   if (!art) return null
   const color = CAT_COLORS[art.category] || '#555'
   return (
-    <a href={`/artigo/${art.slug}`} className="msn-card-wide" style={{ textDecoration: 'none' }}>
-      <img src={art.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={art.title} className="msn-card-wide-img" />
+    <a href={"/artigo/" + art.slug} className="msn-card-wide" style={{ textDecoration: 'none' }}>
+      <img src={art.image || '/placeholder.jpg'} alt={art.title} className="msn-card-wide-img" />
       <div className="msn-card-wide-body">
         <div>
           <span style={{ fontSize: 9, fontWeight: 800, background: color, color: 'white', padding: '2px 6px', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '.5px' }}>{art.category}</span>
@@ -77,19 +69,25 @@ function MsnCardWide({ art }) {
 
 function CatBlock({ title, color, articles }) {
   if (!articles || articles.length === 0) return null
-  const [main, ...rest] = articles
-  const emoji = { 'Comunidade': '🏙️', 'Imigracao': '✈️', 'Negocios': '💼', 'Saude': '🏥', 'Esportes': '⚽', 'Cultura e Lazer': '🎭' }[title] || '📰'
+  const main = articles[0]
+  const rest = articles.slice(1)
+  const emojis = {
+    'Comunidade': '🏙️', 'Imigracao': '✈️', 'Negocios': '💼',
+    'Saude': '🏥', 'Esportes': '⚽', 'Cultura e Lazer': '🎭'
+  }
+  const emoji = emojis[title] || '📰'
   const catSlug = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')
+
   return (
     <div className="cat-block section-wrap">
       <div className="section-hd">
         <div className="section-hd-bar" style={{ background: color }} />
         <span className="section-hd-title">{emoji} {title}</span>
-        <a href={`/categoria/${catSlug}`} className="section-hd-link">Ver todas →</a>
+        <a href={"/categoria/" + catSlug} className="section-hd-link">Ver todas →</a>
       </div>
       <div className="cat-block-grid">
-        <a href={`/artigo/${main.slug}`} className="cat-block-main">
-          <img src={main.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={main.title} className="cat-block-main-img" />
+        <a href={"/artigo/" + main.slug} className="cat-block-main">
+          <img src={main.image || '/placeholder.jpg'} alt={main.title} className="cat-block-main-img" />
           <div className="cat-block-main-body">
             <h3 className="cat-block-main-title">{main.title}</h3>
             {main.excerpt && <p className="cat-block-main-excerpt">{main.excerpt.slice(0, 100)}...</p>}
@@ -98,8 +96,8 @@ function CatBlock({ title, color, articles }) {
         </a>
         <div className="cat-block-list">
           {rest.slice(0, 4).map((art, i) => (
-            <a key={art.slug || i} href={`/artigo/${art.slug}`} className="cat-list-item">
-              <img src={art.image || 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800'} alt={art.title} className="cat-list-img" />
+            <a key={art.slug || i} href={"/artigo/" + art.slug} className="cat-list-item">
+              <img src={art.image || '/placeholder.jpg'} alt={art.title} className="cat-list-img" />
               <div>
                 <span className="cat-list-title">{art.title}</span>
                 <span className="cat-list-time">{timeAgo(art.publishedAt)}</span>
@@ -159,4 +157,4 @@ export default async function Home() {
       </div>
     </div>
   )
-    }
+  }
