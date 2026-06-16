@@ -400,3 +400,27 @@ footer { background: var(--bg-header); border-top: 1px solid var(--border); marg
   .carousel-title { font-size: 18px; }
   .carousel-img { height: 260px; }
                  }
+
+/* ===== OVERLAY CARD (MSN mosaic - titulo sobre imagem) ===== */
+.ov-card { display: block; border-radius: var(--radius); overflow: hidden; text-decoration: none; }
+.ov-card-inner { position: relative; overflow: hidden; }
+.ov-card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+.ov-card:hover .ov-card-img { transform: scale(1.05); }
+.ov-card-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.1) 55%, transparent 100%); }
+.ov-card-body { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 12px; }
+.ov-cat { display: inline-block; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; letter-spacing: .8px; color: white; margin-bottom: 7px; }
+.ov-title { font-family: Georgia, serif; font-size: 14px; font-weight: 700; line-height: 1.3; color: white; text-shadow: 0 1px 3px rgba(0,0,0,.5); margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ov-title-lg { font-size: 20px; }
+.ov-time { font-size: 10px; color: rgba(255,255,255,.7); margin-top: 5px; display: block; }
+
+/* ===== MOSAIC GRID ===== */
+.mosaic-top { display: grid; grid-template-columns: 3fr 2fr; gap: 4px; }
+.mosaic-side { display: flex; flex-direction: column; gap: 4px; }
+.mosaic-bot { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 4px; }
+@media (max-width: 860px) {
+  .mosaic-top { grid-template-columns: 1fr; }
+  .mosaic-bot { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .mosaic-bot { grid-template-columns: 1fr; }
+}
