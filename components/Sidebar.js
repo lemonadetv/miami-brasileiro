@@ -1,74 +1,226 @@
-// components/Sidebar.js
-// Barra lateral com: mais lidas, newsletter, WhatsApp, links úteis, anúncio
+'use client'
+import { useState, useEffect } from 'react'
 
-export default function Sidebar({ articles = [] }) {
+// ── Copa 2026 ──────────────────────────────────────────────────────────────
+const COPA_DATA = {
+  live: [],
+  today: [
+    { id:1, home:'🇧🇷', homeCode:'BRA', away:'🇺🇾', awayCode:'URU', homeScore:2, awayScore:1, status:"75'", group:'Grupo D' },
+    { id:2, home:'🇦🇷', homeCode:'ARG', away:'🇵🇪', awayCode:'PER', homeScore:1, awayScore:0, status:'INTERVALO', group:'Grupo C' },
+  ],
+  upcoming: [
+    { id:3, home:'🇲🇽', homeCode:'MEX', away:'🇨🇱', awayCode:'CHI', date:'18:00', group:'Grupo B' },
+    { id:4, home:'🇺🇸', homeCode:'USA', away:'🇨🇦', awayCode:'CAN', date:'21:00', group:'Grupo A' },
+  ]
+}
 
-  // Pega as 5 mais recentes como "mais lidas"
-  const maisLidas = articles.slice(0, 5)
+function weatherIcon(code) {
+  if (!code && code !== 0) return '🌤️'
+  if ([0].includes(code)) return '☀️'
+  if ([1,2].includes(code)) return '⛅'
+  if ([3].includes(code)) return '☁️'
+  if ([45,48].includes(code)) return '🌫️'
+  if ([51,53,55,61,63,65].includes(code)) return '🌧️'
+  if ([71,73,75,77].includes(code)) return '❄️'
+  if ([80,81,82].includes(code)) return '🌦️'
+  if ([95,96,99].includes(code)) return '⛈️'
+  return '🌤️'
+}
 
+function weatherDesc(code) {
+  if (code === 0) return 'Céu limpo'
+  if ([1,2].includes(code)) return 'Parcialmente nublado'
+  if (code === 3) return 'Nublado'
+  if ([45,48].includes(code)) return 'Névoa'
+  if ([51,53,55,61,63,65].includes(code)) return 'Chuva'
+  if ([71,73,75].includes(code)) return 'Neve'
+  if ([80,81,82].includes(code)) return 'Pancadas de chuva'
+  if ([95,96,99].includes(code)) return 'Trovoada'
+  return 'Parcialmente nublado'
+}
+
+function CopaWidget() {
   return (
-    <aside className="sidebar">
-
-      {/* MAIS LIDAS */}
-      <div className="sidebar-box">
-        <div className="sidebar-box-header">🔥 Mais Lidas</div>
-        <div className="sidebar-box-body">
-          {maisLidas.map((art, i) => (
-            <a key={art.id} href={`/artigo/${art.id}`} className="trending-item" style={{display:'flex',gap:'12px',alignItems:'flex-start',padding:'10px 0',borderBottom: i < maisLidas.length-1 ? '1px solid #F3F4F6' : 'none',textDecoration:'none'}}>
-              <div className="trending-num">{i + 1}</div>
-              <h4 style={{fontSize:'13px',fontWeight:600,color:'#1F2937',lineHeight:1.35}}>{art.title}</h4>
-            </a>
-          ))}
-          {maisLidas.length === 0 && (
-            <p style={{fontSize:'13px',color:'#9CA3AF',padding:'8px 0'}}>Carregando notícias...</p>
-          )}
-        </div>
+    <div className="sidebar-widget">
+      <div className="widget-header copa-header">
+        <span>⚽</span> Copa 2026 – Ao Vivo
       </div>
-
-      {/* ANÚNCIO */}
-      <div className="ad-box">
-        <div className="ad-title">Anuncie Aqui</div>
-        <div className="ad-sub">
-          Alcance milhares de brasileiros em Miami e Sul da Flórida todos os dias
-        </div>
-        <a href="/contato" className="ad-btn">Fale conosco</a>
+      <div className="widget-body" style={{ padding: '10px 14px' }}>
+        {COPA_DATA.today.map(m => (
+          <div key={m.id} className="copa-match">
+            <div className="copa-team">
+              <span className="copa-team-flag">{m.home}</span>
+              <span className="copa-team-name">{m.homeCode}</span>
+            </div>
+            <div className="copa-score">
+              <div className="copa-score-num">{m.homeScore} – {m.awayScore}</div>
+              <span className={"copa-score-status" + (m.status.includes("'") ? " live" : "")}>
+                {m.status}
+              </span>
+              <div className="copa-group-label">{m.group}</div>
+            </div>
+            <div className="copa-team">
+              <span className="copa-team-flag">{m.away}</span>
+              <span className="copa-team-name">{m.awayCode}</span>
+            </div>
+          </div>
+        ))}
+        {COPA_DATA.upcoming.length > 0 && (
+          <div>
+            <div style={{ fontSize:10, color:'var(--text-muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.5px', padding:'8px 0 4px', borderTop:'1px solid var(--border)' }}>
+              Hoje mais tarde
+            </div>
+            {COPA_DATA.upcoming.map(m => (
+              <div key={m.id} className="copa-match">
+                <div className="copa-team">
+                  <span className="copa-team-flag">{m.home}</span>
+                  <span className="copa-team-name">{m.homeCode}</span>
+                </div>
+                <div className="copa-score">
+                  <div style={{ fontSize:18, fontWeight:900, color:'var(--text-bright)' }}>{m.date}</div>
+                  <div className="copa-group-label">{m.group}</div>
+                </div>
+                <div className="copa-team">
+                  <span className="copa-team-flag">{m.away}</span>
+                  <span className="copa-team-name">{m.awayCode}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <a href="/copa-2026" className="copa-live-btn">Ver todos os jogos →</a>
       </div>
-
-      {/* NEWSLETTER */}
-      <div className="sidebar-box">
-        <div className="sidebar-box-header">📧 Receba Notícias</div>
-        <div className="sidebar-box-body newsletter-box">
-          <p>Cadastre seu e-mail e receba as principais notícias da comunidade brasileira de Miami toda manhã.</p>
-          <input type="text"  placeholder="Seu nome" />
-          <input type="email" placeholder="Seu melhor s-mail" />
-          <button type="button">Quero receber →</button>
-        </div>
-      </div>
-
-      {/* LINKS ÚTEIS */}
-      <div className="sidebar-box">
-        <div className="sidebar-box-header">📌 Links Úteis</div>
-        <div className="sidebar-box-body" style={{padding:'12px 16px'}}>
-          {[
-            { emoji: '🏛', title: 'Consulado Geral do Brasil em Miami', url: 'https://miami.itamaraty.gov.br', label: 'miami.itamaraty.gov.br' },
-            { emoji: '🛂', title: 'USCIS – Servicos de Imigracao', url: 'https://uscis.gov', label: 'uscis.gov' },
-            { emoji: '🚗', title: 'FLHSMV – Carteira de Motorista', url: 'https://flhsmv.gov', label: 'flhsmv.gov' },
-            { emoji: '🏥', title: 'Seguro Saúde – Healthcare.gov', url: 'https://healthcare.gov', label: 'healthcare.gov' },
-          ].map(link => (
-            <a
-              key={link.url}
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              style={{display:'flex',flexDirection:'column',padding:'8px 0',borderBottom:'1px solid #F3F4F6',textDecoration:'none'}}
-            >
-              <span style={{fontSize:'13px',fontWeight:600,color:'#1F2937'}}>{link.emoji} {link.title}</span>
-              <span style={{fontSize:'11px',color:'#9CA3AF',marginTop:'2px'}}>{link.label}</span>
-            </a>
-          ))}
-        </div>
-      </div>
-
-    </aside>
+    </div>
   )
 }
+
+function WeatherWidget() {
+  const [weather, setWeather] = useState(null)
+
+  useEffect(() => {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York')
+      .then(r => r.json())
+      .then(d => setWeather(d.current))
+      .catch(() => {})
+  }, [])
+
+  const temp = weather ? Math.round(weather.temperature_2m) : '--'
+  const humidity = weather ? weather.relative_humidity_2m : '--'
+  const wind = weather ? Math.round(weather.wind_speed_10m) : '--'
+  const code = weather ? weather.weather_code : null
+
+  return (
+    <div className="sidebar-widget">
+      <div className="widget-header weather-header">
+        <span>🌤️</span> Clima em Miami
+      </div>
+      <div className="widget-body">
+        <div className="weather-main">
+          <div className="weather-icon">{weatherIcon(code)}</div>
+          <div>
+            <span className="weather-temp">{temp}</span>
+            <span className="weather-temp-unit">°F</span>
+          </div>
+          <div className="weather-desc">{weatherDesc(code)}</div>
+        </div>
+        <div className="weather-details">
+          <div className="weather-detail">
+            <span className="weather-detail-label">💧 Humidade</span>
+            <span className="weather-detail-val">{humidity}%</span>
+          </div>
+          <div className="weather-detail">
+            <span className="weather-detail-label">💨 Vento</span>
+            <span className="weather-detail-val">{wind} mph</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CotacoesWidget() {
+  const [rates, setRates] = useState({ usd: null, eur: null, btc: null })
+
+  useEffect(() => {
+    fetch('/api/rates')
+      .then(r => r.json())
+      .then(d => setRates(d))
+      .catch(() => {})
+  }, [])
+
+  const items = [
+    { flag: '🇺🇸', code: 'USD', name: 'Dólar Americano', val: rates.usd ? rates.usd.brl : null, chg: rates.usd ? rates.usd.change : null },
+    { flag: '🇪🇺', code: 'EUR', name: 'Euro',             val: rates.eur ? rates.eur.brl : null, chg: rates.eur ? rates.eur.change : null },
+    { flag: '🪙',  code: 'BTC', name: 'Bitcoin',          val: rates.btc ? rates.btc.brl : null, chg: rates.btc ? rates.btc.change : null, compact: true },
+  ]
+
+  const fmt = (v, compact) => {
+    if (!v) return '–'
+    if (compact) {
+      const n = parseFloat(v)
+      if (n > 1000000) return 'R$ ' + (n/1000000).toFixed(2) + 'M'
+      if (n > 1000) return 'R$ ' + (n/1000).toFixed(1) + 'K'
+    }
+    return 'R$ ' + parseFloat(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
+  return (
+    <div className="sidebar-widget">
+      <div className="widget-header cot-header">
+        <span>💹</span> Cotações
+      </div>
+      <div className="widget-body">
+        {items.map(item => (
+          <div key={item.code} className="cot-item">
+            <div className="cot-left">
+              <span className="cot-flag">{item.flag}</span>
+              <div>
+                <div className="cot-code">{item.code}</div>
+                <div className="cot-name">{item.name}</div>
+              </div>
+            </div>
+            <div className="cot-right">
+              <div className="cot-val">{fmt(item.val, item.compact)}</div>
+              {item.chg && (
+                <div className={"cot-chg " + (parseFloat(item.chg) >= 0 ? 'rate-up' : 'rate-dn')}>
+                  {parseFloat(item.chg) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(item.chg)).toFixed(2)}%
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function TrendingWidget({ articles = [] }) {
+  const top = articles.slice(0, 5)
+  if (top.length === 0) return null
+  return (
+    <div className="sidebar-widget">
+      <div className="widget-header trending-header">
+        <span>🔥</span> Mais Lidas
+      </div>
+      <div className="widget-body">
+        {top.map((art, i) => (
+          <a key={art.slug || i} href={"/artigo/" + art.slug} className="trending-item">
+            <span className="trending-num">{i + 1}</span>
+            <span className="trending-title">{art.title}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function Sidebar({ articles = [] }) {
+  return (
+    <div className="msn-sidebar">
+      <CopaWidget />
+      <WeatherWidget />
+      <CotacoesWidget />
+      <TrendingWidget articles={articles} />
+    </div>
+  )
+    }
