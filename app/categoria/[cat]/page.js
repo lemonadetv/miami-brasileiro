@@ -1,5 +1,5 @@
 // app/categoria/[cat]/page.js
-import Header from '../../../components/Header'
+
 import Footer from '../../../components/Footer'
 import Sidebar from '../../../components/Sidebar'
 import Link from 'next/link'
@@ -12,7 +12,7 @@ const CATS = {
   negocios:   { label: 'Negocios',   color: '#7C3AED', desc: 'Empreendedorismo, financas e oportunidades de negocio na Florida' },
   saude:      { label: 'Saude',      color: '#15803D', desc: 'Saude, planos medicos, seguros e bem-estar para brasileiros nos EUA' },
   esportes:       { label: 'Esportes',       color: '#DC2626', desc: 'Futebol, Copa do Mundo, MMA e esportes com a visao brasileira' },
-  'cultura-lazer': { label: 'Cultura e Lazer', color: '#e91e8c', desc: 'Dicas de cultura, lazer, entretenimento e diversao para brasileiros em Miami' },
+  'cultura-e-lazer': { label: 'Cultura e Lazer', color: '#e91e8c', desc: 'Dicas de cultura, lazer, entretenimento e diversao para brasileiros em Miami' },
 }
 
 const CAT_MAP = {
@@ -21,7 +21,7 @@ const CAT_MAP = {
   negocios:   'Negocios',
   saude:      'Saude',
   esportes:        'Esportes',
-  'cultura-lazer': 'Cultura e Lazer',
+  'cultura-e-lazer': 'Cultura e Lazer',
 }
 
 const FALLBACK = {
@@ -59,7 +59,7 @@ export default function CategoriaPage(props) {
 
   return (
     <>
-      <Header />
+
       <div className="cat-page">
         <div className="cat-page-header" style={{ borderLeft: '6px solid ' + info.color }}>
           <div className="cat-page-info">
