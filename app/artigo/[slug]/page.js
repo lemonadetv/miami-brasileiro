@@ -6,128 +6,149 @@ import ShareButtons from '../../../components/ShareButtons'
 import Link from 'next/link'
 import { getAllArticles, getArticleBySlug, formatDate, readingTime } from '../../../lib/articles'
 
-// Converte markdown inline em HTML: **negrito**, *italico*, [link](url)
 function toHtml(text) {
   if (!text) return ''
   return text
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer" style="color:#F4622A;text-decoration:underline;font-weight:600">$1</a>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer" style="color:var(--orange);text-decoration:underline;font-weight:600">$1</a>')
 }
 
-function ArticleContent({ content }) {
+function ArticleContent({ content, relacionados, catColor }) {
   if (!content) return null
-  const blocks = content.split(/\n\n+/).filter(function(b) { return b.trim().length > 0 })
+  const blocks = content.split(/\n\n+/).filter(b => b.trim().length > 0)
+  // Insert "Leia também" box after block 4 if there are related articles
+  const insertAt = 4
 
   return (
-    <div className="article-content" style={{ fontFamily: 'Georgia, serif' }}>
+    <div className="article-content">
       {blocks.map(function(block, i) {
         const b = block.trim()
+        const elements = []
 
-        // Imagem inline: ![alt](url)
-        const imgMatch = b.match(/^!\[([^\]]*)\]\((https?:\/\/[^)]+)\)$/)
-        if (imgMatch) {
-          return (
-            <figure key={i} style={{ margin: '32px 0', borderRadius: 10, overflow: 'hidden' }}>
-              <img src={imgMatch[2]} alt={imgMatch[1]} style={{ width: '100%', maxHeight: 420, objectFit: 'cover', display: 'block' }} />
-              {imgMatch[1] && <figcaption style={{ fontSize: 13, color: '#9CA3AF', padding: '8px 12px', textAlign: 'center', fontStyle: 'italic', fontFamily: 'sans-serif' }}>{imgMatch[1]}</figcaption>}
-            </figure>
+        // Insert "Leia também" box mid-article
+        if (i === insertAt && relacionados && relacionados.length > 0) {
+          elements.push(
+            <div key="leia-tb" className="leia-tambem" style={{ borderLeft: '4px solid ' + catColor }}>
+              <div className="leia-tambem-label" style={{ color: catColor }}>📌 Leia também</div>
+              {relacionados.slice(0, 2).map(r => (
+                <Link key={r.slug || r.id} href={'/artigo/' + (r.slug || r.id)} className="leia-tambem-link">
+                  {r.title}
+                </Link>
+              ))}
+            </div>
           )
         }
 
-        // H2: ## Titulo
+        const imgMatch = b.match(/^!\[([^\]]*)\]\((https?:\/\/[^)]+)\)$/)
+        if (imgMatch) {
+          elements.push(
+            <figure key={i} className="article-figure">
+              <img src={imgMatch[2]} alt={imgMatch[1]} className="article-figure-img" />
+              {imgMatch[1] && <figcaption className="article-figure-caption">{imgMatch[1]}</figcaption>}
+            </figure>
+          )
+          return elements
+        }
+
         if (b.startsWith('## ')) {
-          return <h2 key={i} style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, margin: '40px 0 16px', borderBottom: '3px solid #F4622A', paddingBottom: 8 }}>{b.slice(3)}</h2>
+          elements.push(<h2 key={i} className="article-h2" style={{ borderBottom: '2px solid ' + catColor }}>{b.slice(3)}</h2>)
+          return elements
         }
 
-        // H3: ### Titulo
         if (b.startsWith('### ')) {
-          return <h3 key={i} style={{ fontSize: 19, fontWeight: 700, margin: '28px 0 12px' }}>{b.slice(4)}</h3>
+          elements.push(<h3 key={i} className="article-h3">{b.slice(4)}</h3>)
+          return elements
         }
 
-        // Bold-only = heading
         if (b.startsWith('**') && b.endsWith('**') && !b.slice(2,-2).includes('**')) {
-          return <h3 key={i} style={{ fontSize: 19, fontWeight: 700, margin: '28px 0 12px' }}>{b.slice(2,-2)}</h3>
+          elements.push(<h3 key={i} className="article-h3">{b.slice(2,-2)}</h3>)
+          return elements
         }
 
-        // --- separador
         if (b === '---') {
-          return <hr key={i} style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '32px 0' }} />
+          elements.push(<hr key={i} className="article-divider" />)
+          return elements
         }
 
-        // > blockquote
         if (b.startsWith('> ')) {
-          return <blockquote key={i} style={{ borderLeft: '4px solid #F4622A', margin: '28px 0', padding: '14px 20px', background: 'rgba(244,98,42,.06)', borderRadius: '0 6px 6px 0', fontStyle: 'italic', fontSize: 18 }} dangerouslySetInnerHTML={{ __html: toHtml(b.slice(2)) }} />
+          elements.push(
+            <blockquote key={i} className="article-quote" style={{ borderColor: catColor }}
+              dangerouslySetInnerHTML={{ __html: toHtml(b.slice(2)) }} />
+          )
+          return elements
         }
 
-        // Caixa de dica: **Dica:** ou **Importante:**
-        if (b.startsWith('**Dica') || b.startsWith('**Importante') || b.startsWith('**Aten\u00e7\u00e3o') || b.startsWith('**Nota')) {
-          return <div key={i} style={{ background: 'rgba(244,98,42,.08)', border: '1px solid rgba(244,98,42,.25)', borderRadius: 8, padding: '14px 18px', margin: '24px 0', fontSize: 16, lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: toHtml(b) }} />
+        if (b.startsWith('**Dica') || b.startsWith('**Importante') || b.startsWith('**Aten') || b.startsWith('**Nota')) {
+          elements.push(
+            <div key={i} className="article-tip" style={{ borderColor: catColor, background: catColor + '12' }}
+              dangerouslySetInnerHTML={{ __html: toHtml(b) }} />
+          )
+          return elements
         }
 
-        // Tabela | col | col |
         if (b.includes('|') && b.split('\n')[0].includes('|')) {
-          const rows = b.split('\n').filter(function(r) { return r.trim() && !r.match(/^\|[-\s|]+\|$/) })
-          return (
-            <div key={i} style={{ overflowX: 'auto', margin: '24px 0' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 15 }}>
-                {rows.map(function(row, ri) {
-                  const cells = row.split('|').filter(function(c) { return c.trim() })
+          const rows = b.split('\n').filter(r => r.trim() && !r.match(/^\|[-\s|]+\|$/))
+          elements.push(
+            <div key={i} className="article-table-wrap">
+              <table className="article-table">
+                {rows.map((row, ri) => {
+                  const cells = row.split('|').filter(c => c.trim())
                   const Tag = ri === 0 ? 'th' : 'td'
                   return (
-                    <tr key={ri} style={{ background: ri === 0 ? '#F4622A' : ri % 2 === 0 ? '#F9FAFB' : 'transparent' }}>
-                      {cells.map(function(cell, ci) {
-                        return <Tag key={ci} style={{ padding: '10px 14px', border: '1px solid #E5E7EB', color: ri === 0 ? 'white' : 'inherit', fontWeight: ri === 0 ? 700 : 400, textAlign: 'left' }} dangerouslySetInnerHTML={{ __html: toHtml(cell.trim()) }} />
-                      })}
+                    <tr key={ri} style={{ background: ri === 0 ? catColor : ri % 2 === 0 ? 'var(--bg-hover)' : 'transparent' }}>
+                      {cells.map((cell, ci) => (
+                        <Tag key={ci} className={ri === 0 ? 'article-table-th' : 'article-table-td'}
+                          dangerouslySetInnerHTML={{ __html: toHtml(cell.trim()) }} />
+                      ))}
                     </tr>
                   )
                 })}
               </table>
             </div>
           )
+          return elements
         }
 
-        // Lista numerada
         if (/^\d+\./.test(b)) {
           const lines = b.split('\n').filter(Boolean)
-          return (
-            <ol key={i} style={{ margin: '4px 0 24px 24px', lineHeight: 1.9 }}>
-              {lines.map(function(line, j) {
-                const text = line.replace(/^\d+\.\s*/, '')
-                return <li key={j} style={{ marginBottom: 8 }} dangerouslySetInnerHTML={{ __html: toHtml(text) }} />
-              })}
+          elements.push(
+            <ol key={i} className="article-ol">
+              {lines.map((line, j) => (
+                <li key={j} dangerouslySetInnerHTML={{ __html: toHtml(line.replace(/^\d+\.\s*/, '')) }} />
+              ))}
             </ol>
           )
+          return elements
         }
 
-        // Lista com marcador
         if (b.startsWith('- ') || b.startsWith('* ')) {
           const lines = b.split('\n').filter(Boolean)
-          return (
-            <ul key={i} style={{ margin: '4px 0 24px 24px', lineHeight: 1.9 }}>
-              {lines.map(function(line, j) {
-                const text = line.replace(/^[-*]\s*/, '')
-                return <li key={j} style={{ marginBottom: 8 }} dangerouslySetInnerHTML={{ __html: toHtml(text) }} />
-              })}
+          elements.push(
+            <ul key={i} className="article-ul">
+              {lines.map((line, j) => (
+                <li key={j} dangerouslySetInnerHTML={{ __html: toHtml(line.replace(/^[-*]\s*/, '')) }} />
+              ))}
             </ul>
           )
+          return elements
         }
 
-        // Link isolado [texto](url)
         const linkMatch = b.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)(.*)$/)
         if (linkMatch) {
-          return (
-            <p key={i} style={{ marginBottom: 10 }}>
-              <a href={linkMatch[2]} target="_blank" rel="noreferrer" style={{ color: '#F4622A', textDecoration: 'underline', fontWeight: 600 }}>{linkMatch[1]}</a>
+          elements.push(
+            <p key={i} className="article-p">
+              <a href={linkMatch[2]} target="_blank" rel="noreferrer" className="article-link">{linkMatch[1]}</a>
               {linkMatch[3] && <span>{linkMatch[3]}</span>}
             </p>
           )
+          return elements
         }
 
-        // Paragrafo normal
         const html = toHtml(b)
         if (!html.trim()) return null
-        return <p key={i} style={{ marginBottom: 22, fontSize: 17, lineHeight: 1.9 }} dangerouslySetInnerHTML={{ __html: html }} />
+        elements.push(<p key={i} className="article-p" dangerouslySetInnerHTML={{ __html: html }} />)
+        return elements
       })}
     </div>
   )
@@ -136,11 +157,11 @@ function ArticleContent({ content }) {
 const CAT_COLORS = {
   'Imigracao': '#F4622A', 'Comunidade': '#00897B',
   'Saude': '#15803D', 'Negocios': '#7C3AED', 'Esportes': '#DC2626',
-  'Cultura e Lazer': '#E91E8C',
+  'Cultura e Lazer': '#D97706',
 }
 
 export async function generateStaticParams() {
-  return getAllArticles().map(function(a) { return { slug: a.id } })
+  return getAllArticles().map(a => ({ slug: a.slug || a.id }))
 }
 
 export async function generateMetadata(props) {
@@ -152,6 +173,7 @@ export async function generateMetadata(props) {
     openGraph: {
       title: article.title,
       description: article.excerpt,
+      images: article.image ? [article.image] : [],
       type: 'article',
       publishedTime: article.publishedAt,
       locale: 'pt_BR',
@@ -164,9 +186,12 @@ export default function ArtigoPage(props) {
   if (!article) notFound()
 
   const allArticles = getAllArticles()
-  const relacionados = allArticles.filter(function(a) {
-    return a.category === article.category && a.id !== article.id
-  }).slice(0, 3)
+  const relacionados = allArticles
+    .filter(a => a.category === article.category && (a.slug || a.id) !== (article.slug || article.id))
+    .slice(0, 4)
+  const maisRecentes = allArticles
+    .filter(a => (a.slug || a.id) !== (article.slug || article.id) && !relacionados.find(r => (r.slug||r.id) === (a.slug||a.id)))
+    .slice(0, 4)
   const catColor = CAT_COLORS[article.category] || '#F4622A'
   const catSlug = (article.category || '').toLowerCase().replace(/ e /g, '-e-').replace(/\s+/g, '-')
 
@@ -174,66 +199,139 @@ export default function ArtigoPage(props) {
     <div>
       <div className="article-page">
         <div className="article-page-grid">
+          {/* Main article */}
           <article className="article-body">
+            {/* Hero image */}
             {article.image && (
-              <div style={{ width: '100%', height: 480, overflow: 'hidden', borderRadius: '0 0 8px 8px' }}>
-                <img src={article.image} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div className="article-hero">
+                <img src={article.image} alt={article.title} className="article-hero-img" />
+                <div className="article-hero-overlay" />
+                <div className="article-hero-cat">
+                  <Link href={'/categoria/' + catSlug}
+                    style={{ background: catColor, color: 'white', padding: '4px 14px', borderRadius: 4,
+                      fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.8px',
+                      textDecoration: 'none' }}>
+                    {article.category}
+                  </Link>
+                </div>
               </div>
             )}
+
             <div className="article-inner">
-              <div className="article-breadcrumb" style={{ marginBottom: 12 }}>
-                <Link href="/" style={{ color: '#9CA3AF' }}>Inicio</Link>
-                <span style={{ color: '#6B7280', margin: '0 6px' }}>›</span>
-                <Link href={'/categoria/' + catSlug} style={{ color: '#9CA3AF' }}>{article.category}</Link>
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                <span style={{ background: catColor, color: 'white', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 3, textTransform: 'uppercase', letterSpacing: '.5px' }}>
-                  {article.category}
-                </span>
-              </div>
-              <h1 className="article-title" style={{ fontFamily: 'Georgia, serif', fontSize: 34, lineHeight: 1.25, marginBottom: 16, borderBottom: '3px solid ' + catColor, paddingBottom: 14 }}>{article.title}</h1>
-              <div className="article-meta-bar" style={{ display: 'flex', gap: 18, fontSize: 13, color: '#9CA3AF', marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
-                <span>📅 {formatDate(article.publishedAt)}</span>
-                <span>✍️ {article.source || 'Miami Brasileira'}</span>
-                <span>⏱ {readingTime(article.content)}</span>
-              </div>
+              {/* Breadcrumb */}
+              <nav className="article-breadcrumb">
+                <Link href="/">Inicio</Link>
+                <span>›</span>
+                <Link href={'/categoria/' + catSlug}>{article.category}</Link>
+              </nav>
+
+              {/* Title */}
+              <h1 className="article-title">{article.title}</h1>
+
+              {/* Excerpt */}
               {article.excerpt && (
-                <p className="article-excerpt" style={{ fontSize: 18, fontStyle: 'italic', color: '#6B7280', borderLeft: '4px solid ' + catColor, paddingLeft: 16, marginBottom: 28, lineHeight: 1.7 }}>{article.excerpt}</p>
+                <p className="article-excerpt">{article.excerpt}</p>
               )}
-              <ArticleContent content={article.content} />
-              <ShareButtons title={article.title} />
+
+              {/* Meta bar */}
+              <div className="article-meta-bar">
+                <span className="article-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  {formatDate(article.publishedAt)}
+                </span>
+                <span className="article-meta-sep">·</span>
+                <span className="article-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {article.source || 'Miami Brasileira'}
+                </span>
+                <span className="article-meta-sep">·</span>
+                <span className="article-meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {readingTime(article.content)}
+                </span>
+                {article.originalUrl && (
+                  <>
+                    <span className="article-meta-sep">·</span>
+                    <a href={article.originalUrl} target="_blank" rel="noreferrer" className="article-source-link">
+                      Ver fonte original →
+                    </a>
+                  </>
+                )}
+              </div>
+
+              {/* Content */}
+              <ArticleContent content={article.content} relacionados={relacionados} catColor={catColor} />
+
+              {/* Share */}
+              <div className="article-share-wrap">
+                <ShareButtons title={article.title} />
+              </div>
             </div>
           </article>
+
           <Sidebar articles={allArticles} />
         </div>
+
+        {/* Related articles */}
         {relacionados.length > 0 && (
-          <div style={{ marginTop: 48 }}>
-            <div className="section-header">
-              <div className="section-bar" />
-              <h2>Noticias Relacionadas</h2>
+          <section className="related-section">
+            <div className="related-header">
+              <span className="related-bar" style={{ background: catColor }} />
+              <h2 className="related-title">Mais sobre {article.category}</h2>
+              <Link href={'/categoria/' + catSlug} className="related-see-all" style={{ color: catColor }}>
+                Ver todos →
+              </Link>
             </div>
-            <div className="article-grid">
-              {relacionados.map(function(art) {
+            <div className="related-grid">
+              {relacionados.map(art => (
+                <Link key={art.slug || art.id} href={'/artigo/' + (art.slug || art.id)} className="related-card">
+                  <div className="related-card-img-wrap">
+                    <img src={art.image || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&q=70'}
+                      alt={art.title} className="related-card-img" />
+                    <span className="related-card-cat" style={{ background: catColor }}>{art.category}</span>
+                  </div>
+                  <div className="related-card-body">
+                    <h3 className="related-card-title">{art.title}</h3>
+                    <span className="related-card-meta">{formatDate(art.publishedAt)}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Mais recentes */}
+        {maisRecentes.length > 0 && (
+          <section className="related-section">
+            <div className="related-header">
+              <span className="related-bar" style={{ background: 'var(--teal)' }} />
+              <h2 className="related-title">Mais Noticias</h2>
+              <Link href="/" className="related-see-all" style={{ color: 'var(--teal)' }}>
+                Ver home →
+              </Link>
+            </div>
+            <div className="related-grid">
+              {maisRecentes.map(art => {
+                const c = CAT_COLORS[art.category] || '#555'
                 return (
-                  <Link key={art.id} href={'/artigo/' + art.id} className="article-card">
-                    <img src={art.image || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&q=70'} alt={art.title} />
-                    <div className="card-body">
-                      <div className="card-tag">{art.category}</div>
-                      <h3>{art.title}</h3>
-                      <div className="card-meta">
-                        <span>{art.publishedAt && art.publishedAt.slice(0, 10)}</span>
-                        <div className="dot" />
-                        <span>{readingTime(art.content)}</span>
-                      </div>
+                  <Link key={art.slug || art.id} href={'/artigo/' + (art.slug || art.id)} className="related-card">
+                    <div className="related-card-img-wrap">
+                      <img src={art.image || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&q=70'}
+                        alt={art.title} className="related-card-img" />
+                      <span className="related-card-cat" style={{ background: c }}>{art.category}</span>
+                    </div>
+                    <div className="related-card-body">
+                      <h3 className="related-card-title">{art.title}</h3>
+                      <span className="related-card-meta">{formatDate(art.publishedAt)}</span>
                     </div>
                   </Link>
                 )
               })}
             </div>
-          </div>
+          </section>
         )}
       </div>
       <Footer />
     </div>
   )
-             }
+}
