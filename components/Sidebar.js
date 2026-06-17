@@ -1,19 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 
-// ── Copa 2026 ──────────────────────────────────────────────────────────────
-const COPA_DATA = {
-  live: [],
-  today: [
-    { id:1, home:'🇧🇷', homeCode:'BRA', away:'🇺🇾', awayCode:'URU', homeScore:2, awayScore:1, status:"75'", group:'Grupo D' },
-    { id:2, home:'🇦🇷', homeCode:'ARG', away:'🇵🇪', awayCode:'PER', homeScore:1, awayScore:0, status:'INTERVALO', group:'Grupo C' },
-  ],
-  upcoming: [
-    { id:3, home:'🇲🇽', homeCode:'MEX', away:'🇨🇱', awayCode:'CHI', date:'18:00', group:'Grupo B' },
-    { id:4, home:'🇺🇸', homeCode:'USA', away:'🇨🇦', awayCode:'CAN', date:'21:00', group:'Grupo A' },
-  ]
-}
-
 function weatherIcon(code) {
   if (!code && code !== 0) return '🌤️'
   if ([0].includes(code)) return '☀️'
@@ -39,54 +26,111 @@ function weatherDesc(code) {
   return 'Parcialmente nublado'
 }
 
+const FLAG = {
+  BRA:'🇧🇷',ARG:'🇦🇷',URU:'🇺🇾',COL:'🇨🇴',
+  CHI:'🇨🇱',PER:'🇵🇪',USA:'🇺🇸',MEX:'🇲🇽',
+  CAN:'🇨🇦',ECU:'🇪🇨',PAR:'🇵🇾',VEN:'🇻🇪',
+  BOL:'🇧🇴',PAN:'🇵🇦',CRC:'🇨🇷',HON:'🇭🇳',
+  JAM:'🇯🇲',TRI:'🇹🇹',GER:'🇩🇪',FRA:'🇫🇷',
+  ESP:'🇪🇸',POR:'🇵🇹',NED:'🇳🇱',BEL:'🇧🇪',
+  ITA:'🇮🇹',CRO:'🇭🇷',SUI:'🇨🇭',AUT:'🇦🇹',
+  DEN:'🇩🇰',POL:'🇵🇱',SER:'🇷🇸',NOR:'🇳🇴',
+  SWE:'🇸🇪',SEN:'🇸🇳',GHA:'🇬🇭',CMR:'🇨🇲',
+  MAR:'🇲🇦',TUN:'🇹🇳',EGY:'🇪🇬',NGA:'🇳🇬',
+  CIV:'🇨🇮',MLI:'🇲🇱',ALG:'🇩🇿',IRQ:'🇮🇶',
+  JPN:'🇯🇵',KOR:'🇰🇷',AUS:'🇦🇺',IRN:'🇮🇷',
+  SAU:'🇸🇦',QAT:'🇶🇦',UAE:'🇦🇪',JOR:'🇯🇴',
+  UZB:'🇺🇿',CHN:'🇨🇳',TUR:'🇹🇷',GRE:'🇬🇷',
+}
+
 function CopaWidget() {
+  const [matches, setMatches] = useState(null)
+
+  useEffect(() => {
+    const load = () => {
+      fetch('/api/copa')
+        .then(r => r.json())
+        .then(d => setMatches(d.events || []))
+        .catch(() => setMatches([]))
+    }
+    load()
+    const t = setInterval(load, 60000)
+    return () => clearInterval(t)
+  }, [])
+
+  const f = (code) => FLAG[code] || '🏳️'
+
+  const fmt = (dateStr) => {
+    try {
+      return new Date(dateStr).toLocaleTimeString('pt-BR', {
+        hour:'2-digit', minute:'2-digit', timeZone:'America/New_York'
+      })
+    } catch { return '' }
+  }
+
+  const live = matches?.filter(m => m.isLive) || []
+  const done = matches?.filter(m => m.isCompleted) || []
+  const next = matches?.filter(m => m.isScheduled) || []
+  const hasResults = live.length > 0 || done.length > 0
+
+  const MatchRow = ({ m }) => (
+    <div className="copa-match">
+      <div className="copa-team">
+        <span className="copa-team-flag">{f(m.homeCode)}</span>
+        <span className="copa-team-name">{m.homeCode}</span>
+      </div>
+      <div className="copa-score">
+        {(m.isLive || m.isCompleted) ? (
+          <>
+            <div className="copa-score-num">{m.homeScore} – {m.awayScore}</div>
+            <span className={'copa-score-status' + (m.isLive ? ' live' : '')}>
+              {m.isLive ? m.displayClock : 'FIM'}
+            </span>
+          </>
+        ) : (
+          <div style={{ fontSize:18, fontWeight:900, color:'var(--text-bright)' }}>{fmt(m.date)}</div>
+        )}
+        {m.group && <div className="copa-group-label">{m.group}</div>}
+      </div>
+      <div className="copa-team">
+        <span className="copa-team-flag">{f(m.awayCode)}</span>
+        <span className="copa-team-name">{m.awayCode}</span>
+      </div>
+    </div>
+  )
+
   return (
     <div className="sidebar-widget">
-      <div className="widget-header copa-header">
+      <div className="widget-header copa-header" style={{ display:'flex', alignItems:'center', gap:6 }}>
         <span>⚽</span> Copa 2026 – Ao Vivo
+        {live.length > 0 && (
+          <span style={{ marginLeft:'auto', fontSize:10, color:'#ff4444', fontWeight:700 }}>● AO VIVO</span>
+        )}
       </div>
-      <div className="widget-body" style={{ padding: '10px 14px' }}>
-        {COPA_DATA.today.map(m => (
-          <div key={m.id} className="copa-match">
-            <div className="copa-team">
-              <span className="copa-team-flag">{m.home}</span>
-              <span className="copa-team-name">{m.homeCode}</span>
-            </div>
-            <div className="copa-score">
-              <div className="copa-score-num">{m.homeScore} – {m.awayScore}</div>
-              <span className={"copa-score-status" + (m.status.includes("'") ? " live" : "")}>
-                {m.status}
-              </span>
-              <div className="copa-group-label">{m.group}</div>
-            </div>
-            <div className="copa-team">
-              <span className="copa-team-flag">{m.away}</span>
-              <span className="copa-team-name">{m.awayCode}</span>
-            </div>
+      <div className="widget-body" style={{ padding:'10px 14px' }}>
+        {matches === null ? (
+          <div style={{ textAlign:'center', color:'var(--text-muted)', fontSize:12, padding:'12px 0' }}>
+            Carregando...
           </div>
-        ))}
-        {COPA_DATA.upcoming.length > 0 && (
-          <div>
-            <div style={{ fontSize:10, color:'var(--text-muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.5px', padding:'8px 0 4px', borderTop:'1px solid var(--border)' }}>
-              Hoje mais tarde
-            </div>
-            {COPA_DATA.upcoming.map(m => (
-              <div key={m.id} className="copa-match">
-                <div className="copa-team">
-                  <span className="copa-team-flag">{m.home}</span>
-                  <span className="copa-team-name">{m.homeCode}</span>
-                </div>
-                <div className="copa-score">
-                  <div style={{ fontSize:18, fontWeight:900, color:'var(--text-bright)' }}>{m.date}</div>
-                  <div className="copa-group-label">{m.group}</div>
-                </div>
-                <div className="copa-team">
-                  <span className="copa-team-flag">{m.away}</span>
-                  <span className="copa-team-name">{m.awayCode}</span>
-                </div>
-              </div>
-            ))}
+        ) : matches.length === 0 ? (
+          <div style={{ textAlign:'center', color:'var(--text-muted)', fontSize:12, padding:'12px 0' }}>
+            Nenhum jogo hoje
           </div>
+        ) : (
+          <>
+            {live.map(m => <MatchRow key={m.id} m={m} />)}
+            {done.map(m => <MatchRow key={m.id} m={m} />)}
+            {next.length > 0 && (
+              <>
+                {hasResults && (
+                  <div style={{ fontSize:10, color:'var(--text-muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.5px', padding:'8px 0 4px', borderTop:'1px solid var(--border)' }}>
+                    Hoje mais tarde
+                  </div>
+                )}
+                {next.slice(0, 3).map(m => <MatchRow key={m.id} m={m} />)}
+              </>
+            )}
+          </>
         )}
         <a href="/copa-2026" className="copa-live-btn">Ver todos os jogos →</a>
       </div>
@@ -139,7 +183,7 @@ function WeatherWidget() {
 }
 
 function CotacoesWidget() {
-  const [rates, setRates] = useState({ usd: null, eur: null, btc: null })
+  const [rates, setRates] = useState({})
 
   useEffect(() => {
     fetch('/api/rates')
@@ -149,19 +193,19 @@ function CotacoesWidget() {
   }, [])
 
   const items = [
-    { flag: '🇺🇸', code: 'USD', name: 'Dólar Americano', val: rates.usd ? rates.usd.brl : null, chg: rates.usd ? rates.usd.change : null },
-    { flag: '🇪🇺', code: 'EUR', name: 'Euro',             val: rates.eur ? rates.eur.brl : null, chg: rates.eur ? rates.eur.change : null },
-    { flag: '🪙',  code: 'BTC', name: 'Bitcoin',          val: rates.btc ? rates.btc.brl : null, chg: rates.btc ? rates.btc.change : null, compact: true },
+    { flag: '🇺🇸', code: 'USD', name: 'Dólar',  val: rates.usd,  chg: rates.usdChange },
+    { flag: '🇪🇺', code: 'EUR', name: 'Euro',    val: rates.eur,  chg: rates.eurChange },
+    { flag: '🪙',  code: 'BTC', name: 'Bitcoin', val: rates.btc,  chg: rates.btcChange, compact: true },
   ]
 
   const fmt = (v, compact) => {
     if (!v) return '–'
+    const n = parseFloat(v)
     if (compact) {
-      const n = parseFloat(v)
       if (n > 1000000) return 'R$ ' + (n/1000000).toFixed(2) + 'M'
       if (n > 1000) return 'R$ ' + (n/1000).toFixed(1) + 'K'
     }
-    return 'R$ ' + parseFloat(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
   return (
@@ -182,7 +226,7 @@ function CotacoesWidget() {
             <div className="cot-right">
               <div className="cot-val">{fmt(item.val, item.compact)}</div>
               {item.chg && (
-                <div className={"cot-chg " + (parseFloat(item.chg) >= 0 ? 'rate-up' : 'rate-dn')}>
+                <div className={'cot-chg ' + (parseFloat(item.chg) >= 0 ? 'rate-up' : 'rate-dn')}>
                   {parseFloat(item.chg) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(item.chg)).toFixed(2)}%
                 </div>
               )}
@@ -204,7 +248,7 @@ function TrendingWidget({ articles = [] }) {
       </div>
       <div className="widget-body">
         {top.map((art, i) => (
-          <a key={art.slug || i} href={"/artigo/" + art.slug} className="trending-item">
+          <a key={art.slug || i} href={'/artigo/' + art.slug} className="trending-item">
             <span className="trending-num">{i + 1}</span>
             <span className="trending-title">{art.title}</span>
           </a>
@@ -223,4 +267,4 @@ export default function Sidebar({ articles = [] }) {
       <TrendingWidget articles={articles} />
     </div>
   )
-    }
+}
