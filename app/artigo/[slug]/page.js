@@ -12,7 +12,7 @@ function toHtml(text) {
   return text
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer" style="color:#4DB6AC;text-decoration:underline;font-weight:600">$1</a>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer" style="color:#F4622A;text-decoration:underline;font-weight:600">$1</a>')
 }
 
 function ArticleContent({ content }) {
@@ -37,32 +37,32 @@ function ArticleContent({ content }) {
 
         // H2: ## Titulo
         if (b.startsWith('## ')) {
-          return <h2 key={i} style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, margin: '40px 0 16px', color: '#F3F4F6', borderBottom: '3px solid #F4622A', paddingBottom: 8 }}>{b.slice(3)}</h2>
+          return <h2 key={i} style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, margin: '40px 0 16px', borderBottom: '3px solid #F4622A', paddingBottom: 8 }}>{b.slice(3)}</h2>
         }
 
         // H3: ### Titulo
         if (b.startsWith('### ')) {
-          return <h3 key={i} style={{ fontSize: 19, fontWeight: 700, margin: '28px 0 12px', color: '#E5E7EB' }}>{b.slice(4)}</h3>
+          return <h3 key={i} style={{ fontSize: 19, fontWeight: 700, margin: '28px 0 12px' }}>{b.slice(4)}</h3>
         }
 
         // Bold-only = heading
         if (b.startsWith('**') && b.endsWith('**') && !b.slice(2,-2).includes('**')) {
-          return <h3 key={i} style={{ fontSize: 19, fontWeight: 700, margin: '28px 0 12px', color: '#E5E7EB' }}>{b.slice(2,-2)}</h3>
+          return <h3 key={i} style={{ fontSize: 19, fontWeight: 700, margin: '28px 0 12px' }}>{b.slice(2,-2)}</h3>
         }
 
         // --- separador
         if (b === '---') {
-          return <hr key={i} style={{ border: 'none', borderTop: '1px solid #374151', margin: '32px 0' }} />
+          return <hr key={i} style={{ border: 'none', borderTop: '1px solid #E5E7EB', margin: '32px 0' }} />
         }
 
         // > blockquote
         if (b.startsWith('> ')) {
-          return <blockquote key={i} style={{ borderLeft: '4px solid #F4622A', margin: '28px 0', padding: '14px 20px', background: 'rgba(244,98,42,.08)', borderRadius: '0 6px 6px 0', fontStyle: 'italic', fontSize: 18, color: '#D1D5DB' }} dangerouslySetInnerHTML={{ __html: toHtml(b.slice(2)) }} />
+          return <blockquote key={i} style={{ borderLeft: '4px solid #F4622A', margin: '28px 0', padding: '14px 20px', background: 'rgba(244,98,42,.06)', borderRadius: '0 6px 6px 0', fontStyle: 'italic', fontSize: 18 }} dangerouslySetInnerHTML={{ __html: toHtml(b.slice(2)) }} />
         }
 
         // Caixa de dica: **Dica:** ou **Importante:**
-        if (b.startsWith('**Dica') || b.startsWith('**Importante') || b.startsWith('**Atenção') || b.startsWith('**Nota')) {
-          return <div key={i} style={{ background: 'rgba(244,98,42,.1)', border: '1px solid rgba(244,98,42,.3)', borderRadius: 8, padding: '14px 18px', margin: '24px 0', color: '#FCA5A5', fontSize: 16, lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: toHtml(b) }} />
+        if (b.startsWith('**Dica') || b.startsWith('**Importante') || b.startsWith('**Aten\u00e7\u00e3o') || b.startsWith('**Nota')) {
+          return <div key={i} style={{ background: 'rgba(244,98,42,.08)', border: '1px solid rgba(244,98,42,.25)', borderRadius: 8, padding: '14px 18px', margin: '24px 0', fontSize: 16, lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: toHtml(b) }} />
         }
 
         // Tabela | col | col |
@@ -75,9 +75,9 @@ function ArticleContent({ content }) {
                   const cells = row.split('|').filter(function(c) { return c.trim() })
                   const Tag = ri === 0 ? 'th' : 'td'
                   return (
-                    <tr key={ri} style={{ background: ri === 0 ? '#1E3A5F' : ri % 2 === 0 ? 'rgba(255,255,255,.03)' : 'transparent' }}>
+                    <tr key={ri} style={{ background: ri === 0 ? '#F4622A' : ri % 2 === 0 ? '#F9FAFB' : 'transparent' }}>
                       {cells.map(function(cell, ci) {
-                        return <Tag key={ci} style={{ padding: '10px 14px', border: '1px solid #374151', color: ri === 0 ? '#F3F4F6' : '#D1D5DB', fontWeight: ri === 0 ? 700 : 400, textAlign: 'left' }} dangerouslySetInnerHTML={{ __html: toHtml(cell.trim()) }} />
+                        return <Tag key={ci} style={{ padding: '10px 14px', border: '1px solid #E5E7EB', color: ri === 0 ? 'white' : 'inherit', fontWeight: ri === 0 ? 700 : 400, textAlign: 'left' }} dangerouslySetInnerHTML={{ __html: toHtml(cell.trim()) }} />
                       })}
                     </tr>
                   )
@@ -91,7 +91,7 @@ function ArticleContent({ content }) {
         if (/^\d+\./.test(b)) {
           const lines = b.split('\n').filter(Boolean)
           return (
-            <ol key={i} style={{ margin: '4px 0 24px 24px', lineHeight: 1.9, color: '#E5E7EB' }}>
+            <ol key={i} style={{ margin: '4px 0 24px 24px', lineHeight: 1.9 }}>
               {lines.map(function(line, j) {
                 const text = line.replace(/^\d+\.\s*/, '')
                 return <li key={j} style={{ marginBottom: 8 }} dangerouslySetInnerHTML={{ __html: toHtml(text) }} />
@@ -104,7 +104,7 @@ function ArticleContent({ content }) {
         if (b.startsWith('- ') || b.startsWith('* ')) {
           const lines = b.split('\n').filter(Boolean)
           return (
-            <ul key={i} style={{ margin: '4px 0 24px 24px', lineHeight: 1.9, color: '#E5E7EB' }}>
+            <ul key={i} style={{ margin: '4px 0 24px 24px', lineHeight: 1.9 }}>
               {lines.map(function(line, j) {
                 const text = line.replace(/^[-*]\s*/, '')
                 return <li key={j} style={{ marginBottom: 8 }} dangerouslySetInnerHTML={{ __html: toHtml(text) }} />
@@ -118,8 +118,8 @@ function ArticleContent({ content }) {
         if (linkMatch) {
           return (
             <p key={i} style={{ marginBottom: 10 }}>
-              <a href={linkMatch[2]} target="_blank" rel="noreferrer" style={{ color: '#4DB6AC', textDecoration: 'underline', fontWeight: 600 }}>{linkMatch[1]}</a>
-              {linkMatch[3] && <span style={{ color: '#9CA3AF' }}>{linkMatch[3]}</span>}
+              <a href={linkMatch[2]} target="_blank" rel="noreferrer" style={{ color: '#F4622A', textDecoration: 'underline', fontWeight: 600 }}>{linkMatch[1]}</a>
+              {linkMatch[3] && <span>{linkMatch[3]}</span>}
             </p>
           )
         }
@@ -127,7 +127,7 @@ function ArticleContent({ content }) {
         // Paragrafo normal
         const html = toHtml(b)
         if (!html.trim()) return null
-        return <p key={i} style={{ marginBottom: 22, fontSize: 17, lineHeight: 1.9, color: '#E5E7EB' }} dangerouslySetInnerHTML={{ __html: html }} />
+        return <p key={i} style={{ marginBottom: 22, fontSize: 17, lineHeight: 1.9 }} dangerouslySetInnerHTML={{ __html: html }} />
       })}
     </div>
   )
@@ -191,14 +191,14 @@ export default function ArtigoPage(props) {
                   {article.category}
                 </span>
               </div>
-              <h1 className="article-title" style={{ fontFamily: 'Georgia, serif', fontSize: 34, lineHeight: 1.25, color: '#F9FAFB', marginBottom: 16, borderBottom: '3px solid ' + catColor, paddingBottom: 14 }}>{article.title}</h1>
+              <h1 className="article-title" style={{ fontFamily: 'Georgia, serif', fontSize: 34, lineHeight: 1.25, marginBottom: 16, borderBottom: '3px solid ' + catColor, paddingBottom: 14 }}>{article.title}</h1>
               <div className="article-meta-bar" style={{ display: 'flex', gap: 18, fontSize: 13, color: '#9CA3AF', marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
                 <span>📅 {formatDate(article.publishedAt)}</span>
                 <span>✍️ {article.source || 'Miami Brasileira'}</span>
                 <span>⏱ {readingTime(article.content)}</span>
               </div>
               {article.excerpt && (
-                <p className="article-excerpt" style={{ fontSize: 18, fontStyle: 'italic', color: '#9CA3AF', borderLeft: '4px solid ' + catColor, paddingLeft: 16, marginBottom: 28, lineHeight: 1.7 }}>{article.excerpt}</p>
+                <p className="article-excerpt" style={{ fontSize: 18, fontStyle: 'italic', color: '#6B7280', borderLeft: '4px solid ' + catColor, paddingLeft: 16, marginBottom: 28, lineHeight: 1.7 }}>{article.excerpt}</p>
               )}
               <ArticleContent content={article.content} />
               <ShareButtons title={article.title} />
@@ -236,4 +236,4 @@ export default function ArtigoPage(props) {
       <Footer />
     </div>
   )
-            }
+             }
