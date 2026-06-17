@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import Header from '../../components/Header'
+
 import Footer from '../../components/Footer'
 
 const BAIRROS = [
@@ -22,7 +22,7 @@ const BAIRROS = [
     brasileiros: '★★★☆☆',
     destaque: 'Melhor para: Profissionais 25–40 anos sem filhos',
     pontos: ['Brickell City Centre', 'Mary Brickell Village', 'Simpson Park', 'Metrorail Station'],
-    coords: [25.7452, -80.1939],
+    coords: [25.7617, -80.1918],
   },
   {
     id: 'wynwood',
@@ -319,7 +319,7 @@ function LeafletMap({ bairros, selected, onSelect }) {
           .bindPopup(`<div style="font-family:sans-serif;min-width:140px">
             <div style="font-weight:800;font-size:1rem;margin-bottom:4px">${b.emoji} ${b.nome}</div>
             <div style="color:#888;font-size:0.8rem;margin-bottom:6px">${b.subtitulo}</div>
-            <div style="font-size:0.78rem;color:${ALUGUEL_COLORS[b.aluguel]};font-weight:700">${b.aluguel} ${b.alugelFaixa}</div>
+            <div style="font-size:0.78rem;color:${ALUGUEL_COLORS[b.aluguel]};font-weight:700">${b.aluguel}</div>
           </div>`, { maxWidth: 200 })
 
         marker.on('click', () => onSelect(b.id))
@@ -384,8 +384,8 @@ export default function MorandoEmMiami() {
 
   return (
     <>
-      <Header articles={[]} />
-      <main style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingTop: 80 }}>
+      
+      <main style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingTop: 0 }}>
 
         {/* HERO */}
         <div style={{
@@ -468,7 +468,7 @@ export default function MorandoEmMiami() {
                           <span style={{
                             fontSize: '0.72rem', fontWeight: 700, color: ALUGUEL_COLORS[b.aluguel],
                             background: (ALUGUEL_COLORS[b.aluguel]) + '18', padding: '2px 8px', borderRadius: 4,
-                          }}>{b.aluguel} {b.alugelFaixa}</span>
+                          }}>{b.aluguel}</span>
                           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>🇧🇷 {b.brasileiros}</span>
                         </div>
                       </div>
@@ -572,7 +572,7 @@ export default function MorandoEmMiami() {
                       <span style={{ fontSize: '1.6rem' }}>{bairro.emoji}</span>
                       <div>
                         <div style={{ fontWeight: 800, color: bairro.cor, fontSize: '0.9rem' }}>{bairro.nome}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{bairro.alugelFaixa}</div>
+                        
                       </div>
                     </div>
                   </div>
