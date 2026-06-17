@@ -22,6 +22,30 @@ function weatherIcon(code) {
   return '⛈️'
 }
 
+function Logo() {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: '0.18em', lineHeight: 1 }}>
+      <span style={{
+        color: '#FF6EC7',
+        fontWeight: 900,
+        fontStyle: 'italic',
+        fontSize: '1.15em',
+        letterSpacing: '-0.5px',
+        textShadow: '0 0 18px rgba(255,110,199,0.35)',
+      }}>Miami</span>
+      <span style={{
+        fontWeight: 900,
+        fontSize: '1.15em',
+        letterSpacing: '-0.5px',
+        background: 'linear-gradient(135deg, #009C3B 0%, #009C3B 22%, #FFDF00 38%, #FFDF00 62%, #009C3B 78%, #009C3B 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+      }}>Brasileiro</span>
+    </span>
+  )
+}
+
 export default function Header({ articles = [] }) {
   const [theme, setTheme] = useState('dark')
   const [weather, setWeather] = useState(null)
@@ -58,15 +82,11 @@ export default function Header({ articles = [] }) {
     return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
-  const usdChg = rates.usd?.change ? parseFloat(rates.usd.change) : null
-  const eurChg = rates.eur?.change ? parseFloat(rates.eur.change) : null
-
   return (
     <header className="msn-header">
       <div className="msn-header-top">
         <a href="/" className="msn-logo" style={{ textDecoration: 'none' }}>
-          <div className="msn-logo-icon">🇧🇷</div>
-          <span className="msn-logo-text">Miami <span>Brasileiro</span></span>
+          <Logo />
         </a>
 
         <div className="msn-search">
@@ -87,10 +107,10 @@ export default function Header({ articles = [] }) {
               <div className="rate-pill">
                 <span className="flag">🇺🇸</span>
                 <span className="code">USD</span>
-                <span className="val">{fmtRate(rates.usd.brl)}</span>
-                {usdChg !== null && (
-                  <span className={`chg ${usdChg >= 0 ? 'rate-up' : 'rate-dn'}`}>
-                    {usdChg >= 0 ? '▲' : '▼'} {Math.abs(usdChg).toFixed(2)}%
+                <span className="val">{fmtRate(rates.usd)}</span>
+                {rates.usdChange && (
+                  <span className={'chg ' + (parseFloat(rates.usdChange) >= 0 ? 'rate-up' : 'rate-dn')}>
+                    {parseFloat(rates.usdChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
                   </span>
                 )}
               </div>
@@ -99,10 +119,10 @@ export default function Header({ articles = [] }) {
               <div className="rate-pill">
                 <span className="flag">🇪🇺</span>
                 <span className="code">EUR</span>
-                <span className="val">{fmtRate(rates.eur.brl)}</span>
-                {eurChg !== null && (
-                  <span className={`chg ${eurChg >= 0 ? 'rate-up' : 'rate-dn'}`}>
-                    {eurChg >= 0 ? '▲' : '▼'} {Math.abs(eurChg).toFixed(2)}%
+                <span className="val">{fmtRate(rates.eur)}</span>
+                {rates.eurChange && (
+                  <span className={'chg ' + (parseFloat(rates.eurChange) >= 0 ? 'rate-up' : 'rate-dn')}>
+                    {parseFloat(rates.eurChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
                   </span>
                 )}
               </div>
@@ -144,4 +164,4 @@ export default function Header({ articles = [] }) {
       )}
     </header>
   )
-      }
+}
