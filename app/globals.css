@@ -103,8 +103,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* ===== HERO CAROUSEL ===== */
 .hero-wrap { display: grid; grid-template-columns: 1fr 300px; gap: 0; background: var(--bg-card); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow); }
 .carousel { position: relative; overflow: hidden; background: #000; }
-.carousel-slide { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; }
-.carousel-slide.active { opacity: 1; position: relative; }
+.carousel-slide { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+.carousel-slide.active { opacity: 1; position: relative; pointer-events: auto; }
 .carousel-img { width: 100%; height: 380px; object-fit: cover; display: block; }
 .carousel-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.2) 50%, transparent 100%); }
 .carousel-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 20px; color: white; }
