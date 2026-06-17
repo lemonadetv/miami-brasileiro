@@ -119,6 +119,7 @@ function CatBlock({ title, color, articles }) {
 export default async function Home() {
   const articles = await getArticles()
   const CATEGORIES = ['Comunidade', 'Imigracao', 'Negocios', 'Saude', 'Esportes', 'Cultura e Lazer']
+  const CAT_LABEL = {'Imigracao':'Imigração','Negocios':'Negócios','Saude':'Saúde'}
   const byCategory = {}
   CATEGORIES.forEach(cat => { byCategory[cat] = articles.filter(a => a.category === cat) })
 

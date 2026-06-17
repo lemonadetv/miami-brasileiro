@@ -3,7 +3,7 @@ import Footer from '../../components/Footer'
 
 export const metadata = {
   title: 'Contato | Miami Brasileira',
-  description: 'Entre em contato com a redacao do Miami Brasileira',
+  description: 'Entre em contato com a redação do Miami Brasileira',
 }
 
 export default function ContatoPage() {

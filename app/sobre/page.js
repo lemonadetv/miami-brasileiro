@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'Sobre Nos | Miami Brasileiro',
-  description: 'Conheca a historia do Miami Brasileiro, o principal portal de noticias para brasileiros na Florida',
+  description: 'Conheça a história do Miami Brasileiro, o principal portal de notícias para brasileiros na Flórida',
 }
 
 export default function SobrePage() {
@@ -44,13 +44,13 @@ export default function SobrePage() {
                 Nascemos da saudade e da necessidade
               </h3>
               <p style={{ color: '#4B5563', fontSize: 16, lineHeight: 1.75, margin: '0 0 16px' }}>
-                O Miami Brasileiro nasceu em 2020 da saudade e da necessidade. Um grupo de brasileiros em Miami percebeu que faltava um portal confiavel, em portugues, que ajudasse nossa comunidade a navegar a vida nos EUA.
+                O Miami Brasileiro nasceu em 2020 da saudade e da necessidade. Um grupo de brasileiros em Miami percebeu que faltava um portal confiável, em português, que ajudasse nossa comunidade a navegar a vida nos EUA.
               </p>
               <p style={{ color: '#4B5563', fontSize: 16, lineHeight: 1.75, margin: '0 0 16px' }}>
-                Hoje somos o principal portal de informacao para brasileiros na Florida, com milhares de leitores mensais e cobertura de temas que realmente importam: imigracao, saude, negocios, cultura e muito mais.
+                Hoje somos o principal portal de informação para brasileiros na Flórida, com milhares de leitores mensais e cobertura de temas que realmente importam: imigração, saúde, negócios, cultura e muito mais.
               </p>
               <p style={{ color: '#4B5563', fontSize: 16, lineHeight: 1.75, margin: 0 }}>
-                Desde os primeiros passos em Miami ate a conquista do sonho americano, o Miami Brasileiro esta ao seu lado com informacao de qualidade, em portugues, para cada fase da sua jornada nos EUA.
+                Desde os primeiros passos em Miami até a conquista do sonho americano, o Miami Brasileiro está ao seu lado com informação de qualidade, em português, para cada fase da sua jornada nos EUA.
               </p>
             </div>
             <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
@@ -74,8 +74,8 @@ export default function SobrePage() {
             Conectar, informar e empoderar a comunidade brasileira em Miami.
           </p>
           <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 17, maxWidth: 600, margin: '0 auto', lineHeight: 1.7 }}>
-            Acreditamos que toda pessoa merece ter acesso a informacao de qualidade no idioma que entende. 
-            Por isso entregamos jornalismo honesto, relevante e sempre em portugues.
+            Acreditamos que toda pessoa merece ter acesso a informação de qualidade no idioma que entende. 
+            Por isso entregamos jornalismo honesto, relevante e sempre em português.
           </p>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function SobrePage() {
                 Brasileiros apaixonados por Miami
               </h3>
               <p style={{ color: '#4B5563', fontSize: 16, lineHeight: 1.75, margin: '0 0 16px' }}>
-                Somos jornalistas, empreendedores e entusiastas brasileiros apaixonados por Miami. Nossa equipe vive e respira a cidade, conhece os desafios da comunidade e sabe o que voce precisa saber para ter sucesso nos EUA.
+                Somos jornalistas, empreendedores e entusiastas brasileiros apaixonados por Miami. Nossa equipe vive e respira a cidade, conhece os desafios da comunidade e sabe o que você precisa saber para ter sucesso nos EUA.
               </p>
               <p style={{ color: '#4B5563', fontSize: 16, lineHeight: 1.75, margin: '0 0 24px' }}>
                 Com correspondentes em Miami, Fort Lauderdale e Orlando, cobrimos tudo o que importa para a comunidade brasileira na Florida e alem.
@@ -121,7 +121,7 @@ export default function SobrePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32 }}>
             {[
               { num: '50K+', label: 'Leitores Mensais' },
-              { num: '2020', label: 'Ano de Fundacao' },
+              { num: '2020', label: 'Ano de Fundação' },
               { num: '500+', label: 'Materias Publicadas' },
             ].map(function(item) {
               return (

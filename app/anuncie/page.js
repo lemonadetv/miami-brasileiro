@@ -35,7 +35,7 @@ export default function AnunciePage() {
             </h2>
 
             <form action="https://formsubmit.co/contato@miamibrasileiro.com" method="POST">
-              <input type="hidden" name="_subject" value="Solicitacao de Anuncio - Miami Brasileiro" />
+              <input type="hidden" name="_subject" value="Solicitação de Anúncio - Miami Brasileiro" />
               <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="_next" value="https://miami-brasileiro.vercel.app/anuncie" />
 
@@ -80,7 +80,7 @@ export default function AnunciePage() {
 
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
-                  Tipo de Anuncio *
+                  Tipo de Anúncio *
                 </label>
                 <select
                   name="tipo_anuncio"
@@ -111,7 +111,7 @@ export default function AnunciePage() {
                 type="submit"
                 style={{ width: '100%', padding: '14px', background: '#009C3B', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em' }}
               >
-                Enviar Solicitacao
+                Enviar Solicitação
               </button>
             </form>
 
