@@ -1,6 +1,6 @@
 
 /* ===== RATES PILLS ===== */
-.rate-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; background: white; border-radius: 20px; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-left: 8px; }
+.rate-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; background: var(--bg-card); border-radius: 20px; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-left: 8px; }
 .rate-flag { font-size: 14px; }
 .rate-code { font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--gray-600); }
 .rate-pill strong { font-weight: 800; font-size: 13px; }
