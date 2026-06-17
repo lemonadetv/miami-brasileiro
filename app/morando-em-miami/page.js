@@ -384,7 +384,24 @@ export default function MorandoEmMiami() {
 
   return (
     <>
-      
+      <style>{`
+        .miami-main-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+          gap: 28px;
+          align-items: start;
+          margin: 32px 0 0;
+        }
+        .miami-map-col { position: sticky; top: 90px; }
+        .miami-proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+        @media (max-width: 768px) {
+          .miami-main-grid { grid-template-columns: 1fr; }
+          .miami-map-col { position: static; order: -1; }
+          .miami-proscons { grid-template-columns: 1fr; }
+          .leaflet-map-wrap { height: 340px !important; }
+          .miami-score-label { width: 80px !important; font-size: 0.72rem !important; }
+        }
+      `}</style>
       <main style={{ minHeight: '100vh', background: 'var(--bg-primary)', paddingTop: 0 }}>
 
         {/* HERO */}
@@ -426,13 +443,7 @@ export default function MorandoEmMiami() {
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 20px' }}>
 
           {/* LAYOUT: MAPA + LISTA */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 420px)',
-            gap: 28,
-            alignItems: 'start',
-            margin: '32px 0 0',
-          }}>
+          <div className="miami-main-grid">
 
             {/* COLUNA ESQUERDA: LISTA DE BAIRROS */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -507,7 +518,7 @@ export default function MorandoEmMiami() {
                           </div>
 
                           {/* Pros e Contras */}
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                          <div className="miami-proscons">
                             <div style={{ background: '#10B98110', border: '1px solid #10B98130', borderRadius: 8, padding: '10px 12px' }}>
                               <div style={{ fontWeight: 700, fontSize: '0.78rem', color: '#10B981', marginBottom: 8 }}>✅ Pontos positivos</div>
                               {b.pros.map(p => <div key={p} style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginBottom: 4 }}>• {p}</div>)}
@@ -539,7 +550,7 @@ export default function MorandoEmMiami() {
             </div>
 
             {/* COLUNA DIREITA: MAPA STICKY */}
-            <div style={{ position: 'sticky', top: 90 }}>
+            <div className="miami-map-col">
               <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}>
                 <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
