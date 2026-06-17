@@ -9,6 +9,7 @@ const CATEGORIES = [
   { label: '🏥 Saúde', href: '/categoria/saude' },
   { label: '⚽ Esportes', href: '/categoria/esportes' },
   { label: '🎭 Cultura', href: '/categoria/cultura-e-lazer' },
+  { label: '🏘️ Morando em Miami', href: '/morando-em-miami' },
   { label: '🏆 Copa 2026', href: '/copa-2026', isCopa: true },
 ]
 
