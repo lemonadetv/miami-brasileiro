@@ -41,7 +41,7 @@ function Logo() {
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
-      }}>Brasileiro</span>
+      }}>Brasileira</span>
     </span>
   )
 }
