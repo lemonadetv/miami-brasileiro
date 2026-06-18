@@ -321,6 +321,7 @@ footer { background: var(--bg-header); border-top: 1px solid var(--border); marg
 .admin-logo { padding: 20px; border-bottom: 1px solid #222; }
 .admin-logo .al-title { font-size: 14px; font-weight: 800; color: #fff; }
 .admin-logo .al-sub { font-size: 11px; color: #666; margin-top: 2px; }
+.admin-logo .al-icon { font-size: 28px; margin-bottom: 4px; }
 .admin-nav { padding: 12px 0; flex: 1; }
 .admin-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(255,255,255,.6); transition: all .18s; }
 .admin-nav a:hover { background: rgba(255,255,255,.06); color: #fff; }

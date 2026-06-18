@@ -6,17 +6,20 @@ import { useRouter } from 'next/navigation'
 const NAV = ({ active }) => (
   <aside className="admin-sidebar">
     <div className="admin-logo">
-      <div className="al-title">Miami Brasileira</div>
+      <div className="al-icon">🌴</div>
+      <div className="al-title">Miami Brasileiro</div>
       <div className="al-sub">Painel Admin</div>
     </div>
     <nav className="admin-nav">
-      <Link href="/admin/dashboard"><span className="nav-icon">Dashboard</span></Link>
-      <Link href="/admin/artigos"><span className="nav-icon">Artigos</span></Link>
-      <Link href="/admin/artigos/novo"><span className="nav-icon">Novo Artigo</span></Link>
-      <Link href="/admin/analytics"><span className="nav-icon">Analytics</span></Link>
-      <Link href="/admin/config" className={active === 'config' ? 'active' : ''}><span className="nav-icon">Configuracoes</span></Link>
+      <Link href="/admin/dashboard"><span className="nav-icon">📊</span> Dashboard</Link>
+      <Link href="/admin/artigos"><span className="nav-icon">📰</span> Artigos</Link>
+      <Link href="/admin/artigos/novo"><span className="nav-icon">✏️</span> Novo Artigo</Link>
+      <Link href="/admin/bot"><span className="nav-icon">🤖</span> Bot / Automação</Link>
+      <Link href="/admin/facebook"><span className="nav-icon">📣</span> Facebook</Link>
+      <Link href="/admin/analytics"><span className="nav-icon">📈</span> Analytics</Link>
+      <Link href="/admin/config" className={active === 'config' ? 'active' : ''}><span className="nav-icon">⚙️</span> Configurações</Link>
       <div className="admin-nav-section">Site</div>
-      <Link href="/" target="_blank"><span className="nav-icon">Ver Site</span></Link>
+      <Link href="/" target="_blank"><span className="nav-icon">🌐</span> Ver Site</Link>
     </nav>
   </aside>
 )
