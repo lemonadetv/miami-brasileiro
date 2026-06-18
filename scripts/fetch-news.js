@@ -1,270 +1,179 @@
+#!/usr/bin/env node
 const Anthropic = require('@anthropic-ai/sdk')
 const https = require('https')
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
-const crypto = require('crypto')
 
 const client = new Anthropic()
 
 const QUERIES = [
-  { query: 'brazilians miami florida community news', category: 'Comunidade' },
-  { query: 'immigration visa green card brazil usa florida', category: 'Imigracao' },
-  { query: 'business entrepreneurs brazil miami florida', category: 'Negocios' },
-  { query: 'health insurance medicaid florida immigrants', category: 'Saude' },
-  { query: 'soccer brazil inter miami sports', category: 'Esportes' },
-  { query: 'miami culture restaurants events florida', category: 'Cultura e Lazer' },
+  { query: 'brazil miami florida community 2026', category: 'Comunidade' },
+  { query: 'immigration visa green card uscis brazil usa 2026', category: 'Imigracao' },
+  { query: 'brazil business entrepreneur florida miami 2026', category: 'Negocios' },
+  { query: 'health insurance medicaid florida immigrants 2026', category: 'Saude' },
+  { query: 'soccer copa mundo inter miami mls 2026', category: 'Esportes' },
+  { query: 'miami culture restaurants events nightlife 2026', category: 'Cultura e Lazer' },
 ]
 
-const CATEGORY_IMAGES = {
-  'Comunidade': [
-    'https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?w=800&q=80',
-    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
-    'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&q=80',
-    'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=800&q=80',
-    'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
-    'https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=800&q=80',
-    'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
-    'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80',
-    'https://images.unsplash.com/photo-1543269664-7eef42226a21?w=800&q=80',
-    'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=800&q=80',
-  ],
-  'Imigracao': [
-    'https://images.unsplash.com/photo-1569974507005-6dc61f97fb5c?w=800&q=80',
-    'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80',
-    'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&q=80',
-    'https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=800&q=80',
-    'https://images.unsplash.com/photo-1548438294-1ad5d5f4f063?w=800&q=80',
-    'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80',
-    'https://images.unsplash.com/photo-1501700493788-fa1a4fc9fe62?w=800&q=80',
-    'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800&q=80',
-    'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=800&q=80',
-    'https://images.unsplash.com/photo-1568218434790-5a06b91f5f42?w=800&q=80',
-  ],
-  'Negocios': [
-    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80',
-    'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80',
-    'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=800&q=80',
-    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&q=80',
-    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&q=80',
-    'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=800&q=80',
-    'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80',
-    'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80',
-    'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80',
-    'https://images.unsplash.com/photo-1551135049-8a33b5883817?w=800&q=80',
-  ],
-  'Saude': [
-    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
-    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800&q=80',
-    'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800&q=80',
-    'https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?w=800&q=80',
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80',
-    'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=800&q=80',
-    'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=800&q=80',
-    'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&q=80',
-    'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80',
-    'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=800&q=80',
-  ],
-  'Esportes': [
-    'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-    'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=800&q=80',
-    'https://images.unsplash.com/photo-1551280857-2b9bbe52acf4?w=800&q=80',
-    'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=800&q=80',
-    'https://images.unsplash.com/photo-1565728744382-61accd4aa148?w=800&q=80',
-    'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&q=80',
-    'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
-    'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80',
-    'https://images.unsplash.com/photo-1540747913346-19212a729a33?w=800&q=80',
-    'https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&q=80',
-  ],
-  'Cultura e Lazer': [
-    'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=800&q=80',
-    'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80',
-    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
-    'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=800&q=80',
-    'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80',
-    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
-    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80',
-    'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f?w=800&q=80',
-    'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80',
-    'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80',
-  ],
+const TOPIC_IMAGES = [
+  { keys: ['copa','world cup','mundial','futebol','soccer','mls','inter miami'], id: 'photo-1574629810360-7efbbe195018' },
+  { keys: ['bola','ball','gol','goal','stadium','estadio'], id: 'photo-1560272564-c83b66b1ad12' },
+  { keys: ['samba','carnival','carnaval','danca','dance','festa'], id: 'photo-1516450360452-9312f5e86fc7' },
+  { keys: ['miami beach','brickell','downtown','skyline'], id: 'photo-1533929736458-ca588d08c8be' },
+  { keys: ['florida','palm','praia','beach','ocean'], id: 'photo-1506905925346-21bda4d32df4' },
+  { keys: ['wynwood','arte','graffiti','street art','mural'], id: 'photo-1611348524140-53c9a25263d6' },
+  { keys: ['visto','visa','passaporte','passport','imigra'], id: 'photo-1436491865332-7a61a109cc05' },
+  { keys: ['green card','residencia','documento','citizenship'], id: 'photo-1589829545856-d10d557cf95f' },
+  { keys: ['negocio','business','empresa','startup','empreende'], id: 'photo-1507003211169-0a1dd7228f2d' },
+  { keys: ['llc','contrato','contract','document','escritorio'], id: 'photo-1454165804606-c3d57bc86b40' },
+  { keys: ['saude','health','medico','hospital','doctor'], id: 'photo-1519494026892-80bbd2d6fd0d' },
+  { keys: ['seguro','insurance','medicaid','medicare','plano'], id: 'photo-1576091160399-112ba8d25d1d' },
+  { keys: ['restaurante','restaurant','comida','food','gastronomia'], id: 'photo-1546069901-ba9599a7e63c' },
+  { keys: ['dinheiro','money','dolar','dollar','financ','invest'], id: 'photo-1580519542036-c47de6196ba5' },
+  { keys: ['trabalho','job','emprego','work','career'], id: 'photo-1497366216548-37526070297c' },
+  { keys: ['tecnolog','tech','software','app','digital','laptop'], id: 'photo-1498050108023-c5249f4df085' },
+  { keys: ['comunidade','community','familia','family','reuniao'], id: 'photo-1529156069898-49953e39b3ac' },
+  { keys: ['celebracao','celebration','evento','event','show'], id: 'photo-1492684223066-81342ee5ff30' },
+]
+
+const CATEGORY_FALLBACK = {
+  'Comunidade':      'photo-1529156069898-49953e39b3ac',
+  'Imigracao':       'photo-1436491865332-7a61a109cc05',
+  'Negocios':        'photo-1507003211169-0a1dd7228f2d',
+  'Saude':           'photo-1576091160399-112ba8d25d1d',
+  'Esportes':        'photo-1574629810360-7efbbe195018',
+  'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
+  'default':         'photo-1533929736458-ca588d08c8be',
 }
 
-function pickImage(category, title) {
-  const pool = CATEGORY_IMAGES[category] || CATEGORY_IMAGES['Comunidade']
-  const hash = crypto.createHash('md5').update(title || '').digest('hex')
-  const idx = parseInt(hash.substring(0, 4), 16) % pool.length
-  return pool[idx]
+function getTopicImage(title, category) {
+  const t = (title || '').toLowerCase()
+  for (const { keys, id } of TOPIC_IMAGES) {
+    if (keys.some(k => t.includes(k))) {
+      return 'https://images.unsplash.com/' + id + '?w=1280&auto=format&fit=crop&q=80'
+    }
+  }
+  const fid = CATEGORY_FALLBACK[category] || CATEGORY_FALLBACK['default']
+  return 'https://images.unsplash.com/' + fid + '?w=1280&auto=format&fit=crop&q=80'
 }
 
-function fetchUrl(url, redirects = 5) {
-  return new Promise((resolve, reject) => {
-    if (redirects === 0) { reject(new Error('Too many redirects')); return }
-    const lib = url.startsWith('https') ? https : http
-    const req = lib.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; MiamiBrasileiro/1.0)',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-      },
-      timeout: 10000,
-    }, (res) => {
-      if ([301, 302, 307, 308].includes(res.statusCode) && res.headers.location) {
-        resolve(fetchUrl(res.headers.location, redirects - 1))
-        return
-      }
-      let data = ''
-      res.on('data', chunk => data += chunk)
-      res.on('end', () => resolve({ status: res.statusCode, body: data }))
-    })
-    req.on('error', reject)
-    req.on('timeout', () => { req.destroy(); reject(new Error('Request timeout')) })
+function validateImage(url) {
+  return new Promise((resolve) => {
+    if (!url || !url.startsWith('http')) return resolve(false)
+    try {
+      const mod = url.startsWith('https') ? https : http
+      const req = mod.request(url, { method: 'HEAD', timeout: 4000 }, (res) => {
+        const ct = res.headers['content-type'] || ''
+        resolve(res.statusCode >= 200 && res.statusCode < 300 && ct.includes('image'))
+      })
+      req.on('error', () => resolve(false))
+      req.on('timeout', () => { req.destroy(); resolve(false) })
+      req.end()
+    } catch { resolve(false) }
   })
 }
 
-function parseRSS(xml) {
-  const items = []
-  const itemRegex = /<item>([\s\S]*?)<\/item>/g
-  let m
-  while ((m = itemRegex.exec(xml)) !== null) {
-    const block = m[1]
-    const get = (tag) => {
-      const r = new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`)
-      const res = r.exec(block)
-      return res ? res[1].trim() : ''
-    }
-    const title = get('title').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-    const link  = get('link')
-    const pubDate = get('pubDate')
-    const source = get('source') || ''
-    if (title) items.push({ title, link, pubDate, source })
-  }
-  return items
-}
-
-async function fetchRSS(query) {
-  const encoded = encodeURIComponent(query)
-  const url = `https://news.google.com/rss/search?q=${encoded}&hl=en-US&gl=US&ceid=US:en&num=10`
-  try {
-    const { status, body } = await fetchUrl(url)
-    if (status !== 200) { console.log(`  RSS ${status} for: ${query}`); return [] }
-    const items = parseRSS(body)
-    console.log(`  RSS: ${items.length} items for "${query}"`)
-    return items
-  } catch (e) {
-    console.log(`  RSS error: ${e.message}`)
-    return []
-  }
-}
-
-function slugify(text) {
-  return text
+function generateSlug(title) {
+  return title
     .toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
-    .slice(0, 80)
+    .substring(0, 80)
+    + '-' + Date.now().toString(36)
 }
 
-async function rewriteInPortuguese(title, source, category) {
-  const prompt = `Voce e um jornalista da comunidade brasileira em Miami.\n\nReescreva a noticia abaixo em portugues brasileiro, focado na comunidade brasileira em Miami/EUA.\n\nTitulo original (em ingles): ${title}\nFonte: ${source || 'Miami Brasileiro'}\nCategoria: ${category}\n\nResponda APENAS com JSON valido, sem markdown, sem texto extra:\n{\n  "title": "Titulo em portugues (max 90 chars, impactante e direto)",\n  "excerpt": "Resumo em 2-3 frases (max 180 chars)",\n  "content": "Artigo completo em portugues (minimo 5 paragrafos, ~400-600 palavras). Inclua contexto para brasileiros em Miami, impacto na comunidade, dicas praticas quando relevante. Use subtitulos com ## quando apropriado.",\n  "source": "Nome curto da fonte original"\n}`
-
-  try {
-    const msg = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content: prompt }],
-    })
-    const text = msg.content[0].text.trim()
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error('No JSON found')
-    return JSON.parse(jsonMatch[0])
-  } catch (e) {
-    console.log(`  Claude error: ${e.message}`)
-    return null
-  }
+function fetchNews(query) {
+  return new Promise((resolve) => {
+    if (!process.env.NEWS_API_KEY) { resolve([]); return }
+    const q = encodeURIComponent(query)
+    const url = 'https://newsapi.org/v2/everything?q=' + q + '&language=en&sortBy=publishedAt&pageSize=3&apiKey=' + process.env.NEWS_API_KEY
+    https.get(url, (res) => {
+      let body = ''
+      res.on('data', d => body += d)
+      res.on('end', () => {
+        try { resolve(JSON.parse(body).articles || []) } catch { resolve([]) }
+      })
+    }).on('error', () => resolve([]))
+  })
 }
 
-async function postToFacebook(article) {
-  const pageId    = process.env.FACEBOOK_PAGE_ID
-  const pageToken = process.env.FACEBOOK_PAGE_TOKEN
-  if (!pageId || !pageToken) {
-    console.log('  Facebook: sem credenciais, pulando')
-    return
-  }
-  const postUrl  = `https://miamisbrasileiro.com/artigo/${article.slug}`
-  const message  = `${article.title}\n\n${article.excerpt}\n\nLeia mais: ${postUrl}`
-  const body     = `message=${encodeURIComponent(message)}&link=${encodeURIComponent(postUrl)}&access_token=${pageToken}`
-  try {
-    const { status, body: res } = await fetchUrl(`https://graph.facebook.com/v19.0/${pageId}/feed`)
-    if (status === 200) console.log('  Facebook: postado!')
-    else console.log(`  Facebook: erro ${status}: ${res.slice(0,120)}`)
-  } catch (e) {
-    console.log(`  Facebook: ${e.message}`)
+async function rewrite(article, category, heroImage) {
+  const prompt = 'Voce e redator do portal Miami Brasileira, o maior portal de noticias para brasileiros em Miami.\n\nBaseado APENAS no resumo abaixo, escreva um artigo ORIGINAL e COMPLETO em portugues brasileiro (minimo 700 palavras).\n\nTITULO ORIGINAL: ' + article.title + '\nRESUMO: ' + (article.description || article.title) + '\nCATEGORIA: ' + category + '\n\nESTRUTURA OBRIGATORIA:\n# [Titulo em portugues, atraente e informativo]\n\n[Paragrafo de abertura - contexto e importancia - 3-4 frases]\n\n## [Emoji] [Subtitulo 1]\n[2-3 paragrafos ricos em detalhes e analise]\n\n## [Emoji] [Subtitulo 2]\n[2-3 paragrafos com perspectiva para brasileiros em Miami]\n\n## [Emoji] [Subtitulo 3]\n[2-3 paragrafos com informacoes acionaveis]\n\n## [Emoji] [Subtitulo 4]\n[2-3 paragrafos com perspectivas futuras]\n\n---\n\n**Miami Brasileira** acompanha todos os desenvolvimentos que impactam nossa comunidade.\n\nEscreva SOMENTE o artigo. Minimo 700 palavras. Linguagem clara e acessivel.'
+
+  const msg = await client.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 2000,
+    messages: [{ role: 'user', content: prompt }]
+  })
+
+  const body = msg.content[0].text
+  const titleMatch = body.match(/^#\s+(.+)$/m)
+  const title = titleMatch ? titleMatch[1].trim() : article.title
+  const slug = generateSlug(title)
+
+  return {
+    id: slug,
+    slug,
+    title,
+    category,
+    date: new Date().toISOString().split('T')[0],
+    author: 'Redacao Miami Brasileira',
+    imageUrl: heroImage,
+    excerpt: body.replace(/^#.+\n/, '').replace(/#{1,3}[^\n]+\n/g, '').trim().substring(0, 200) + '...',
+    content: body,
+    source: article.url || '',
   }
 }
 
 async function main() {
-  console.log('=== Miami Brasileiro - Bot de Noticias ===')
-  console.log('Data:', new Date().toLocaleString('pt-BR', { timeZone: 'America/New_York' }))
-
-  const dataPath = path.join(__dirname, '..', 'data', 'articles.json')
+  const articlesPath = path.join(__dirname, '..', 'data', 'articles.json')
   let existing = []
-  try {
-    existing = JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
-  } catch {
-    console.log('Nenhum artigo existente encontrado, comecando do zero.')
-  }
+  try { existing = JSON.parse(fs.readFileSync(articlesPath, 'utf8')) } catch { existing = [] }
 
-  const existingTitles = new Set(existing.map(a => a.title && a.title.toLowerCase().trim()))
+  const existingSlugs = new Set(existing.map(a => a.slug || a.id).filter(Boolean))
   const newArticles = []
-  let totalFetched = 0
 
   for (const { query, category } of QUERIES) {
-    console.log(`\n[${category}] Buscando: "${query}"`)
-    const items = await fetchRSS(query)
-    totalFetched += items.length
+    try {
+      console.log('Buscando:', category)
+      const articles = await fetchNews(query)
+      let processed = 0
 
-    let saved = 0
-    for (const item of items.slice(0, 3)) {
-      if (existingTitles.has(item.title.toLowerCase().trim())) {
-        console.log(`  Duplicado: ${item.title.slice(0, 60)}...`)
-        continue
+      for (const art of articles) {
+        if (processed >= 2) break
+        if (!art.title || !art.description) continue
+        const tmpSlug = generateSlug(art.title)
+        if (existingSlugs.has(tmpSlug)) continue
+
+        let heroImage = getTopicImage(art.title, category)
+        if (art.urlToImage) {
+          const valid = await validateImage(art.urlToImage)
+          if (valid) heroImage = art.urlToImage
+        }
+
+        console.log('  Reescrevendo:', art.title.substring(0, 60))
+        const newArt = await rewrite(art, category, heroImage)
+        if (existingSlugs.has(newArt.slug)) continue
+        existingSlugs.add(newArt.slug)
+        newArticles.push(newArt)
+        processed++
       }
-
-      console.log(`  Reescrevendo: ${item.title.slice(0, 60)}...`)
-      const rewritten = await rewriteInPortuguese(item.title, item.source, category)
-      if (!rewritten) continue
-
-      const article = {
-        slug:        slugify(rewritten.title),
-        title:       rewritten.title,
-        excerpt:     rewritten.excerpt,
-        content:     rewritten.content,
-        category,
-        source:      rewritten.source || item.source || 'Miami Brasileiro',
-        originalUrl: item.link,
-        image:       pickImage(category, rewritten.title),
-        publishedAt: item.pubDate ? new Date(item.pubDate).toISOString() : new Date().toISOString(),
-        createdAt:   new Date().toISOString(),
-      }
-
-      newArticles.push(article)
-      existingTitles.add(item.title.toLowerCase().trim())
-      saved++
-
-      await postToFacebook(article)
-      await new Promise(r => setTimeout(r, 800))
+    } catch (e) {
+      console.error('Erro na categoria', category, e.message)
     }
-    console.log(`  Salvos: ${saved}`)
   }
 
-  const merged = [...newArticles, ...existing].slice(0, 150)
-  fs.mkdirSync(path.dirname(dataPath), { recursive: true })
-  fs.writeFileSync(dataPath, JSON.stringify(merged, null, 2))
-
-  console.log(`\n=== Total buscados: ${totalFetched} | Novos: ${newArticles.length} | Arquivo: ${merged.length} artigos ===`)
+  if (newArticles.length > 0) {
+    const updated = [...newArticles, ...existing]
+    fs.writeFileSync(articlesPath, JSON.stringify(updated, null, 2))
+    console.log('Adicionados', newArticles.length, 'artigos novos')
+  } else {
+    console.log('Nenhum artigo novo encontrado')
+  }
 }
 
 main().catch(console.error)
