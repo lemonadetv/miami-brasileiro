@@ -1,4 +1,3 @@
-// app/api/buscar-noticias/route.js
 import Anthropic from '@anthropic-ai/sdk'
 
 export const maxDuration = 60
@@ -6,98 +5,130 @@ export const maxDuration = 60
 const ANTHROPIC = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const QUERIES = [
-  { query: 'brazil miami florida community news 2026', category: 'Comunidade' },
+  { query: 'brazil miami florida community 2026', category: 'Comunidade' },
   { query: 'immigration visa green card uscis brazil usa 2026', category: 'Imigracao' },
   { query: 'brazil business entrepreneur florida miami 2026', category: 'Negocios' },
   { query: 'health insurance medicaid florida immigrants 2026', category: 'Saude' },
-  { query: 'soccer brazil copa mundo inter miami sports 2026', category: 'Esportes' },
-  { query: 'miami culture leisure restaurants events brazilian community 2026', category: 'Cultura e Lazer' },
+  { query: 'soccer copa mundo inter miami mls 2026', category: 'Esportes' },
+  { query: 'miami culture restaurants events nightlife 2026', category: 'Cultura e Lazer' },
 ]
 
-const FALLBACK_IMAGES = {
-  Comunidade:       'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70',
-  Imigracao:        'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=70',
-  Negocios:         'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=70',
-  Saude:            'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=70',
-  Esportes:         'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=70',
-  'Cultura e Lazer':'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=70',
+// Verified Unsplash photo IDs by topic keyword (all tested 200 OK)
+const TOPIC_IMAGES = [
+  { keys: ['copa','world cup','mundial','futebol','soccer','mls','inter miami','casemiro'], id: 'photo-1574629810360-7efbbe195018' },
+  { keys: ['bola','ball','gol','goal','stadium','estadio'], id: 'photo-1560272564-c83b66b1ad12' },
+  { keys: ['samba','carnival','carnaval','danca','dance','festa'], id: 'photo-1516450360452-9312f5e86fc7' },
+  { keys: ['miami beach','brickell','downtown','skyline'], id: 'photo-1533929736458-ca588d08c8be' },
+  { keys: ['florida','palm','praia','beach','ocean'], id: 'photo-1506905925346-21bda4d32df4' },
+  { keys: ['wynwood','arte','graffiti','street art','mural'], id: 'photo-1611348524140-53c9a25263d6' },
+  { keys: ['visto','visa','passaporte','passport','imigra'], id: 'photo-1436491865332-7a61a109cc05' },
+  { keys: ['green card','residencia','documento','citizenship'], id: 'photo-1589829545856-d10d557cf95f' },
+  { keys: ['negocio','business','empresa','startup','empreende'], id: 'photo-1507003211169-0a1dd7228f2d' },
+  { keys: ['llc','contrato','contract','document','escritorio'], id: 'photo-1454165804606-c3d57bc86b40' },
+  { keys: ['saude','health','medico','hospital','doctor'], id: 'photo-1519494026892-80bbd2d6fd0d' },
+  { keys: ['seguro','insurance','medicaid','medicare','plano'], id: 'photo-1576091160399-112ba8d25d1d' },
+  { keys: ['restaurante','restaurant','comida','food','gastronomia','culinaria'], id: 'photo-1546069901-ba9599a7e63c' },
+  { keys: ['dinheiro','money','dolar','dollar','financ','invest'], id: 'photo-1580519542036-c47de6196ba5' },
+  { keys: ['trabalho','job','emprego','work','career','rh'], id: 'photo-1497366216548-37526070297c' },
+  { keys: ['tecnolog','tech','software','app','digital','laptop'], id: 'photo-1498050108023-c5249f4df085' },
+  { keys: ['comunidade','community','familia','family','reuniao'], id: 'photo-1529156069898-49953e39b3ac' },
+  { keys: ['celebracao','celebration','evento','event','show'], id: 'photo-1492684223066-81342ee5ff30' },
+]
+
+// Category fallbacks (when no keyword matches)
+const CATEGORY_FALLBACK = {
+  'Comunidade':    'photo-1529156069898-49953e39b3ac',
+  'Imigracao':     'photo-1436491865332-7a61a109cc05',
+  'Negocios':      'photo-1507003211169-0a1dd7228f2d',
+  'Saude':         'photo-1576091160399-112ba8d25d1d',
+  'Esportes':      'photo-1574629810360-7efbbe195018',
+  'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
+  'default':       'photo-1533929736458-ca588d08c8be',
 }
 
-const INLINE_IMAGES = {
-  Comunidade:       'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=70',
-  Imigracao:        'https://images.unsplash.com/photo-1589998059171-988d887df646?w=800&q=70',
-  Negocios:         'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=70',
-  Saude:            'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=70',
-  Esportes:         'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=70',
-  'Cultura e Lazer':'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70',
+function getTopicImage(title, category) {
+  const t = (title || '').toLowerCase()
+  for (const { keys, id } of TOPIC_IMAGES) {
+    if (keys.some(k => t.includes(k))) {
+      return 'https://images.unsplash.com/' + id + '?w=1280&auto=format&fit=crop&q=80'
+    }
+  }
+  const fallbackId = CATEGORY_FALLBACK[category] || CATEGORY_FALLBACK['default']
+  return 'https://images.unsplash.com/' + fallbackId + '?w=1280&auto=format&fit=crop&q=80'
 }
 
-const LINKS_UTEIS = {
-  Comunidade:       '\n[City of Miami](https://www.miamigov.com) - Servicos municipais\n[Miami-Dade County](https://www.miamidade.gov) - Servicos do condado\n[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Apoio consular',
-  Imigracao:        '\n[USCIS](https://www.uscis.gov) - Servicos de imigracao\n[Consulado do Brasil em Miami](https://miami.itamaraty.gov.br) - Documentos e apostilas\n[AILA - Advogados de Imigracao](https://www.aila.org) - Encontre um especialista',
-  Negocios:         '\n[Sunbiz - Empresa na Florida](https://dos.fl.gov/sunbiz) - Registre sua LLC\n[SBA](https://www.sba.gov) - Suporte federal para PMEs\n[SCORE Miami](https://miami.score.org) - Mentoria gratuita',
-  Saude:            '\n[Healthcare.gov](https://www.healthcare.gov) - Compare planos de saude\n[Florida Medicaid](https://www.myflorida.com/apps/medicaid) - Saude para baixa renda\n[Jackson Health](https://jacksonhealth.org) - Hospital publico de Miami',
-  Esportes:         '\n[Inter Miami CF](https://www.intermiamicf.com) - Futebol em Miami\n[Copa do Mundo 2026 Miami](https://www.fifa.com) - Informacoes do Mundial\n[Miami Heat](https://www.nba.com/heat) - NBA em Miami',
-  'Cultura e Lazer':'\n[Visit Miami](https://www.miamiandbeaches.com) - Guia oficial de turismo\n[Eventbrite Miami](https://www.eventbrite.com/d/fl--miami/) - Eventos em Miami\n[Time Out Miami](https://www.timeout.com/miami) - O que fazer em Miami',
+async function validateImage(url) {
+  if (!url || !url.startsWith('http')) return false
+  try {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 4000)
+    const r = await fetch(url, { method: 'HEAD', signal: ctrl.signal })
+    clearTimeout(timer)
+    const ct = r.headers.get('content-type') || ''
+    return r.ok && ct.includes('image')
+  } catch { return false }
 }
 
 function generateSlug(title) {
-  return title.toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return (title || 'artigo')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s-]/g, '').trim()
     .replace(/\s+/g, '-').slice(0, 80)
 }
 
 async function fetchNews(query) {
+  const key = process.env.NEWSAPI_KEY
+  if (!key) return []
   try {
-    const url = 'https://newsapi.org/v2/everything?q=' + encodeURIComponent(query) +
-      '&language=en&sortBy=publishedAt&pageSize=3&apiKey=' + process.env.NEWS_API_KEY
+    const url = 'https://newsapi.org/v2/everything?q=' + encodeURIComponent(query) + '&language=en&pageSize=5&sortBy=publishedAt&apiKey=' + key
     const r = await fetch(url)
     const d = await r.json()
-    return d.articles || []
+    return (d.articles || []).filter(a => a.title && a.title !== '[Removed]' && a.description)
   } catch(e) {
     console.error('[ERR] NewsAPI:', e.message)
     return []
   }
 }
 
-async function rewrite(article, category) {
-  const links = LINKS_UTEIS[category] || ''
-  const inlineImg = INLINE_IMAGES[category] || FALLBACK_IMAGES[category] || ''
-  const prompt = `Voce e jornalista brasileira que escreve para o portal Miami Brasileira, voltado para brasileiros em Miami.
+async function rewrite(article, category, heroImage) {
+  const siteUrl = 'https://miami-brasileiro.vercel.app'
+  const prompt = `Voce e jornalista brasileira experiente do portal Miami Brasileira, voltado para brasileiros em Miami e Sul da Florida.
 
-NOTICIA (ingles):
+NOTICIA ORIGINAL (em ingles):
 Titulo: ${article.title}
 Descricao: ${article.description || ''}
+Fonte: ${article.source?.name || 'Agencias internacionais'}
+Data: ${article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('pt-BR') : 'Hoje'}
 
-Escreva um artigo LONGO e RICO em PORTUGUES BRASILEIRO seguindo EXATAMENTE este formato:
+INSTRUCOES - Escreva um artigo LONGO, RICO e PROFISSIONAL em PORTUGUES BRASILEIRO com:
 
-1. ABERTURA: Comece com um cenario real que o leitor vai se identificar ("Imagine a cena...", "Voce ja passou por...")
-2. Use ### com EMOJI para cada subtitulo. Ex: ### 🏠 O que e o Renters Insurance?
-3. Use **negrito** para termos importantes, valores em dolares, nomes de lugares
-4. Use listas numeradas (1. 2. 3.) e bullets (- ) onde apropriado
-5. Insira UMA imagem inline no meio do artigo usando EXATAMENTE este formato:
-   ![descricao relevante da imagem](${inlineImg})
-6. Minimo 600 palavras
-7. SEMPRE termine com esta secao EXATA:
+1. ABERTURA CATIVANTE: Comece com cenario real que o leitor vai se identificar. Ex: "Imagine que voce acaba de..."
+2. Use ### com EMOJI para CADA subtitulo (minimo 4 subtitulos)
+3. Use **negrito** para termos importantes, valores em dolares, nomes de lugares, datas
+4. Use listas (1. 2. 3. ou -) onde fizer sentido organizar informacao
+5. No MEIO do artigo, insira exatamente esta imagem inline: ![Imagem do artigo](${heroImage})
+6. MINIMO 700 palavras
+7. Tom: profissional mas acolhedor, como se fosse um amigo brasileiro experiente explicando
+8. Termine SEMPRE com esta secao:
 
-### 🔗 Links e Recursos Uteis
-${links}
+### \u2705 Resumo e Proximos Passos
+- **O que fazer agora**: [acao concreta]
+- **Onde buscar ajuda em Miami**: [recurso local especifico]
+- **Fique de olho em**: [o que acompanhar]
 
-IMPORTANTE: Use emojis nos titulos das secoes. O artigo deve parecer profissional, acolhedor e util para quem vive em Miami.
-
-Responda APENAS com JSON valido:
-{"titulo":"...","resumo":"2-3 frases sobre o que e e por que importa para brasileiros em Miami","conteudo":"artigo completo em markdown com headers emoji, bold, lista, imagem inline e links"}`
+Responda SOMENTE com JSON valido (sem markdown ao redor):
+{"titulo":"titulo em portugues brasileiro chamativo e SEO-friendly (max 80 chars)","resumo":"2-3 frases sobre o que e e por que importa para brasileiros em Miami","conteudo":"artigo completo em markdown"}`
 
   try {
     const msg = await ANTHROPIC.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 3000,
+      max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }]
     })
     const text = msg.content[0].text.trim()
     const match = text.match(/\{[\s\S]*\}/)
-    if (!match) throw new Error('no JSON')
+    if (!match) throw new Error('no JSON in response')
     return JSON.parse(match[0])
   } catch(e) {
     console.error('[ERR] Claude:', e.message)
@@ -105,30 +136,10 @@ Responda APENAS com JSON valido:
   }
 }
 
-async function getExistingArticles() {
-  const token = process.env.GITHUB_TOKEN
-  const repo = process.env.GITHUB_REPO || 'lemonadetv/miami-brasileiro'
-  const url = 'https://api.github.com/repos/' + repo + '/contents/data/articles.json'
-  try {
-    const r = await fetch(url, {
-      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github.v3+json' }
-    })
-    if (!r.ok) return []
-    const data = await r.json()
-    const content = Buffer.from(data.content, 'base64').toString('utf-8')
-    return JSON.parse(content)
-  } catch(e) {
-    console.error('[ERR] getExisting:', e.message)
-    return []
-  }
-}
-
 async function saveToGitHub(newArticles) {
   const token = process.env.GITHUB_TOKEN
   const repo = process.env.GITHUB_REPO || 'lemonadetv/miami-brasileiro'
   const url = 'https://api.github.com/repos/' + repo + '/contents/data/articles.json'
-
-  // Get current SHA and existing articles
   let sha = null
   let existing = []
   try {
@@ -142,23 +153,20 @@ async function saveToGitHub(newArticles) {
       existing = JSON.parse(raw)
     }
   } catch(e) {
-    console.error('[WARN] Could not fetch existing articles:', e.message)
+    console.error('[WARN] fetch existing:', e.message)
   }
-
-  // Merge: new articles first, then existing (excluding duplicates by id)
-  const existingIds = new Set(newArticles.map(a => a.id))
+  // Deduplicate using slug (handles both old and new articles)
+  const newSlugs = new Set(newArticles.map(a => a.slug || a.id).filter(Boolean))
   const merged = [
     ...newArticles,
-    ...existing.filter(a => !existingIds.has(a.id))
-  ].slice(0, 300) // keep max 300 articles
-
+    ...existing.filter(a => {
+      const key = a.slug || a.id
+      return key && !newSlugs.has(key)
+    })
+  ].slice(0, 400)
   const content = Buffer.from(JSON.stringify(merged, null, 2)).toString('base64')
-  const body = {
-    message: '[BOT] Atualizacao automatica ' + new Date().toISOString(),
-    content
-  }
+  const body = { message: '[BOT] Atualizacao automatica ' + new Date().toISOString(), content }
   if (sha) body.sha = sha
-
   const r = await fetch(url, {
     method: 'PUT',
     headers: {
@@ -180,9 +188,8 @@ async function postToFacebook(article) {
   const pageId = process.env.FB_PAGE_ID
   if (!token || !pageId) return false
   try {
-    const msg = article.title + '\n\n' + (article.excerpt || '') +
-      '\n\nLeia mais: https://miami-brasileiro.vercel.app/artigo/' + article.id
-    const r = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
+    const msg = article.title + '\n\n' + (article.excerpt || '') + '\n\nhttps://miami-brasileiro.vercel.app/artigo/' + article.slug
+    const r = await fetch('https://graph.facebook.com/' + pageId + '/feed', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg, access_token: token })
@@ -197,27 +204,29 @@ async function postToFacebook(article) {
 export async function GET(request) {
   const isVercelCron = request.headers.get('x-vercel-cron') === '1'
   const { searchParams } = new URL(request.url)
-  if (!isVercelCron && process.env.CRON_SECRET && searchParams.get('secret') !== process.env.CRON_SECRET) {
+  const secret = searchParams.get('secret')
+  if (!isVercelCron && secret !== process.env.BOT_SECRET) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
   console.log('[BOT] Start at ' + new Date().toISOString())
   const newArticles = []
-
   for (let i = 0; i < QUERIES.length; i++) {
     const q = QUERIES[i]
-    console.log('[API] ' + q.category)
+    console.log('[API] Fetching: ' + q.category)
     const raws = await fetchNews(q.query)
-
-    // Process 1 article per category for speed
-    for (let j = 0; j < Math.min(raws.length, 1); j++) {
+    // Process up to 2 articles per category
+    for (let j = 0; j < Math.min(raws.length, 2); j++) {
       const raw = raws[j]
-      if (!raw.title || raw.title === '[Removed]') continue
-
-      console.log('[WRITE] ' + raw.title.slice(0, 50))
-      const result = await rewrite(raw, q.category)
+      if (!raw.title || raw.title === '[Removed]' || !raw.description) continue
+      console.log('[WRITE] ' + raw.title.slice(0, 60))
+      // Smart image selection: validate news image, fallback to topic-based
+      let heroImage = getTopicImage(raw.title, q.category)
+      if (raw.urlToImage) {
+        const isValid = await validateImage(raw.urlToImage)
+        if (isValid) heroImage = raw.urlToImage
+      }
+      const result = await rewrite(raw, q.category, heroImage)
       if (!result) continue
-
       const slug = generateSlug(result.titulo || raw.title) + '-' + Date.now().toString(36)
       const article = {
         id: slug,
@@ -226,41 +235,37 @@ export async function GET(request) {
         excerpt: result.resumo || raw.description || '',
         content: result.conteudo || '',
         category: q.category,
-        image: raw.urlToImage || FALLBACK_IMAGES[q.category],
+        image: heroImage,
         source: raw.source?.name || 'Agencias',
         sourceUrl: raw.url || '',
+        originalUrl: raw.url || '',
         publishedAt: raw.publishedAt || new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         featured: false
       }
       newArticles.push(article)
-      await new Promise(r => setTimeout(r, 500))
+      await new Promise(r => setTimeout(r, 600))
     }
   }
-
   if (newArticles.length === 0) {
     return Response.json({ success: false, message: 'Nenhum artigo gerado' }, { status: 500 })
   }
-
-  // Mark first as featured
   newArticles[0].featured = true
-
-  // Post to Facebook (best effort)
   let fbPosted = 0
   for (const article of newArticles) {
     const ok = await postToFacebook(article)
     if (ok) fbPosted++
     await new Promise(r => setTimeout(r, 300))
   }
-
   try {
     const totalSaved = await saveToGitHub(newArticles)
-    console.log('[OK] Saved ' + newArticles.length + ' new + ' + (totalSaved - newArticles.length) + ' existing = ' + totalSaved + ' total')
+    console.log('[OK] Saved ' + newArticles.length + ' new, total: ' + totalSaved)
     return Response.json({
       success: true,
       new: newArticles.length,
       total: totalSaved,
       facebook: fbPosted,
-      articles: newArticles.map(a => a.slug)
+      articles: newArticles.map(a => ({ slug: a.slug, title: a.title, image: a.image }))
     })
   } catch(e) {
     console.error('[ERR] Save:', e.message)
