@@ -9,9 +9,9 @@ const client = new Anthropic()
 
 const QUERIES = [
   { query: 'brazil miami florida community 2026', category: 'Comunidade' },
-  { query: 'immigration visa green card uscis brazil usa 2026', category: 'Imigracao' },
-  { query: 'brazil business entrepreneur florida miami 2026', category: 'Negocios' },
-  { query: 'health insurance medicaid florida immigrants 2026', category: 'Saude' },
+  { query: 'immigration visa green card uscis brazil usa 2026', category: 'Imigração' },
+  { query: 'brazil business entrepreneur florida miami 2026', category: 'Negócios' },
+  { query: 'health insurance medicaid florida immigrants 2026', category: 'Saúde' },
   { query: 'soccer copa mundo inter miami mls 2026', category: 'Esportes' },
   { query: 'miami culture restaurants events nightlife 2026', category: 'Cultura e Lazer' },
 ]
@@ -39,9 +39,9 @@ const TOPIC_IMAGES = [
 
 const CATEGORY_FALLBACK = {
   'Comunidade':      'photo-1529156069898-49953e39b3ac',
-  'Imigracao':       'photo-1436491865332-7a61a109cc05',
-  'Negocios':        'photo-1507003211169-0a1dd7228f2d',
-  'Saude':           'photo-1576091160399-112ba8d25d1d',
+  'Imigração':       'photo-1436491865332-7a61a109cc05',
+  'Negócios':        'photo-1507003211169-0a1dd7228f2d',
+  'Saúde':           'photo-1576091160399-112ba8d25d1d',
   'Esportes':        'photo-1574629810360-7efbbe195018',
   'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
   'default':         'photo-1533929736458-ca588d08c8be',
