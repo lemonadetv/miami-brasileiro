@@ -73,7 +73,7 @@ export default function CategoriaPage(props) {
             {articles.length === 0 ? (
               <div className="cat-empty">
                 <h2>Nenhum artigo ainda</h2>
-                <p>As noticias de {info.label} aparecerão aqui em breve.</p>
+                <p>As noticias de {info.label} aparecerÃ£o aqui em breve.</p>
               </div>
             ) : (
               <>
@@ -84,7 +84,7 @@ export default function CategoriaPage(props) {
                 <div className="article-grid">
                   {articles.map(function(a) {
                     return (
-                      <Link key={a.id} href={'/artigo/' + a.id} className="article-card">
+                      <Link key={(a.slug || a.id)} href={'/artigo/' + (a.slug || a.id)} className="article-card">
                         <img src={getImg(a)} alt={a.title} />
                         <div className="card-body">
                           <div className="card-tag">{a.category}</div>
