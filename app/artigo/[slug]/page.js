@@ -16,7 +16,12 @@ function toHtml(text) {
 
 function ArticleContent({ content, relacionados, catColor }) {
   if (!content) return null
-  const blocks = content.split(/\n\n+/).filter(b => b.trim().length > 0)
+  // Normalize: ensure headings always have a blank line AFTER them
+  // so '### Header\n- item' splits into two separate blocks
+  const normalized = content
+    .replace(/(#{2,3} [^\n]+)\n([^\n])/g, '$1\n\n$2')
+    .replace(/(#{2,3} [^\n]+)\n([^\n])/g, '$1\n\n$2')
+  const blocks = normalized.split(/\n\n+/).filter(b => b.trim().length > 0)
   // Insert "Leia também" box after block 4 if there are related articles
   const insertAt = 4
 
