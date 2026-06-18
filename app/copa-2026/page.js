@@ -3,13 +3,13 @@ import Link from 'next/link'
 import Footer from '../../components/Footer'
 
 const FOTOS = {
-  hero:       'photo-1540747913346-19e32dc3e97e', // estádio Copa
-  torcida:    'photo-1574629810360-7efbbe195018', // torcedores comemorando
-  hardRock:   'photo-1686168523188-8949907234a5', // estádio moderno / Chase Stadium
-  selecao:    'photo-1531415074968-036ba1b575da', // campo de cima
-  trofeu:     'photo-1562447457-579fc34967f7', // troféu copa
+  hero:       'photo-1574629810360-7efbbe195018', // torcida verde-amarelo comemorando Brasil
+  torcida:    'photo-1551958219-acbc595b93e5',    // multidão em estádio
+  hardRock:   'photo-1686168523188-8949907234a5', // estádio / Chase Stadium
+  selecao:    'photo-1540747913346-19e32dc3e97e', // estádio Copa aéreo
+  trofeu:     'photo-1562447457-579fc34967f7',    // troféu copa
   fans2:      'photo-1594736797933-d0501ba2fe65', // torcedores em estádio
-  fans3:      'photo-1551958219-acbc595b93e5', // multidão em jogo
+  fans3:      'photo-1531415074968-036ba1b575da', // campo de cima
 }
 
 const JOGOS_MIAMI = [
