@@ -183,7 +183,7 @@ export default function AdminDashboard() {
                   {recent.map(a => {
                     const cat = CAT_CONFIG.find(c => c.key === a.category)
                     return (
-                      <tr key={a.id}>
+                      <tr key={a.id || a.slug}>
                         <td className="t-title">{a.title}</td>
                         <td>
                           <span style={{
@@ -197,8 +197,8 @@ export default function AdminDashboard() {
                         <td>{a.featured ? <span style={{ color: '#F4622A' }}>⭐</span> : <span style={{ color: '#333' }}>–</span>}</td>
                         <td>
                           <div style={{ display: 'flex', gap: 6 }}>
-                            <Link href={`/artigo/${a.id}`} target="_blank" className="admin-btn admin-btn-ghost admin-btn-sm">Ver</Link>
-                            <Link href={`/admin/artigos/${a.id}`} className="admin-btn admin-btn-primary admin-btn-sm">Editar</Link>
+                            <Link href={`/artigo/${a.slug || a.id}`} target="_blank" className="admin-btn admin-btn-ghost admin-btn-sm">Ver</Link>
+                            <Link href={`/admin/artigos/${a.id || a.slug}`} className="admin-btn admin-btn-primary admin-btn-sm">Editar</Link>
                           </div>
                         </td>
                       </tr>

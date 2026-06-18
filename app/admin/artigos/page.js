@@ -109,7 +109,7 @@ export default function AdminArtigos() {
                   {sorted.map(a => {
                     const color = CAT_COLORS[a.category] || '#555'
                     return (
-                      <tr key={a.id}>
+                      <tr key={a.id || a.slug}>
                         <td style={{ width: 60 }}>
                           {a.image ? (
                             <img src={a.image} alt="" style={{ width: 52, height: 36, objectFit: 'cover', borderRadius: 4, display: 'block' }} />
@@ -133,9 +133,9 @@ export default function AdminArtigos() {
                         <td>{a.featured ? '⭐' : ''}</td>
                         <td>
                           <div style={{ display: 'flex', gap: 5 }}>
-                            <Link href={`/artigo/${a.id}`} target="_blank" className="admin-btn admin-btn-ghost admin-btn-sm">Ver</Link>
-                            <Link href={`/admin/artigos/${a.id}`} className="admin-btn admin-btn-primary admin-btn-sm">Editar</Link>
-                            <button onClick={() => handleDelete(a.id, a.title)} disabled={deleting === a.id}
+                            <Link href={`/artigo/${a.slug || a.id}`} target="_blank" className="admin-btn admin-btn-ghost admin-btn-sm">Ver</Link>
+                            <Link href={`/admin/artigos/${a.id || a.slug}`} className="admin-btn admin-btn-primary admin-btn-sm">Editar</Link>
+                            <button onClick={() => handleDelete(a.id || a.slug, a.title)} disabled={deleting === a.id}
                               className="admin-btn admin-btn-danger admin-btn-sm">
                               {deleting === a.id ? '...' : '🗑'}
                             </button>

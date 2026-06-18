@@ -161,7 +161,7 @@ export default function ArticleForm({ initial, isNew }) {
     if (!form.title.trim()) { setMsg({ type: 'error', text: 'Título é obrigatório' }); return }
     setSaving(true)
     setMsg(null)
-    const url = isNew ? '/api/admin/artigos' : `/api/admin/artigos/${initial.id}`
+    const url = isNew ? '/api/admin/artigos' : `/api/admin/artigos/${initial.id || initial.slug}`
     const method = isNew ? 'POST' : 'PUT'
     const res = await fetch(url, {
       method,
