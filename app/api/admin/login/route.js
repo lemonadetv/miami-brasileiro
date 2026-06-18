@@ -4,7 +4,7 @@ import { getSessionToken } from '../../../../lib/auth'
 
 export async function POST(request) {
   const { password } = await request.json()
-  const expected = process.env.ADMIN_PASSWORD || 'admin123'
+  const expected = process.env.ADMIN_PASSWORD || 'Lemonade@2026'
 
   if (password !== expected) {
     return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 })
