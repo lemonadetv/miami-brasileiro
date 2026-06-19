@@ -194,7 +194,7 @@ export default function ArticleForm({ initial, isNew }) {
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <span style={{ fontSize: 11, color: '#555' }}>{wordCount} palavras · {charCount} chars</span>
             {!isNew && (
-              <Link href={`/artigo/${initial?.id}`} target="_blank" className="admin-btn admin-btn-ghost">
+              <Link href={`/artigo/${initial?.slug || initial?.id}`} target="_blank" className="admin-btn admin-btn-ghost">
                 👁 Ver Artigo
               </Link>
             )}
