@@ -8,18 +8,18 @@ import { notFound } from 'next/navigation'
 
 const CATS = {
   comunidade: { label: 'Comunidade', color: '#00897B', desc: 'Noticias e eventos da comunidade brasileira em Miami e Sul da Florida' },
-  imigracao:  { label: 'Imigracao',  color: '#F4622A', desc: 'Vistos, green card, USCIS, asilo e tudo sobre imigracao nos EUA' },
-  negocios:   { label: 'Negocios',   color: '#7C3AED', desc: 'Empreendedorismo, financas e oportunidades de negocio na Florida' },
-  saude:      { label: 'Saude',      color: '#15803D', desc: 'Saude, planos medicos, seguros e bem-estar para brasileiros nos EUA' },
+  imigracao:  { label: 'Imigração',  color: '#F4622A', desc: 'Vistos, green card, USCIS, asilo e tudo sobre imigracao nos EUA' },
+  negocios:   { label: 'Negócios',   color: '#7C3AED', desc: 'Empreendedorismo, financas e oportunidades de negocio na Florida' },
+  saude:      { label: 'Saúde',      color: '#15803D', desc: 'Saude, planos medicos, seguros e bem-estar para brasileiros nos EUA' },
   esportes:       { label: 'Esportes',       color: '#DC2626', desc: 'Futebol, Copa do Mundo, MMA e esportes com a visao brasileira' },
   'cultura-e-lazer': { label: 'Cultura e Lazer', color: '#e91e8c', desc: 'Dicas de cultura, lazer, entretenimento e diversao para brasileiros em Miami' },
 }
 
 const CAT_MAP = {
   comunidade: 'Comunidade',
-  imigracao:  'Imigracao',
-  negocios:   'Negocios',
-  saude:      'Saude',
+  imigracao:  'Imigração',
+  negocios:   'Negócios',
+  saude:      'Saúde',
   esportes:        'Esportes',
   'cultura-e-lazer': 'Cultura e Lazer',
 }
