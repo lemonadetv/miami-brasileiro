@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import articles from '../../../data/articles.json'
+import articles from '../../data/articles.json'
 
 const BASE = 'https://miami-brasileiro.vercel.app'
 
