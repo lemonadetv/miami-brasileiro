@@ -26,28 +26,23 @@ function AdminNav({ active }) {
 }
 
 const CAT_CONFIG = [
-  { label: 'Comunidade',     key: 'Comunidade',     color: '#00897B' },
-  { label: 'Imigração',      key: 'Imigração',      color: '#F4622A' },
-  { label: 'Negócios',       key: 'Negócios',       color: '#7C3AED' },
-  { label: 'Saúde',          key: 'Saúde',           color: '#15803D' },
-  { label: 'Esportes',       key: 'Esportes',       color: '#DC2626' },
-  { label: 'Cultura e Lazer',key: 'Cultura e Lazer',color: '#D97706' },
+  { label: 'Comunidade',      key: 'Comunidade',      color: '#00897B' },
+  { label: 'Imigração',       key: 'Imigração',       color: '#F4622A' },
+  { label: 'Negócios',        key: 'Negócios',        color: '#7C3AED' },
+  { label: 'Saúde',           key: 'Saúde',           color: '#15803D' },
+  { label: 'Esportes',        key: 'Esportes',        color: '#DC2626' },
+  { label: 'Cultura e Lazer', key: 'Cultura e Lazer', color: '#D97706' },
 ]
 
 export default function Analytics() {
   const [articles, setArticles] = useState([])
-  const [views, setViews] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/admin/artigos').then(r => r.json()),
-      fetch('/api/admin/analytics').then(r => r.json()).catch(() => ({}))
-    ]).then(([arts, analytics]) => {
+    fetch('/api/admin/artigos').then(r => r.json()).then(arts => {
       if (Array.isArray(arts)) setArticles(arts)
-      if (analytics?.pageviews) setViews(analytics.pageviews)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [])
 
   const total = articles.length
@@ -69,11 +64,9 @@ export default function Analytics() {
   })
   const maxMonthCount = Math.max(...months.map(m => m.count), 1)
 
-  // Top viewed
-  const totalViews = Object.values(views).reduce((s, v) => s + v, 0)
-  const topPages = Object.entries(views)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 10)
+  // Recent articles (last 7 days)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000)
+  const recentArticles = articles.filter(a => new Date(a.publishedAt) > sevenDaysAgo)
 
   return (
     <div className="admin-wrap">
@@ -85,11 +78,48 @@ export default function Analytics() {
         <div className="admin-content">
           {loading ? <p style={{ color: '#555' }}>Carregando...</p> : (<>
 
+            {/* Live Analytics Card */}
+            <div className="admin-card" style={{ background: 'linear-gradient(135deg, #0d1f3c 0%, #1a2f50 100%)', border: '1px solid #1e3a5f', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+                <div>
+                  <h2 style={{ margin: '0 0 8px', color: '#60a5fa' }}>📡 Visitas ao Vivo — Vercel Analytics</h2>
+                  <p style={{ fontSize: 13, color: '#94a3b8', margin: '0 0 16px' }}>
+                    O tracking está ativo no site. Veja dados em tempo real no painel da Vercel.
+                  </p>
+                  <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+                    {[
+                      { label: 'Visitantes (7 dias)', value: '—', note: 'Ver no Vercel' },
+                      { label: 'Page Views (7 dias)', value: '—', note: 'Ver no Vercel' },
+                      { label: 'Bounce Rate', value: '—', note: 'Ver no Vercel' },
+                    ].map(s => (
+                      <div key={s.label} style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>{s.value}</div>
+                        <div style={{ fontSize: 10, color: '#64748b', marginTop: 2 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <a
+                  href="https://vercel.com/ricardo-8237s-projects/miami-brasileiro/analytics"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    background: '#3b82f6', color: '#fff', padding: '12px 20px',
+                    borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none',
+                    whiteSpace: 'nowrap'
+                  }}>
+                  Ver Analytics Completo ↗
+                </a>
+              </div>
+            </div>
+
+            {/* Summary stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
               {[
                 { label: 'Total de Artigos', value: total, color: '#fff' },
-                { label: 'Page Views Registradas', value: totalViews.toLocaleString('pt-BR'), color: '#4ade80' },
-                { label: 'Páginas Únicas', value: Object.keys(views).length, color: '#60a5fa' },
+                { label: 'Artigos esta Semana', value: recentArticles.length, color: '#4ade80' },
+                { label: 'Categorias Ativas', value: Object.keys(byCategory).length, color: '#60a5fa' },
               ].map(s => (
                 <div key={s.label} className="admin-card" style={{ textAlign: 'center', margin: 0, padding: '18px' }}>
                   <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{s.value}</div>
@@ -117,7 +147,7 @@ export default function Analytics() {
                 </div>
               </div>
 
-              {/* Category donut-like */}
+              {/* Category distribution */}
               <div className="admin-card">
                 <h2>🗂 Distribuição por Categoria</h2>
                 {CAT_CONFIG.map(c => {
@@ -138,21 +168,23 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Top pages */}
-            {topPages.length > 0 && (
+            {/* Recent articles */}
+            {recentArticles.length > 0 && (
               <div className="admin-card">
-                <h2>🏆 Páginas Mais Visitadas</h2>
+                <h2>🆕 Artigos Publicados nos Últimos 7 Dias</h2>
                 <table className="admin-table">
-                  <thead><tr><th>Página</th><th>Visitas</th><th>% do Total</th></tr></thead>
+                  <thead><tr><th>Título</th><th>Categoria</th><th>Data</th></tr></thead>
                   <tbody>
-                    {topPages.map(([path, count]) => (
-                      <tr key={path}>
-                        <td style={{ fontFamily: 'monospace', fontSize: 12, color: '#a78bfa' }}>
-                          <a href={path} target="_blank" style={{ color: 'inherit' }}>{path}</a>
+                    {recentArticles.slice(0, 10).map((a, i) => (
+                      <tr key={i}>
+                        <td style={{ fontSize: 13 }}>
+                          <Link href={`/artigo/${a.slug || a.id}`} target="_blank" style={{ color: '#a78bfa' }}>
+                            {a.title}
+                          </Link>
                         </td>
-                        <td style={{ fontWeight: 700, color: '#4ade80' }}>{count.toLocaleString('pt-BR')}</td>
-                        <td style={{ color: '#666', fontSize: 12 }}>
-                          {Math.round((count / totalViews) * 100)}%
+                        <td style={{ fontSize: 12, color: '#888' }}>{a.category}</td>
+                        <td style={{ fontSize: 12, color: '#555' }}>
+                          {new Date(a.publishedAt).toLocaleDateString('pt-BR')}
                         </td>
                       </tr>
                     ))}
@@ -161,15 +193,6 @@ export default function Analytics() {
               </div>
             )}
 
-            {topPages.length === 0 && (
-              <div className="admin-card" style={{ textAlign: 'center', padding: '40px' }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
-                <div style={{ color: '#555', fontSize: 14 }}>Nenhuma visita registrada ainda.</div>
-                <div style={{ color: '#444', fontSize: 12, marginTop: 8 }}>
-                  As visitas são registradas quando o componente de analytics está ativo no site.
-                </div>
-              </div>
-            )}
           </>)}
         </div>
       </main>
