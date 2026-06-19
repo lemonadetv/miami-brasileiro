@@ -62,7 +62,7 @@ export default function AdminDashboard() {
     setBotRunning(true)
     setBotMsg(null)
     try {
-      const res = await fetch('/api/buscar-noticias', { method: 'POST', headers: { 'x-cron-secret': 'miami2026' } })
+      const res = await fetch('/api/trigger-bot', { method: 'POST', headers: { 'x-cron-secret': 'miami2026' } })
       const data = await res.json()
       if (res.ok) setBotMsg({ type: 'success', text: `✓ Bot executado! ${data.added || 0} artigos adicionados.` })
       else setBotMsg({ type: 'error', text: data.error || 'Erro ao executar bot' })
