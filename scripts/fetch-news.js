@@ -63,21 +63,102 @@ function validateImage(url) {
     if (!url || !url.startsWith('http')) return resolve(false)
     try {
       const mod = url.startsWith('https') ? https : http
-      const req = mod.request(url, { method: 'HEAD', timeout: 4000 }, (res) => {
+      // Try HEAD first
+      const headReq = mod.request(url, { method: 'HEAD', timeout: 4000 }, (res) => {
         const ct = res.headers['content-type'] || ''
-        resolve(res.statusCode >= 200 && res.statusCode < 300 && ct.includes('image'))
+        const cl = res.headers['content-length']
+        if (res.statusCode >= 200 && res.statusCode < 300 && ct.includes('image')) {
+          if (cl !== undefined && parseInt(cl, 10) === 0) return resolve(false)
+          return resolve(true)
+        }
+        // HEAD failed (non-2xx or not image content-type) — retry with GET
+        tryGet()
       })
-      req.on('error', () => resolve(false))
-      req.on('timeout', () => { req.destroy(); resolve(false) })
-      req.end()
+      headReq.on('error', () => tryGet())
+      headReq.on('timeout', () => { headReq.destroy(); tryGet() })
+      headReq.end()
+
+      function tryGet() {
+        try {
+          const getReq = mod.request(url, { method: 'GET', timeout: 5000 }, (res) => {
+            const ct = res.headers['content-type'] || ''
+            const cl = res.headers['content-length']
+            if (res.statusCode >= 200 && res.statusCode < 300 && ct.includes('image')) {
+              if (cl !== undefined && parseInt(cl, 10) === 0) {
+                res.destroy()
+                return resolve(false)
+              }
+              res.destroy()
+              return resolve(true)
+            }
+            // Read only the first 1KB then destroy
+            let bytes = 0
+            res.on('data', (chunk) => {
+              bytes += chunk.length
+              if (bytes >= 1024) res.destroy()
+            })
+            res.on('close', () => resolve(false))
+            res.on('end', () => resolve(false))
+          })
+          getReq.on('error', () => resolve(false))
+          getReq.on('timeout', () => { getReq.destroy(); resolve(false) })
+          getReq.end()
+        } catch { resolve(false) }
+      }
     } catch { resolve(false) }
+  })
+}
+
+function extractOgImage(articleUrl) {
+  return new Promise((resolve) => {
+    if (!articleUrl || !articleUrl.startsWith('http')) return resolve(null)
+    try {
+      const mod = articleUrl.startsWith('https') ? https : http
+      const req = mod.request(articleUrl, { method: 'GET', timeout: 5000 }, (res) => {
+        let body = ''
+        let done = false
+        res.on('data', (chunk) => {
+          if (done) return
+          body += chunk.toString()
+          // Stop once we have enough HTML to find og:image (typically in <head>)
+          if (body.length > 50000) {
+            done = true
+            res.destroy()
+            parseAndResolve(body)
+          }
+        })
+        res.on('end', () => {
+          if (!done) parseAndResolve(body)
+        })
+        res.on('close', () => {
+          if (!done) parseAndResolve(body)
+        })
+      })
+      req.on('error', () => resolve(null))
+      req.on('timeout', () => { req.destroy(); resolve(null) })
+      req.end()
+
+      function parseAndResolve(html) {
+        try {
+          // Try og:image
+          const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+            || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
+          if (ogMatch && ogMatch[1]) return resolve(ogMatch[1])
+          // Try twitter:image
+          const twMatch = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
+            || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i)
+          if (twMatch && twMatch[1]) return resolve(twMatch[1])
+          resolve(null)
+        } catch { resolve(null) }
+      }
+    } catch { resolve(null) }
   })
 }
 
 function generateSlug(title) {
   return title
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -123,6 +204,7 @@ async function rewrite(article, category, heroImage) {
     date: new Date().toISOString().split('T')[0],
     author: 'Redacao Miami Brasileira',
     imageUrl: heroImage,
+    image: heroImage,
     excerpt: body.replace(/^#.+\n/, '').replace(/#{1,3}[^\n]+\n/g, '').trim().substring(0, 200) + '...',
     content: body,
     source: article.url || '',
@@ -149,14 +231,21 @@ async function main() {
         const tmpSlug = generateSlug(art.title)
         if (existingSlugs.has(tmpSlug)) continue
 
-        let heroImage = getTopicImage(art.title, category)
-        if (art.urlToImage) {
-          const valid = await validateImage(art.urlToImage)
-          if (valid) heroImage = art.urlToImage
+        let imageUrl = getTopicImage(art.title, category) // Unsplash fallback (last resort)
+
+        // Try og:image from article page
+        if (art.url) {
+          const ogImage = await extractOgImage(art.url)
+          if (ogImage) imageUrl = ogImage
+        }
+
+        // Override with NewsAPI image if available (highest priority)
+        if (art.urlToImage && await validateImage(art.urlToImage)) {
+          imageUrl = art.urlToImage
         }
 
         console.log('  Reescrevendo:', art.title.substring(0, 60))
-        const newArt = await rewrite(art, category, heroImage)
+        const newArt = await rewrite(art, category, imageUrl)
         if (existingSlugs.has(newArt.slug)) continue
         existingSlugs.add(newArt.slug)
         newArticles.push(newArt)
