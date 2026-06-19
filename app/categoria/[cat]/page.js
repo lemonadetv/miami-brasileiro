@@ -38,13 +38,22 @@ export async function generateStaticParams() {
   return Object.keys(CATS).map(function(cat) { return { cat: cat } })
 }
 
-export async function generateMetadata(props) {
-  var params = props.params
-  var info = CATS[params.cat]
-  if (!info) return { title: 'Categoria' }
+const CATEGORY_LABELS = {
+  'comunidade': 'Comunidade',
+  'imigracao': 'Imigração',
+  'negocios': 'Negócios',
+  'saude': 'Saúde',
+  'esportes': 'Esportes',
+  'cultura-e-lazer': 'Cultura e Lazer',
+}
+
+export async function generateMetadata({ params }) {
+  const label = CATEGORY_LABELS[params.cat] || params.cat
+  const info = CATS[params.cat]
   return {
-    title: info.label + ' | Miami Brasileiro',
-    description: info.desc,
+    title: `${label} — Notícias para brasileiros em Miami`,
+    description: info ? info.desc : `Últimas notícias de ${label} para brasileiros em Miami e na Flórida.`,
+    alternates: { canonical: `https://miami-brasileiro.vercel.app/categoria/${params.cat}` },
   }
 }
 
@@ -73,7 +82,7 @@ export default function CategoriaPage(props) {
             {articles.length === 0 ? (
               <div className="cat-empty">
                 <h2>Nenhum artigo ainda</h2>
-                <p>As noticias de {info.label} aparecerÃ£o aqui em breve.</p>
+                <p>As noticias de {info.label} aparecerão aqui em breve.</p>
               </div>
             ) : (
               <>

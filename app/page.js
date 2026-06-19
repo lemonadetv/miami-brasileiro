@@ -135,8 +135,23 @@ export default async function Home() {
 
   const trending = articles.slice(0, 8)
 
+  const homepageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsMediaOrganization',
+    name: 'Miami Brasileira',
+    url: 'https://miami-brasileiro.vercel.app',
+    description: 'Portal de notícias em português para brasileiros que vivem em Miami e na Flórida.',
+    inLanguage: 'pt-BR',
+    publishingPrinciples: 'https://miami-brasileiro.vercel.app/sobre',
+    contactPoint: { '@type': 'ContactPoint', url: 'https://miami-brasileiro.vercel.app/contato' },
+  }
+
   return (
     <div className="msn-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageJsonLd) }}
+      />
       <HeroCarousel articles={articles} />
       <div className="msn-layout">
         <div className="msn-main">

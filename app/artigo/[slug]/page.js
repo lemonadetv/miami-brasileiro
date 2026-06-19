@@ -169,19 +169,31 @@ export async function generateStaticParams() {
   return getAllArticles().map(a => ({ slug: a.slug || a.id }))
 }
 
-export async function generateMetadata(props) {
-  const article = getArticleBySlug(props.params.slug)
-  if (!article) return { title: 'Artigo nao encontrado' }
+export async function generateMetadata({ params }) {
+  const article = getArticleBySlug(params.slug)
+  if (!article) return { title: 'Artigo não encontrado' }
+
   return {
-    title: article.title + ' | Miami Brasileira',
-    description: article.excerpt,
+    title: article.title,
+    description: article.excerpt || article.title,
     openGraph: {
-      title: article.title,
-      description: article.excerpt,
-      images: article.image ? [article.image] : [],
       type: 'article',
+      title: article.title,
+      description: article.excerpt || article.title,
+      url: `https://miami-brasileiro.vercel.app/artigo/${article.slug || article.id}`,
+      images: article.image ? [{ url: article.image, width: 1200, height: 630 }] : [],
       publishedTime: article.publishedAt,
+      authors: [article.source || 'Redação Miami Brasileira'],
       locale: 'pt_BR',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.excerpt || article.title,
+      images: article.image ? [article.image] : [],
+    },
+    alternates: {
+      canonical: `https://miami-brasileiro.vercel.app/artigo/${article.slug || article.id}`,
     },
   }
 }
@@ -199,9 +211,33 @@ export default function ArtigoPage(props) {
     .slice(0, 4)
   const catColor = CAT_COLORS[article.category] || '#F4622A'
   const catSlug = (article.category || '').toLowerCase().replace(/ e /g, '-e-').replace(/\s+/g, '-')
+  const articleSlug = article.slug || article.id
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: article.title,
+    description: article.excerpt,
+    image: article.image ? [article.image] : [],
+    datePublished: article.publishedAt,
+    dateModified: article.publishedAt,
+    author: { '@type': 'Organization', name: article.source || 'Redação Miami Brasileira' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Miami Brasileira',
+      url: 'https://miami-brasileiro.vercel.app',
+    },
+    url: `https://miami-brasileiro.vercel.app/artigo/${articleSlug}`,
+    inLanguage: 'pt-BR',
+    isAccessibleForFree: true,
+  }
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="article-page">
         <div className="article-page-grid">
           {/* Main article */}

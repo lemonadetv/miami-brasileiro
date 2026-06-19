@@ -1,0 +1,21 @@
+# Miami Brasileira
+
+> Portal de notícias em português para brasileiros que vivem em Miami e na Flórida. Cobrimos comunidade, imigração, negócios, saúde, esportes e cultura.
+
+## Seções
+
+- [Comunidade](https://miami-brasileiro.vercel.app/categoria/comunidade)
+- [Imigração](https://miami-brasileiro.vercel.app/categoria/imigracao)
+- [Negócios](https://miami-brasileiro.vercel.app/categoria/negocios)
+- [Saúde](https://miami-brasileiro.vercel.app/categoria/saude)
+- [Esportes](https://miami-brasileiro.vercel.app/categoria/esportes)
+- [Cultura e Lazer](https://miami-brasileiro.vercel.app/categoria/cultura-e-lazer)
+
+## Sobre
+
+Miami Brasileira é o principal portal de notícias em português para a comunidade brasileira na Flórida. Publicamos notícias diárias sobre vida em Miami, oportunidades de negócios, dicas de imigração e muito mais.
+
+## Contato
+
+- Site: https://miami-brasileiro.vercel.app
+- Contato: https://miami-brasileiro.vercel.app/contato
