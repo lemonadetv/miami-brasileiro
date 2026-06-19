@@ -36,6 +36,9 @@ export const metadata = {
   },
   alternates: {
     canonical: 'https://miami-brasileiro.vercel.app',
+    types: {
+      'application/rss+xml': 'https://miami-brasileiro.vercel.app/feed.xml',
+    },
   },
 }
 

@@ -11,3 +11,4 @@ User-agent: Googlebot
 Allow: /
 
 Sitemap: https://miami-brasileiro.vercel.app/sitemap.xml
+Sitemap: https://miami-brasileiro.vercel.app/news-sitemap.xml
