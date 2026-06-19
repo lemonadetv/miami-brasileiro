@@ -34,6 +34,9 @@ export const metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
+  verification: {
+    google: '8s0o6jV4fgBkcAMdH84MU9SpW2W4JZK54ugld_shq98',
+  },
   alternates: {
     canonical: 'https://miami-brasileiro.vercel.app',
     types: {
