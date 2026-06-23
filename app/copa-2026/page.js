@@ -138,24 +138,26 @@ function avatarUrl(nome) {
 }
 
 
-const FLAGS = {
-  'USA':'🇺🇸','MEX':'🇲🇽','CAN':'🇨🇦','PAN':'🇵🇦','BRA':'🇧🇷',
-  'ARG':'🇦🇷','CHL':'🇨🇱','ECU':'🇪🇨','PER':'🇵🇪','COL':'🇨🇴',
-  'PAR':'🇵🇾','URU':'🇺🇾','BOL':'🇧🇴','VEN':'🇻🇪','CRC':'🇨🇷',
-  'JAM':'🇯🇲','HON':'🇭🇳','SLV':'🇸🇻',
-  'FRA':'🇫🇷','ENG':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','ESP':'🇪🇸','POR':'🇵🇹','GER':'🇩🇪',
-  'ITA':'🇮🇹','NED':'🇳🇱','BEL':'🇧🇪','CRO':'🇭🇷','SRB':'🇷🇸',
-  'DEN':'🇩🇰','AUT':'🇦🇹','SUI':'🇨🇭','POL':'🇵🇱','HUN':'🇭🇺',
-  'ALB':'🇦🇱','SLO':'🇸🇮','ROU':'🇷🇴','SVK':'🇸🇰','TUR':'🇹🇷',
-  'UKR':'🇺🇦','GRE':'🇬🇷','NOR':'🇳🇴','CZE':'🇨🇿','GEO':'🇬🇪',
-  'MAR':'🇲🇦','NGA':'🇳🇬','SEN':'🇸🇳','CMR':'🇨🇲','CIV':'🇨🇮',
-  'GHA':'🇬🇭','EGY':'🇪🇬','TUN':'🇹🇳','MLI':'🇲🇱','ALG':'🇩🇿',
-  'ZAF':'🇿🇦','BEN':'🇧🇯','TAN':'🇹🇿','GUI':'🇬🇳','ANG':'🇦🇴',
-  'JPN':'🇯🇵','KOR':'🇰🇷','AUS':'🇦🇺','IRN':'🇮🇷','SAU':'🇸🇦',
-  'QAT':'🇶🇦','IRQ':'🇮🇶','UAE':'🇦🇪','JOR':'🇯🇴','UZB':'🇺🇿',
-  'KAZ':'🇰🇿','OMA':'🇴🇲','CHN':'🇨🇳','NZL':'🇳🇿',
+const ALPHA2 = {
+  'USA':'us','MEX':'mx','CAN':'ca','PAN':'pa','BRA':'br',
+  'ARG':'ar','CHL':'cl','ECU':'ec','PER':'pe','COL':'co',
+  'PAR':'py','URU':'uy','BOL':'bo','VEN':'ve','CRC':'cr',
+  'JAM':'jm','HON':'hn','SLV':'sv',
+  'FRA':'fr','ENG':'gb-eng','ESP':'es','POR':'pt','GER':'de',
+  'ITA':'it','NED':'nl','BEL':'be','CRO':'hr','SRB':'rs',
+  'DEN':'dk','AUT':'at','SUI':'ch','POL':'pl','HUN':'hu',
+  'ALB':'al','ROU':'ro','SVK':'sk','TUR':'tr','UKR':'ua',
+  'GRE':'gr','SCO':'gb-sct','WAL':'gb-wls','NOR':'no','CZE':'cz',
+  'GEO':'ge','SRB':'rs','SLO':'si','MNE':'me','MKD':'mk',
+  'MAR':'ma','NGA':'ng','SEN':'sn','CMR':'cm','CIV':'ci',
+  'GHA':'gh','EGY':'eg','TUN':'tn','MLI':'ml','ALG':'dz',
+  'ZAF':'za','BEN':'bj','TAN':'tz','GUI':'gn','ANG':'ao',
+  'JPN':'jp','KOR':'kr','AUS':'au','IRN':'ir','SAU':'sa',
+  'QAT':'qa','IRQ':'iq','UAE':'ae','JOR':'jo','UZB':'uz',
+  'KAZ':'kz','OMA':'om','CHN':'cn','NZL':'nz','THA':'th',
+  'VNM':'vn','IDN':'id','PHL':'ph','IND':'in',
 }
-function countryFlag(code) { return FLAGS[code] || '🏳️' }
+function countryFlag(code) { return code ? 'https://flagcdn.com/40x30/' + (ALPHA2[code] || 'xx') + '.png' : '' }
 
 export default function Copa2026Page() {
   const [tab, setTab] = useState('jogos');
@@ -278,7 +280,7 @@ export default function Copa2026Page() {
                   gap: '16px',
                 }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '6px' }}>{j.flag1 || '🏳️'}</div>
+                    {j.flag1 ? <img src={j.flag1} alt={j.time1} style={{height:'42px',width:'auto',marginBottom:'6px',borderRadius:'3px',boxShadow:'0 1px 4px rgba(0,0,0,0.4)'}} /> : <span style={{fontSize:'36px',marginBottom:'6px',display:'block'}}>🏳️</span>}
                     <div style={{ fontWeight: 700, fontSize: '18px' }}>{j.time1}</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
@@ -297,7 +299,7 @@ export default function Copa2026Page() {
                     </div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '6px' }}>{j.flag2 || '🏳️'}</div>
+                    {j.flag2 ? <img src={j.flag2} alt={j.time2} style={{height:'42px',width:'auto',marginBottom:'6px',borderRadius:'3px',boxShadow:'0 1px 4px rgba(0,0,0,0.4)'}} /> : <span style={{fontSize:'36px',marginBottom:'6px',display:'block'}}>🏳️</span>}
                     <div style={{ fontWeight: 700, fontSize: '18px' }}>{j.time2}</div>
                   </div>
                 </div>
