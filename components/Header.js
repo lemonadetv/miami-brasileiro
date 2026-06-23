@@ -4,13 +4,13 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 const CATEGORIAS = [
-  { label: 'Inicio',     href: '/' },
-  { label: 'Comunidade', href: '/categoria/comunidade' },
-  { label: 'Imigracao',  href: '/categoria/imigracao' },
-  { label: 'Negocios',   href: '/categoria/negocios' },
-  { label: 'Saude',      href: '/categoria/saude' },
-  { label: 'Esportes',   href: '/esportes' },
-  { label: 'Contato',    href: '/contato' },
+  { label: 'Início',      href: '/' },
+  { label: 'Comunidade',  href: '/categoria/comunidade' },
+  { label: 'Imigração',   href: '/categoria/imigracao' },
+  { label: 'Negócios',    href: '/categoria/negocios' },
+  { label: 'Saúde',       href: '/categoria/saude' },
+  { label: 'Esportes',    href: '/esportes' },
+  { label: 'Contato',     href: '/contato' },
 ]
 
 const WMO = {
@@ -22,11 +22,11 @@ export default function Header() {
   const pathname = usePathname()
   const [rates, setRates] = useState({ usd: null, eur: null, usdChange: null, eurChange: null })
   const [weather, setWeather] = useState({ temp: null, icon: '🌤', desc: '' })
-  const [social, setSocial] = useState({ facebook: '', instagram: '', youtube: '' })
+  const [facebookUrl, setFacebookUrl] = useState('')
   const [tickerItems, setTickerItems] = useState([
     { text: 'Como alugar apartamento em Miami sem historico americano', href: '/categoria/comunidade' },
     { text: 'Green card pelo EB-5: o que mudou para brasileiros em 2026', href: '/categoria/imigracao' },
-    { text: 'Copa do Mundo 2026 em Miami: ingressos e o que esperar', href: '/esportes' },
+    { text: 'Copa do Mundo 2026 em Miami: ingressos e o que esperar', href: '/copa-2026' },
     { text: 'Plano de saude na Florida: como escolher o melhor plano', href: '/categoria/saude' },
     { text: 'Como abrir uma LLC na Florida em 2026: guia completo', href: '/categoria/negocios' },
   ])
@@ -36,6 +36,7 @@ export default function Header() {
       .then(function(r) { return r.json() })
       .then(function(d) { setRates(d) })
       .catch(function() {})
+
     fetch('https://api.open-meteo.com/v1/forecast?latitude=25.7617&longitude=-80.1918&current=temperature_2m,weathercode&temperature_unit=fahrenheit')
       .then(function(r) { return r.json() })
       .then(function(d) {
@@ -47,9 +48,12 @@ export default function Header() {
           setWeather({ temp: tempC, icon: WMO.icons[code] || WMO.icons[baseCode] || '🌤', desc: WMO.desc[code] || WMO.desc[baseCode] || '' })
         }
       }).catch(function() {})
-    fetch('/api/site-config').then(function(r) { return r.json() })
-      .then(function(d) { setSocial({ facebook: d.socialFacebook||'', instagram: d.socialInstagram||'', youtube: d.socialYoutube||'' }) })
+
+    fetch('/api/site-config')
+      .then(function(r) { return r.json() })
+      .then(function(d) { setFacebookUrl(d.socialFacebook || '') })
       .catch(function() {})
+
     fetch('/api/admin/artigos', { credentials: 'include' })
       .then(function(r) { return r.ok ? r.json() : null })
       .then(function(d) {
@@ -71,9 +75,7 @@ export default function Header() {
         <div className="topbar-inner">
           <span>🌎 Miami &amp; Sul da Florida &nbsp;&middot;&nbsp; {data}</span>
           <div className="topbar-social">
-            {social.facebook && <a href={social.facebook} target="_blank" rel="noreferrer">📘 Facebook</a>}
-            {social.instagram && <a href={social.instagram} target="_blank" rel="noreferrer">📸 Instagram</a>}
-            {social.youtube && <a href={social.youtube} target="_blank" rel="noreferrer">▶ YouTube</a>}
+            {facebookUrl && <a href={facebookUrl} target="_blank" rel="noreferrer">📘 Facebook</a>}
           </div>
         </div>
       </div>
@@ -90,7 +92,8 @@ export default function Header() {
           </Link>
           <nav>
             {CATEGORIAS.map(function(c) {
-              return <Link key={c.href} href={c.href} className={pathname===c.href?'active':''}>{c.label}</Link>
+              var isActive = c.href === '/' ? pathname === '/' : pathname.startsWith(c.href)
+              return <Link key={c.href} href={c.href} className={isActive ? 'active' : ''}>{c.label}</Link>
             })}
           </nav>
           <Link href="/contato" className="btn-anuncie">📣 Anuncie</Link>
@@ -107,7 +110,7 @@ export default function Header() {
           <div className="weather-item">
             <span style={{ fontSize:16 }}>{weather.icon}</span>
             <span>Ft. Lauderdale</span>
-            <strong>{weather.temp!==null ? (weather.temp-1)+'C' : '--C'}</strong>
+            <strong>{weather.temp!==null ? (weather.temp-1)+'°C' : '--°C'}</strong>
           </div>
           <div className="date-bar">
             <span className="rate-pill" style={{ color: usdUp ? '#15803D' : '#DC2626' }}>
