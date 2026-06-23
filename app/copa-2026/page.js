@@ -258,7 +258,7 @@ export default function Copa2026Page() {
                   gap: '16px',
                 }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '6px' }}>{j.flag1 || '🏳️'}|/div>
+                    <div style={{ fontSize: '40px', marginBottom: '6px' }}>{j.flag1 || '🏳️'}</div>
                     <div style={{ fontWeight: 700, fontSize: '18px' }}>{j.time1}</div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
