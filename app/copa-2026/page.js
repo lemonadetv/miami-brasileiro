@@ -60,7 +60,7 @@ const GRUPOS = [
   {
     nome: 'Grupo D — 🇧🇷',
     times: [
-      { pais: '🇧🇷 Brasil', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 7, ga: 1, destaque: true },
+      { pais: '🇧🇷 Brasil', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, ga: 1, destaque: true },
       { pais: '🇨🇷 Costa Rica', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 4 },
       { pais: '🇵🇾 Paraguai', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 },
       { pais: '🇺🇾 Uruguai', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 2, ga: 5 },
@@ -365,7 +365,7 @@ export default function Copa2026Page() {
                 {
                   fase: '🏆 Fase de Grupos — Grupo D',
                   cor: '#009c3b',
-                  texto: 'O Brasil lidera o Grupo D com aproveitamento de 100%: 2 vitórias em 2 jogos, 7 gols marcados e apenas 1 sofrido. Vinicius Jr., Rodrygo e Endrick formam um trio ofensivo letal que tem aterrorizado as defesas adversárias. A classificação antecipada às oitavas é praticamente certa, e o Brasil deve terminar o grupo na liderança.',
+                  texto: 'O Brasil soma 4 pontos em 2 jogos no Grupo D: empate com Marrocos (1-1) e vitória sobre o Haiti (3-0). A seleção busca a liderança na última rodada. Vincius Jr., Rodrygo e Endrick têm qualidade, mas a equipe precisa de mais consistência para avançar às oitavas.',
                 },
                 {
                   fase: '⚡ Oitavas de Final (28 jun)',
