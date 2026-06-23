@@ -9,9 +9,9 @@ const client = new Anthropic()
 
 const QUERIES = [
   { query: 'brazil miami florida community 2026', category: 'Comunidade' },
-  { query: 'immigration visa green card uscis brazil usa 2026', category: 'Imigração' },
-  { query: 'brazil business entrepreneur florida miami 2026', category: 'Negócios' },
-  { query: 'health insurance medicaid florida immigrants 2026', category: 'Saúde' },
+  { query: 'immigration visa green card uscis brazil usa 2026', category: 'ImigraÃ§Ã£o' },
+  { query: 'brazil business entrepreneur florida miami 2026', category: 'NegÃ³cios' },
+  { query: 'health insurance medicaid florida immigrants 2026', category: 'SaÃºde' },
   { query: 'soccer copa mundo inter miami mls 2026', category: 'Esportes' },
   { query: 'miami culture restaurants events nightlife 2026', category: 'Cultura e Lazer' },
 ]
@@ -39,9 +39,9 @@ const TOPIC_IMAGES = [
 
 const CATEGORY_FALLBACK = {
   'Comunidade':      'photo-1529156069898-49953e39b3ac',
-  'Imigração':       'photo-1436491865332-7a61a109cc05',
-  'Negócios':        'photo-1507003211169-0a1dd7228f2d',
-  'Saúde':           'photo-1576091160399-112ba8d25d1d',
+  'ImigraÃ§Ã£o':       'photo-1436491865332-7a61a109cc05',
+  'NegÃ³cios':        'photo-1507003211169-0a1dd7228f2d',
+  'SaÃºde':           'photo-1576091160399-112ba8d25d1d',
   'Esportes':        'photo-1574629810360-7efbbe195018',
   'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
   'default':         'photo-1533929736458-ca588d08c8be',
@@ -71,7 +71,7 @@ function validateImage(url) {
           if (cl !== undefined && parseInt(cl, 10) === 0) return resolve(false)
           return resolve(true)
         }
-        // HEAD failed (non-2xx or not image content-type) — retry with GET
+        // HEAD failed (non-2xx or not image content-type) â retry with GET
         tryGet()
       })
       headReq.on('error', () => tryGet())
@@ -158,7 +158,7 @@ function extractOgImage(articleUrl) {
 function generateSlug(title) {
   return title
     .toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .normalize('NFD').replace(/[Ì-Í¯]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -183,11 +183,49 @@ function fetchNews(query) {
 }
 
 async function rewrite(article, category, heroImage) {
-  const prompt = 'Voce e redator do portal Miami Brasileira, o maior portal de noticias para brasileiros em Miami.\n\nBaseado APENAS no resumo abaixo, escreva um artigo ORIGINAL e COMPLETO em portugues brasileiro (minimo 700 palavras).\n\nTITULO ORIGINAL: ' + article.title + '\nRESUMO: ' + (article.description || article.title) + '\nCATEGORIA: ' + category + '\n\nESTRUTURA OBRIGATORIA:\n# [Titulo em portugues, atraente e informativo]\n\n[Paragrafo de abertura - contexto e importancia - 3-4 frases]\n\n## [Emoji] [Subtitulo 1]\n[2-3 paragrafos ricos em detalhes e analise]\n\n## [Emoji] [Subtitulo 2]\n[2-3 paragrafos com perspectiva para brasileiros em Miami]\n\n## [Emoji] [Subtitulo 3]\n[2-3 paragrafos com informacoes acionaveis]\n\n## [Emoji] [Subtitulo 4]\n[2-3 paragrafos com perspectivas futuras]\n\n---\n\n**Miami Brasileira** acompanha todos os desenvolvimentos que impactam nossa comunidade.\n\nEscreva SOMENTE o artigo. Minimo 700 palavras. Linguagem clara e acessivel.'
+  const prompt = `Você é um jornalista sênior do portal Miami Brasileira, o maior portal de notícias em português para brasileiros em Miami e na Flórida. Seu estilo é claro, envolvente e profissional — como os melhores portais brasileiros de jornalismo digital.
+
+Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em português brasileiro.
+
+TÍTULO ORIGINAL: ${article.title}
+RESUMO: ${article.description || article.title}
+CATEGORIA: ${category}
+
+INSTRUÇÕES DE ESTILO:
+- Mínimo 850 palavras, bem desenvolvidas
+- Use **negrito** para destacar informações-chave, números importantes e termos relevantes
+- Parágrafo de abertura forte: contextualize o tema com dados ou fato impactante
+- Analise o impacto específico para brasileiros em Miami/Flórida
+- Inclua contexto local (legislação americana, vida prática em Miami, comunidade brasileira)
+- Tom jornalístico: informativo, objetivo, mas humano e próximo do leitor
+- Termine com perspectiva prática: o que o leitor pode fazer ou esperar
+
+ESTRUTURA OBRIGATÓRIA:
+# [Título em português — atraente, informativo, específico]
+
+[Parágrafo de abertura forte — dado, fato ou contexto impactante — 3-4 frases]
+
+## 🔍 [Subtítulo 1 — O que aconteceu e por quê importa]
+[2-3 parágrafos ricos com análise aprofundada, contexto histórico e dados quando possível]
+
+## 🇧🇷 [Subtítulo 2 — O que muda para brasileiros em Miami]
+[2-3 parágrafos com perspectiva direta para a comunidade brasileira na Flórida]
+
+## 📋 [Subtítulo 3 — O que você precisa saber e fazer]
+[2-3 parágrafos com informações práticas e acionáveis para o leitor]
+
+## 🔮 [Subtítulo 4 — Próximos passos e perspectivas]
+[2-3 parágrafos com análise do que vem por aí e como se preparar]
+
+---
+
+*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na Flórida. Fique por dentro.*
+
+Escreva SOMENTE o artigo completo, sem comentários ou explicações extras.`
 
   const msg = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 2000,
+    model: 'claude-sonnet-4-6',
+    max_tokens: 4000,
     messages: [{ role: 'user', content: prompt }]
   })
 
