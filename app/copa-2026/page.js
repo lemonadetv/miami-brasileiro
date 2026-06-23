@@ -1,24 +1,24 @@
 'use client';
 import { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
 const HOJE_JOGOS = [
-  { time1: 'Portugal', flag1: '🇵🇹', time2: 'Rep. Tcheca', flag2: '🇨🇿', horario: '15:00', estadio: "Levi's Stadium", cidade: 'Santa Clara, CA', placar: '2 x 1', status: 'Encerrado', grupo: 'Grupo E' },
-  { time1: 'Turquia', flag1: '🇹🇷', time2: 'Georgia', flag2: '🇬🇪', horario: '15:00', estadio: 'AT&T Stadium', cidade: 'Arlington, TX', placar: '3 x 1', status: 'Encerrado', grupo: 'Grupo F' },
-  { time1: 'Marrocos', flag1: '🇲🇦', time2: 'Zambia', flag2: '🇿🇲', horario: '19:00', estadio: 'SoFi Stadium', cidade: 'Inglewood, CA', placar: null, status: 'Hoje 19h BRT', grupo: 'Grupo G' },
-  { time1: 'Colombia', flag1: '🇨🇴', time2: 'Senegal', flag2: '🇸🇳', horario: '19:00', estadio: 'Hard Rock Stadium', cidade: 'Miami Gardens, FL', placar: null, status: 'Hoje 19h BRT', grupo: 'Grupo H' },
+  { time1: 'Portugal', flag1: 'ðµð¹', time2: 'Rep. Tcheca', flag2: 'ð¨ð¿', horario: '15:00', estadio: "Levi's Stadium", cidade: 'Santa Clara, CA', placar: '2 x 1', status: 'Encerrado', grupo: 'Grupo E' },
+  { time1: 'Turquia', flag1: 'ð¹ð·', time2: 'Georgia', flag2: 'ð¬ðª', horario: '15:00', estadio: 'AT&T Stadium', cidade: 'Arlington, TX', placar: '3 x 1', status: 'Encerrado', grupo: 'Grupo F' },
+  { time1: 'Marrocos', flag1: 'ð²ð¦', time2: 'Zambia', flag2: 'ð¿ð²', horario: '19:00', estadio: 'SoFi Stadium', cidade: 'Inglewood, CA', placar: null, status: 'Hoje 19h BRT', grupo: 'Grupo G' },
+  { time1: 'Colombia', flag1: 'ð¨ð´', time2: 'Senegal', flag2: 'ð¸ð³', horario: '19:00', estadio: 'Hard Rock Stadium', cidade: 'Miami Gardens, FL', placar: null, status: 'Hoje 19h BRT', grupo: 'Grupo H' },
 ];
 
 const GRUPOS = [
-  { nome: 'Grupo A', times: [{ p: '🇺🇸 EUA', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 5, ga: 1 }, { p: '🇵🇦 Panama', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 3 }, { p: '🇧🇴 Bolivia', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 2, ga: 4 }, { p: '🇨🇦 Canada', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 }] },
-  { nome: 'Grupo B', times: [{ p: '🇦🇷 Argentina', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 6, ga: 0 }, { p: '🇨🇱 Chile', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 2, ga: 3 }, { p: '🇵🇪 Peru', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 2 }, { p: '🇦🇺 Australia', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 5 }] },
-  { nome: 'Grupo C', times: [{ p: '🇲🇽 Mexico', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 3, ga: 1 }, { p: '🇪🇨 Equador', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 2, ga: 1 }, { p: '🇻🇪 Venezuela', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 2 }, { p: '🇯🇲 Jamaica', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 0, ga: 2 }] },
-  { nome: 'Grupo D — BRASIL', brasil: true, times: [{ p: '🇧🇷 Brasil', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 7, ga: 1, d2: true }, { p: '🇨🇷 Costa Rica', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 4 }, { p: '🇵🇾 Paraguai', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 }, { p: '🇺🇾 Uruguai', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 2, ga: 5 }] },
-  { nome: 'Grupo E', times: [{ p: '🇵🇹 Portugal', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, ga: 2 }, { p: '🇪🇸 Espanha', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 3, ga: 1 }, { p: '🇹🇷 Turquia', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 3 }, { p: '🇨🇿 Rep. Tcheca', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 0, ga: 4 }] },
-  { nome: 'Grupo F', times: [{ p: '🇫🇷 Franca', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 5, ga: 1 }, { p: '🇲🇦 Marrocos', pts: 3, pj: 1, v: 1, e: 0, d: 0, gf: 2, ga: 0 }, { p: '🇬🇪 Georgia', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 1, ga: 5 }, { p: '🇵🇱 Polonia', pts: 0, pj: 1, v: 0, e: 0, d: 1, gf: 1, ga: 2 }] },
-  { nome: 'Grupo G', times: [{ p: 'Inglaterra', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 4, ga: 0 }, { p: '🇳🇱 Paises Baixos', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 2 }, { p: '🇷🇸 Serbia', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 }, { p: '🇿🇲 Zambia', pts: 0, pj: 1, v: 0, e: 0, d: 1, gf: 0, ga: 1 }] },
-  { nome: 'Grupo H', times: [{ p: '🇩🇪 Alemanha', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, ga: 2 }, { p: '🇯🇵 Japao', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 3, ga: 2 }, { p: '🇨🇴 Colombia', pts: 1, pj: 1, v: 0, e: 1, d: 0, gf: 0, ga: 0 }, { p: '🇸🇳 Senegal', pts: 0, pj: 1, v: 0, e: 0, d: 1, gf: 0, ga: 1 }] },
+  { nome: 'Grupo A', times: [{ p: 'ðºð¸ EUA', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 5, ga: 1 }, { p: 'ðµð¦ Panama', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 3 }, { p: 'ð§ð´ Bolivia', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 2, ga: 4 }, { p: 'ð¨ð¦ Canada', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 }] },
+  { nome: 'Grupo B', times: [{ p: 'ð¦ð· Argentina', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 6, ga: 0 }, { p: 'ð¨ð± Chile', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 2, ga: 3 }, { p: 'ðµðª Peru', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 2 }, { p: 'ð¦ðº Australia', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 5 }] },
+  { nome: 'Grupo C', times: [{ p: 'ð²ð½ Mexico', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 3, ga: 1 }, { p: 'ðªð¨ Equador', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 2, ga: 1 }, { p: 'ð»ðª Venezuela', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 2 }, { p: 'ð¯ð² Jamaica', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 0, ga: 2 }] },
+  { nome: 'Grupo D â BRASIL', brasil: true, times: [{ p: 'ð§ð· Brasil', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 7, ga: 1, d2: true }, { p: 'ð¨ð· Costa Rica', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 4 }, { p: 'ðµð¾ Paraguai', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 }, { p: 'ðºð¾ Uruguai', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 2, ga: 5 }] },
+  { nome: 'Grupo E', times: [{ p: 'ðµð¹ Portugal', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, ga: 2 }, { p: 'ðªð¸ Espanha', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 3, ga: 1 }, { p: 'ð¹ð· Turquia', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 3 }, { p: 'ð¨ð¿ Rep. Tcheca', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 0, ga: 4 }] },
+  { nome: 'Grupo F', times: [{ p: 'ð«ð· Franca', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 5, ga: 1 }, { p: 'ð²ð¦ Marrocos', pts: 3, pj: 1, v: 1, e: 0, d: 0, gf: 2, ga: 0 }, { p: 'ð¬ðª Georgia', pts: 0, pj: 2, v: 0, e: 0, d: 2, gf: 1, ga: 5 }, { p: 'ðµð± Polonia', pts: 0, pj: 1, v: 0, e: 0, d: 1, gf: 1, ga: 2 }] },
+  { nome: 'Grupo G', times: [{ p: 'Inglaterra', pts: 6, pj: 2, v: 2, e: 0, d: 0, gf: 4, ga: 0 }, { p: 'ð³ð± Paises Baixos', pts: 3, pj: 2, v: 1, e: 0, d: 1, gf: 3, ga: 2 }, { p: 'ð·ð¸ Serbia', pts: 1, pj: 2, v: 0, e: 1, d: 1, gf: 1, ga: 3 }, { p: 'ð¿ð² Zambia', pts: 0, pj: 1, v: 0, e: 0, d: 1, gf: 0, ga: 1 }] },
+  { nome: 'Grupo H', times: [{ p: 'ð©ðª Alemanha', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 4, ga: 2 }, { p: 'ð¯ðµ Japao', pts: 4, pj: 2, v: 1, e: 1, d: 0, gf: 3, ga: 2 }, { p: 'ð¨ð´ Colombia', pts: 1, pj: 1, v: 0, e: 1, d: 0, gf: 0, ga: 0 }, { p: 'ð¸ð³ Senegal', pts: 0, pj: 1, v: 0, e: 0, d: 1, gf: 0, ga: 1 }] },
 ];
 
 const JOGADORES = [
@@ -69,13 +69,13 @@ export default function Copa2026Page() {
       <Header />
 
       <div style={{ background: 'linear-gradient(135deg, #009c3b, #006828, #002d12)', padding: '48px 24px 32px', textAlign: 'center' }}>
-        <div style={{ fontSize: '52px', marginBottom: '8px' }}>🏆</div>
+        <div style={{ fontSize: '52px', marginBottom: '8px' }}>ð</div>
         <h1 style={{ fontSize: 'clamp(26px,5vw,46px)', fontWeight: 900, margin: '0 0 8px', color: '#ffdf00' }}>Copa do Mundo 2026</h1>
-        <p style={{ color: '#a8e6c1', fontSize: '17px', margin: 0 }}>EUA · Canada · Mexico — Rumo ao Hexa! 🇧🇷</p>
+        <p style={{ color: '#a8e6c1', fontSize: '17px', margin: 0 }}>EUA Â· Canada Â· Mexico â Rumo ao Hexa! ð§ð·</p>
       </div>
 
       <div style={{ display: 'flex', gap: '4px', padding: '16px 24px 0', background: '#111', overflowX: 'auto', borderBottom: '2px solid #222' }}>
-        {[['jogos','📅 Jogos de Hoje'], ['grupos','📊 Grupos'], ['analise','🇧🇷 Analise'], ['jogadores','👥 Jogadores']].map(([k,l]) => (
+        {[['jogos','ð Jogos de Hoje'], ['grupos','ð Grupos'], ['analise','ð§ð· Analise'], ['jogadores','ð¥ Jogadores']].map(([k,l]) => (
           <button key={k} onClick={() => setTab(k)} style={s.tab(tab===k)}>{l}</button>
         ))}
       </div>
@@ -84,7 +84,7 @@ export default function Copa2026Page() {
 
         {tab === 'jogos' && (
           <div>
-            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '8px' }}>📅 Jogos de Hoje — 23 de Junho de 2026</h2>
+            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '8px' }}>ð Jogos de Hoje â 23 de Junho de 2026</h2>
             <p style={{ color: '#888', marginBottom: '24px' }}>Horarios em BRT (Brasilia, UTC-3)</p>
             <div style={{ display: 'grid', gap: '16px' }}>
               {HOJE_JOGOS.map((j, i) => (
@@ -100,8 +100,8 @@ export default function Copa2026Page() {
                     </div>
                     <div style={{ fontSize: '12px', color: '#009c3b', fontWeight: 600, marginBottom: '8px' }}>{j.grupo}</div>
                     <div style={{ background: '#0d2a0d', borderRadius: '8px', padding: '10px 14px' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 700 }}>🏟 {j.estadio}</div>
-                      <div style={{ fontSize: '13px', color: '#888', marginTop: '3px' }}>📍 {j.cidade}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700 }}>ð {j.estadio}</div>
+                      <div style={{ fontSize: '13px', color: '#888', marginTop: '3px' }}>ð {j.cidade}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
@@ -116,7 +116,7 @@ export default function Copa2026Page() {
 
         {tab === 'grupos' && (
           <div>
-            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '24px' }}>📊 Grupos — Copa 2026</h2>
+            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '24px' }}>ð Grupos â Copa 2026</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(460px, 1fr))', gap: '20px' }}>
               {GRUPOS.map((g, gi) => (
                 <div key={gi} style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '12px', overflow: 'hidden' }}>
@@ -150,12 +150,12 @@ export default function Copa2026Page() {
 
         {tab === 'analise' && (
           <div style={{ maxWidth: '800px' }}>
-            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '24px' }}>🇧🇷 Caminho do Brasil Rumo ao Hexa</h2>
+            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '24px' }}>ð§ð· Caminho do Brasil Rumo ao Hexa</h2>
             <div style={{ display: 'grid', gap: '20px' }}>
               {[
-                { fase: 'Fase de Grupos — Grupo D', cor: '#009c3b', txt: 'O Brasil lidera o Grupo D com aproveitamento de 100%: 2 vitorias em 2 jogos, 7 gols marcados e apenas 1 sofrido. Vinicius Jr., Rodrygo e Endrick formam um trio ofensivo letal que tem aterrorizado as defesas adversarias. A classificacao antecipada as oitavas e praticamente certa, e o Brasil deve terminar o grupo na lideranca.' },
-                { fase: 'Oitavas de Final (28 jun)', cor: '#3b82f6', txt: 'Classificando como lider do Grupo D, o Brasil enfrentara o segundo colocado do Grupo C — atualmente um duelo acirrado entre Mexico e Equador. Ambas as selecoes tem qualidade, mas o Brasil chega como favorito claro gracas ao seu poder ofensivo e experiencia.' },
-                { fase: 'Quartas de Final (5 jul)', cor: '#f59e0b', txt: 'A chave do Brasil aponta para um possivel confronto com os Estados Unidos (Grupo A) ou Argentina (Grupo B). Brasil x Argentina nas quartas seria o jogo mais esperado da Copa — Vinicius Jr. vs Messi seria o confronto dos astros.' },
+                { fase: 'Fase de Grupos â Grupo D', cor: '#009c3b', txt: 'O Brasil lidera o Grupo D com aproveitamento de 100%: 2 vitorias em 2 jogos, 7 gols marcados e apenas 1 sofrido. Vinicius Jr., Rodrygo e Endrick formam um trio ofensivo letal que tem aterrorizado as defesas adversarias. A classificacao antecipada as oitavas e praticamente certa, e o Brasil deve terminar o grupo na lideranca.' },
+                { fase: 'Oitavas de Final (28 jun)', cor: '#3b82f6', txt: 'Classificando como lider do Grupo D, o Brasil enfrentara o segundo colocado do Grupo C â atualmente um duelo acirrado entre Mexico e Equador. Ambas as selecoes tem qualidade, mas o Brasil chega como favorito claro gracas ao seu poder ofensivo e experiencia.' },
+                { fase: 'Quartas de Final (5 jul)', cor: '#f59e0b', txt: 'A chave do Brasil aponta para um possivel confronto com os Estados Unidos (Grupo A) ou Argentina (Grupo B). Brasil x Argentina nas quartas seria o jogo mais esperado da Copa â Vinicius Jr. vs Messi seria o confronto dos astros.' },
                 { fase: 'Semifinal e Final (11-19 jul)', cor: '#ef4444', txt: 'Na semifinal, o Brasil pode cruzar com potencias europeias como Franca, Espanha ou Inglaterra. A grande final esta marcada para 19 de julho no MetLife Stadium (82.500 torcedores). Com Vinicius Jr. em forma olimpica, Bruno Guimaraes controlando o meio e Marquinhos liderando a defesa, o Brasil esta montado para o Hexa.' },
               ].map((item, i) => (
                 <div key={i} style={{ background: '#1a1a1a', borderLeft: '4px solid ' + item.cor, borderRadius: '12px', padding: '20px' }}>
@@ -169,7 +169,7 @@ export default function Copa2026Page() {
 
         {tab === 'jogadores' && (
           <div>
-            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '8px' }}>👥 Selecao Brasileira — Copa 2026</h2>
+            <h2 style={{ color: '#ffdf00', fontSize: '24px', marginBottom: '8px' }}>ð¥ Selecao Brasileira â Copa 2026</h2>
             <p style={{ color: '#888', marginBottom: '24px' }}>Clique em um jogador para ver sua carreira completa</p>
             {POSICOES.map(({ label, filtro }) => {
               const lista = JOGADORES.filter(j => filtro.includes(j.pos));
@@ -203,7 +203,7 @@ export default function Copa2026Page() {
               <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 900, color: '#ffdf00', border: '3px solid #ffdf00', flexShrink: 0 }}>{jogador.num}</div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 900, fontSize: '20px', marginBottom: '3px' }}>{jogador.nome}</div>
-                <div style={{ color: '#a8e6c1', fontSize: '14px' }}>{jogador.pos} · {jogador.clube}</div>
+                <div style={{ color: '#a8e6c1', fontSize: '14px' }}>{jogador.pos} Â· {jogador.clube}</div>
                 <div style={{ color: '#a8e6c1', fontSize: '13px' }}>Nasc: {jogador.nasc}</div>
               </div>
               <button onClick={() => setJogador(null)} style={{ background: 'rgba(0,0,0,0.4)', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '18px', flexShrink: 0 }}>x</button>
@@ -228,7 +228,7 @@ export default function Copa2026Page() {
               {jogador.titulos.length > 0 && (
                 <div>
                   <h4 style={{ color: '#009c3b', margin: '0 0 8px', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Titulos</h4>
-                  {jogador.titulos.map((t, ti) => <div key={ti} style={{ color: '#ccc', fontSize: '13px', marginBottom: '4px' }}>{'🏆 ' + t}</div>)}
+                  {jogador.titulos.map((t, ti) => <div key={ti} style={{ color: '#ccc', fontSize: '13px', marginBottom: '4px' }}>{'ð ' + t}</div>)}
                 </div>
               )}
             </div>
