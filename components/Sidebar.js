@@ -2,23 +2,20 @@
 import { useState, useEffect } from 'react'
 
 function weatherIcon(code) {
-if (!code && code !== 0) return 'ð¤ï¸'
-if ([0].includes(code)) return 'âï¸'
-if ([1,2].includes(code)) return 'â'
-if ([3].includes(code)) return 'âï¸'
-if ([45,48].includes(code)) return 'ð«ï¸'
-if ([51,53,55,61,63,65].includes(code)) return 'ð§ï¸'
-if ([71,73,75,77].includes(code)) return 'âï¸'
-if ([80,81,82].includes(code)) return 'ð¦ï¸'
-if ([95,96,99].includes(code)) return 'âï¸'
-return 'ð¤ï¸'
+  if (code === 0) return '☀️'
+  if ([1,2,3].includes(code)) return '⛅'
+  if ([45,48].includes(code)) return '🌫️'
+  if (code < 70) return '🌧️'
+  if (code < 80) return '⛈️'
+  if (code < 90) return '🌨️'
+  return '⛈️'
 }
 
 function weatherDesc(code) {
-if (code === 0) return 'CÃ©u limpo'
+if (code === 0) return 'Céu limpo'
 if ([1,2].includes(code)) return 'Parcialmente nublado'
 if (code === 3) return 'Nublado'
-if ([45,48].includes(code)) return 'NÃ©voa'
+if ([45,48].includes(code)) return 'Névoa'
 if ([51,53,55,61,63,65].includes(code)) return 'Chuva'
 if ([71,73,75].includes(code)) return 'Neve'
 if ([80,81,82].includes(code)) return 'Pancadas de chuva'
@@ -26,7 +23,7 @@ if ([95,96,99].includes(code)) return 'Trovoada'
 return 'Parcialmente nublado'
 }
 
-// ESPN code â ESPN CDN slug overrides (when abbreviation differs from CDN slug)
+// ESPN code → ESPN CDN slug overrides (when abbreviation differs from CDN slug)
 const ESPN_SLUG = {
   ENG: 'england', SCO: 'scotland', WAL: 'wales', NIR: 'northern-ireland',
   COD: 'dr-congo', CIV: 'ivory-coast', BIH: 'bosnia-herzegovina',
@@ -77,24 +74,24 @@ function WeatherWidget() {
   return (
     <div className="sidebar-widget">
       <div className="widget-header weather-header">
-        <span>ð¤ï¸</span> Clima em Miami
+        <span>🌤️</span> Clima em Miami
       </div>
       <div className="widget-body">
         <div className="weather-main">
           <div className="weather-icon">{weatherIcon(code)}</div>
           <div>
             <span className="weather-temp">{temp}</span>
-            <span className="weather-temp-unit">Â°F</span>
+            <span className="weather-temp-unit">°F</span>
           </div>
           <div className="weather-desc">{weatherDesc(code)}</div>
         </div>
         <div className="weather-details">
           <div className="weather-detail">
-            <span className="weather-detail-label">ð§ Humidade</span>
+            <span className="weather-detail-label">💧 Humidade</span>
             <span className="weather-detail-val">{humidity}%</span>
           </div>
           <div className="weather-detail">
-            <span className="weather-detail-label">ð¨ Vento</span>
+            <span className="weather-detail-label">💨 Vento</span>
             <span className="weather-detail-val">{wind} mph</span>
           </div>
         </div>
@@ -120,15 +117,15 @@ function CotacoesWidget() {
   }, [])
 
   const items = [
-    { flag: 'ðºð¸', code: 'USD', name: 'DÃ³lar', val: rates.usd, chg: rates.usdChange },
-    { flag: 'ðªðº', code: 'EUR', name: 'Euro', val: rates.eur, chg: rates.eurChange },
-    { flag: 'ðª', code: 'BTC', name: 'Bitcoin', val: rates.btc, chg: rates.btcChange, compact: true },
+    { flag: '🇺🇸', code: 'USD', name: 'Dólar', val: rates.usd, chg: rates.usdChange },
+    { flag: '🇪🇺', code: 'EUR', name: 'Euro', val: rates.eur, chg: rates.eurChange },
+    { flag: '🪙', code: 'BTC', name: 'Bitcoin', val: rates.btc, chg: rates.btcChange, compact: true },
   ]
 
   const fmt = (v, compact) => {
-    if (!v) return 'â'
+    if (!v) return '–'
     const n = parseFloat(v)
-    if (isNaN(n)) return 'â'
+    if (isNaN(n)) return '–'
     if (compact) {
       if (n >= 1000000) return 'R$ ' + (n/1000000).toFixed(2) + 'M'
       if (n >= 1000) return 'R$ ' + (n/1000).toFixed(1) + 'K'
@@ -144,7 +141,7 @@ function CotacoesWidget() {
   return (
     <div className="sidebar-widget">
       <div className="widget-header cot-header" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span>ð¹</span> CotaÃ§Ãµes
+        <span>💹</span> Cotações
         {lastUpdate && (
           <span style={{ marginLeft: 'auto', fontSize: 9, color: 'var(--text-muted)', fontWeight: 400 }}>
             {fmtTime(lastUpdate)}
@@ -165,7 +162,7 @@ function CotacoesWidget() {
               <div className="cot-val">{fmt(item.val, item.compact)}</div>
               {item.chg && (
                 <div className={'cot-chg ' + (parseFloat(item.chg) >= 0 ? 'rate-up' : 'rate-dn')}>
-                  {parseFloat(item.chg) >= 0 ? 'â²' : 'â¼'} {Math.abs(parseFloat(item.chg)).toFixed(2)}%
+                  {parseFloat(item.chg) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(item.chg)).toFixed(2)}%
                 </div>
               )}
             </div>
@@ -182,7 +179,7 @@ function TrendingWidget({ articles = [] }) {
   return (
     <div className="sidebar-widget">
       <div className="widget-header trending-header">
-        <span>ð¥</span> Mais Lidas
+        <span>🔥</span> Mais Lidas
       </div>
       <div className="widget-body">
         {top.map((art, i) => (
