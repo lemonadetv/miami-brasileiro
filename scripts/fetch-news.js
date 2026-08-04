@@ -9,9 +9,9 @@ const client = new Anthropic()
 
 const QUERIES = [
   { query: 'miami brazil', category: 'Comunidade' },
-  { query: 'florida immigration visa', category: 'ImigraÃ§Ã£o' },
-  { query: 'miami business florida', category: 'NegÃ³cios' },
-  { query: 'florida health insurance', category: 'SaÃºde' },
+  { query: 'florida immigration visa', category: 'ImigraÃÂ§ÃÂ£o' },
+  { query: 'miami business florida', category: 'NegÃÂ³cios' },
+  { query: 'florida health insurance', category: 'SaÃÂºde' },
   { query: 'inter miami soccer mls', category: 'Esportes' },
   { query: 'miami restaurants events', category: 'Cultura e Lazer' },
 ]
@@ -39,9 +39,9 @@ const TOPIC_IMAGES = [
 
 const CATEGORY_FALLBACK = {
   'Comunidade':      'photo-1529156069898-49953e39b3ac',
-  'ImigraÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ£o':       'photo-1436491865332-7a61a109cc05',
-  'NegÃÂÃÂÃÂÃÂ³cios':        'photo-1507003211169-0a1dd7228f2d',
-  'SaÃÂÃÂÃÂÃÂºde':           'photo-1576091160399-112ba8d25d1d',
+  'ImigraÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ£o':       'photo-1436491865332-7a61a109cc05',
+  'NegÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ³cios':        'photo-1507003211169-0a1dd7228f2d',
+  'SaÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂºde':           'photo-1576091160399-112ba8d25d1d',
   'Esportes':        'photo-1574629810360-7efbbe195018',
   'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
   'default':         'photo-1533929736458-ca588d08c8be',
@@ -71,7 +71,7 @@ function validateImage(url) {
           if (cl !== undefined && parseInt(cl, 10) === 0) return resolve(false)
           return resolve(true)
         }
-        // HEAD failed (non-2xx or not image content-type) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ retry with GET
+        // HEAD failed (non-2xx or not image content-type) ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ retry with GET
         tryGet()
       })
       headReq.on('error', () => tryGet())
@@ -158,7 +158,7 @@ function extractOgImage(articleUrl) {
 function generateSlug(title) {
   return title
     .toLowerCase()
-    .normalize('NFD').replace(/[ÃÂÃÂÃÂÃÂ-ÃÂÃÂÃÂÃÂ¯]/g, '')
+    .normalize('NFD').replace(/[ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ-ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¯]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -188,45 +188,45 @@ function fetchNews(query) {
 }
 
 async function rewrite(article, category, heroImage) {
-  const prompt = `VocÃÂÃÂª ÃÂÃÂ© um jornalista sÃÂÃÂªnior do portal Miami Brasileira, o maior portal de notÃÂÃÂ­cias em portuguÃÂÃÂªs para brasileiros em Miami e na FlÃÂÃÂ³rida. Seu estilo ÃÂÃÂ© claro, envolvente e profissional ÃÂ¢ÃÂÃÂ como os melhores portais brasileiros de jornalismo digital.
+  const prompt = `VocÃÂÃÂÃÂÃÂª ÃÂÃÂÃÂÃÂ© um jornalista sÃÂÃÂÃÂÃÂªnior do portal Miami Brasileira, o maior portal de notÃÂÃÂÃÂÃÂ­cias em portuguÃÂÃÂÃÂÃÂªs para brasileiros em Miami e na FlÃÂÃÂÃÂÃÂ³rida. Seu estilo ÃÂÃÂÃÂÃÂ© claro, envolvente e profissional ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ como os melhores portais brasileiros de jornalismo digital.
 
-Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em portuguÃÂÃÂªs brasileiro.
+Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em portuguÃÂÃÂÃÂÃÂªs brasileiro.
 
-TÃÂÃÂTULO ORIGINAL: ${article.title}
+TÃÂÃÂÃÂÃÂTULO ORIGINAL: ${article.title}
 RESUMO: ${article.description || article.title}
 CATEGORIA: ${category}
 
-INSTRUÃÂÃÂÃÂÃÂES DE ESTILO:
-- MÃÂÃÂ­nimo 850 palavras, bem desenvolvidas
-- Use **negrito** para destacar informaÃÂÃÂ§ÃÂÃÂµes-chave, nÃÂÃÂºmeros importantes e termos relevantes
-- ParÃÂÃÂ¡grafo de abertura forte: contextualize o tema com dados ou fato impactante
-- Analise o impacto especÃÂÃÂ­fico para brasileiros em Miami/FlÃÂÃÂ³rida
-- Inclua contexto local (legislaÃÂÃÂ§ÃÂÃÂ£o americana, vida prÃÂÃÂ¡tica em Miami, comunidade brasileira)
-- Tom jornalÃÂÃÂ­stico: informativo, objetivo, mas humano e prÃÂÃÂ³ximo do leitor
-- Termine com perspectiva prÃÂÃÂ¡tica: o que o leitor pode fazer ou esperar
+INSTRUÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂES DE ESTILO:
+- MÃÂÃÂÃÂÃÂ­nimo 850 palavras, bem desenvolvidas
+- Use **negrito** para destacar informaÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂµes-chave, nÃÂÃÂÃÂÃÂºmeros importantes e termos relevantes
+- ParÃÂÃÂÃÂÃÂ¡grafo de abertura forte: contextualize o tema com dados ou fato impactante
+- Analise o impacto especÃÂÃÂÃÂÃÂ­fico para brasileiros em Miami/FlÃÂÃÂÃÂÃÂ³rida
+- Inclua contexto local (legislaÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ£o americana, vida prÃÂÃÂÃÂÃÂ¡tica em Miami, comunidade brasileira)
+- Tom jornalÃÂÃÂÃÂÃÂ­stico: informativo, objetivo, mas humano e prÃÂÃÂÃÂÃÂ³ximo do leitor
+- Termine com perspectiva prÃÂÃÂÃÂÃÂ¡tica: o que o leitor pode fazer ou esperar
 
-ESTRUTURA OBRIGATÃÂÃÂRIA:
-# [TÃÂÃÂ­tulo em portuguÃÂÃÂªs ÃÂ¢ÃÂÃÂ atraente, informativo, especÃÂÃÂ­fico]
+ESTRUTURA OBRIGATÃÂÃÂÃÂÃÂRIA:
+# [TÃÂÃÂÃÂÃÂ­tulo em portuguÃÂÃÂÃÂÃÂªs ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ atraente, informativo, especÃÂÃÂÃÂÃÂ­fico]
 
-[ParÃÂÃÂ¡grafo de abertura forte ÃÂ¢ÃÂÃÂ dado, fato ou contexto impactante ÃÂ¢ÃÂÃÂ 3-4 frases]
+[ParÃÂÃÂÃÂÃÂ¡grafo de abertura forte ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ dado, fato ou contexto impactante ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ 3-4 frases]
 
-## ÃÂ°ÃÂÃÂÃÂ [SubtÃÂÃÂ­tulo 1 ÃÂ¢ÃÂÃÂ O que aconteceu e por quÃÂÃÂª importa]
-[2-3 parÃÂÃÂ¡grafos ricos com anÃÂÃÂ¡lise aprofundada, contexto histÃÂÃÂ³rico e dados quando possÃÂÃÂ­vel]
+## ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ [SubtÃÂÃÂÃÂÃÂ­tulo 1 ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ O que aconteceu e por quÃÂÃÂÃÂÃÂª importa]
+[2-3 parÃÂÃÂÃÂÃÂ¡grafos ricos com anÃÂÃÂÃÂÃÂ¡lise aprofundada, contexto histÃÂÃÂÃÂÃÂ³rico e dados quando possÃÂÃÂÃÂÃÂ­vel]
 
-## ÃÂ°ÃÂÃÂÃÂ§ÃÂ°ÃÂÃÂÃÂ· [SubtÃÂÃÂ­tulo 2 ÃÂ¢ÃÂÃÂ O que muda para brasileiros em Miami]
-[2-3 parÃÂÃÂ¡grafos com perspectiva direta para a comunidade brasileira na FlÃÂÃÂ³rida]
+## ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ§ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ· [SubtÃÂÃÂÃÂÃÂ­tulo 2 ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ O que muda para brasileiros em Miami]
+[2-3 parÃÂÃÂÃÂÃÂ¡grafos com perspectiva direta para a comunidade brasileira na FlÃÂÃÂÃÂÃÂ³rida]
 
-## ÃÂ°ÃÂÃÂÃÂ [SubtÃÂÃÂ­tulo 3 ÃÂ¢ÃÂÃÂ O que vocÃÂÃÂª precisa saber e fazer]
-[2-3 parÃÂÃÂ¡grafos com informaÃÂÃÂ§ÃÂÃÂµes prÃÂÃÂ¡ticas e acionÃÂÃÂ¡veis para o leitor]
+## ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ [SubtÃÂÃÂÃÂÃÂ­tulo 3 ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ O que vocÃÂÃÂÃÂÃÂª precisa saber e fazer]
+[2-3 parÃÂÃÂÃÂÃÂ¡grafos com informaÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂµes prÃÂÃÂÃÂÃÂ¡ticas e acionÃÂÃÂÃÂÃÂ¡veis para o leitor]
 
-## ÃÂ°ÃÂÃÂÃÂ® [SubtÃÂÃÂ­tulo 4 ÃÂ¢ÃÂÃÂ PrÃÂÃÂ³ximos passos e perspectivas]
-[2-3 parÃÂÃÂ¡grafos com anÃÂÃÂ¡lise do que vem por aÃÂÃÂ­ e como se preparar]
+## ÃÂÃÂ°ÃÂÃÂÃÂÃÂÃÂÃÂ® [SubtÃÂÃÂÃÂÃÂ­tulo 4 ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ PrÃÂÃÂÃÂÃÂ³ximos passos e perspectivas]
+[2-3 parÃÂÃÂÃÂÃÂ¡grafos com anÃÂÃÂÃÂÃÂ¡lise do que vem por aÃÂÃÂÃÂÃÂ­ e como se preparar]
 
 ---
 
-*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na FlÃÂÃÂ³rida. Fique por dentro.*
+*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na FlÃÂÃÂÃÂÃÂ³rida. Fique por dentro.*
 
-Escreva SOMENTE o artigo completo, sem comentÃÂÃÂ¡rios ou explicaÃÂÃÂ§ÃÂÃÂµes extras.`
+Escreva SOMENTE o artigo completo, sem comentÃÂÃÂÃÂÃÂ¡rios ou explicaÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂµes extras.`
 
   const msg = await client.messages.create({
     model: 'claude-sonnet-4-6',
@@ -269,7 +269,7 @@ async function main() {
       let processed = 0
 
       for (const art of articles) {
-        if (processed >= 3) break
+        if (processed >= 2) break
         if (!art.title || !art.description) continue
         const tmpSlug = generateSlug(art.title)
         console.log("  Found article:", art.title?.substring(0,50), "| slug exists:", existingSlugs.has(tmpSlug))
@@ -277,14 +277,9 @@ async function main() {
 
         let imageUrl = getTopicImage(art.title, category) // Unsplash fallback (last resort)
 
-        // Try og:image from article page
-        if (art.url) {
-          const ogImage = await extractOgImage(art.url)
-          if (ogImage) imageUrl = ogImage
-        }
 
         // Override with NewsAPI image if available (highest priority)
-        if (art.urlToImage && await validateImage(art.urlToImage)) {
+        if (art.urlToImage) {
           imageUrl = art.urlToImage
         }
 
