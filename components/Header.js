@@ -12,13 +12,13 @@ const CATEGORIES = [
 ]
 
 function weatherIcon(code) {
-  if (code === 0) return 'âï¸'
-  if ([1,2,3].includes(code)) return 'â'
-  if ([45,48].includes(code)) return 'ð«ï¸'
-  if (code < 70) return 'ð§ï¸'
-  if (code < 80) return 'âï¸'
-  if (code < 90) return 'ð¦ï¸'
-  return 'âï¸'
+  if (code === 0) return '☀️'
+  if ([1,2,3].includes(code)) return '⛅'
+  if ([45,48].includes(code)) return '🌫️'
+  if (code < 70) return '🌧️'
+  if (code < 80) return '⛈️'
+  if (code < 90) return '🌨️'
+  return '⛈️'
 }
 
 function Logo() {
@@ -90,7 +90,7 @@ export default function Header({ articles = [] }) {
 
         <div className="msn-search">
           <span className="msn-search-icon">ð</span>
-          <input type="search" placeholder="Buscar notÃ­ciasâ¦" aria-label="Buscar" />
+          <input type="search" placeholder="Buscar notícias…" aria-label="Buscar" />
         </div>
 
         <div className="msn-header-right">
