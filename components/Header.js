@@ -2,24 +2,23 @@
 import { useState, useEffect } from 'react'
 
 const CATEGORIES = [
-  { label: '🏠 Início', href: '/' },
-  { label: '🏙️ Comunidade', href: '/categoria/comunidade' },
-  { label: '✈️ Imigração', href: '/categoria/imigracao' },
-  { label: '💼 Negócios', href: '/categoria/negocios' },
-  { label: '🏥 Saúde', href: '/categoria/saude' },
-  { label: '⚽ Esportes', href: '/esportes' },
-  { label: '🎭 Cultura', href: '/categoria/cultura-e-lazer' },
-  { label: '🏆 Copa 2026', href: '/copa-2026', isCopa: true },
+  { label: 'ð  InÃ­cio', href: '/' },
+  { label: 'ðï¸ Comunidade', href: '/categoria/comunidade' },
+  { label: 'âï¸ ImigraÃ§Ã£o', href: '/categoria/imigracao' },
+  { label: 'ð¼ NegÃ³cios', href: '/categoria/negocios' },
+  { label: 'ð¥ SaÃºde', href: '/categoria/saude' },
+  { label: 'â½ Esportes', href: '/esportes' },
+  { label: 'ð­ Cultura', href: '/categoria/cultura-e-lazer' },
 ]
 
 function weatherIcon(code) {
-  if (code === 0) return '☀️'
-  if ([1,2,3].includes(code)) return '⛅'
-  if ([45,48].includes(code)) return '🌫️'
-  if (code < 70) return '🌧️'
-  if (code < 80) return '❄️'
-  if (code < 90) return '🌦️'
-  return '⛈️'
+  if (code === 0) return 'âï¸'
+  if ([1,2,3].includes(code)) return 'â'
+  if ([45,48].includes(code)) return 'ð«ï¸'
+  if (code < 70) return 'ð§ï¸'
+  if (code < 80) return 'âï¸'
+  if (code < 90) return 'ð¦ï¸'
+  return 'âï¸'
 }
 
 function Logo() {
@@ -78,7 +77,7 @@ export default function Header({ articles = [] }) {
   }
 
   const fmtRate = (val) => {
-    if (!val) return '–'
+    if (!val) return 'â'
     return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
@@ -90,46 +89,46 @@ export default function Header({ articles = [] }) {
         </a>
 
         <div className="msn-search">
-          <span className="msn-search-icon">🔍</span>
-          <input type="search" placeholder="Buscar notícias…" aria-label="Buscar" />
+          <span className="msn-search-icon">ð</span>
+          <input type="search" placeholder="Buscar notÃ­ciasâ¦" aria-label="Buscar" />
         </div>
 
         <div className="msn-header-right">
           {weather && (
             <div className="msn-weather">
               <span>{weatherIcon(weather.weather_code)}</span>
-              <span className="temp">{Math.round((weather.temperature_2m - 32) * 5 / 9)}°C</span>
+              <span className="temp">{Math.round((weather.temperature_2m - 32) * 5 / 9)}Â°C</span>
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Miami</span>
             </div>
           )}
           <div className="msn-rates">
             {rates.usd && (
               <div className="rate-pill">
-                <span className="flag">🇺🇸</span>
+                <span className="flag">ðºð¸</span>
                 <span className="code">USD</span>
                 <span className="val">{fmtRate(rates.usd)}</span>
                 {rates.usdChange && (
                   <span className={'chg ' + (parseFloat(rates.usdChange) >= 0 ? 'rate-up' : 'rate-dn')}>
-                    {parseFloat(rates.usdChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
+                    {parseFloat(rates.usdChange) >= 0 ? 'â²' : 'â¼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
                   </span>
                 )}
               </div>
             )}
             {rates.eur && (
               <div className="rate-pill">
-                <span className="flag">🇪🇺</span>
+                <span className="flag">ðªðº</span>
                 <span className="code">EUR</span>
                 <span className="val">{fmtRate(rates.eur)}</span>
                 {rates.eurChange && (
                   <span className={'chg ' + (parseFloat(rates.eurChange) >= 0 ? 'rate-up' : 'rate-dn')}>
-                    {parseFloat(rates.eurChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
+                    {parseFloat(rates.eurChange) >= 0 ? 'â²' : 'â¼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
                   </span>
                 )}
               </div>
             )}
           </div>
           <button className="dark-toggle" onClick={toggleTheme} aria-label="Alternar tema" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? 'âï¸' : 'ð'}
           </button>
         </div>
       </div>
@@ -140,7 +139,7 @@ export default function Header({ articles = [] }) {
             <a
               key={cat.href}
               href={cat.href}
-              className={`msn-nav-link${cat.isCopa ? ' copa' : ''}${activePath === cat.href || (cat.href !== '/' && activePath.startsWith(cat.href)) ? ' active' : ''}`}
+              className={`msn-nav-link${activePath === cat.href || (cat.href !== '/' && activePath.startsWith(cat.href)) ? ' active' : ''}`}
             >
               {cat.label}
             </a>
@@ -149,7 +148,7 @@ export default function Header({ articles = [] }) {
       </nav>
 
       {articles.length > 0 && (
-        <div className="ticker" role="marquee" aria-label="Últimas notícias">
+        <div className="ticker" role="marquee" aria-label="Ãltimas notÃ­cias">
           <div className="ticker-label">Ao Vivo</div>
           <div className="ticker-wrapper">
             <div className="ticker-track">
