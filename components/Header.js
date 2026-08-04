@@ -77,7 +77,7 @@ export default function Header({ articles = [] }) {
   }
 
   const fmtRate = (val) => {
-    if (!val) return 'â'
+    if (!val) return '–'
     return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
@@ -89,7 +89,7 @@ export default function Header({ articles = [] }) {
         </a>
 
         <div className="msn-search">
-          <span className="msn-search-icon">ð</span>
+          <span className="msn-search-icon">🔍</span>
           <input type="search" placeholder="Buscar notícias…" aria-label="Buscar" />
         </div>
 
@@ -97,38 +97,38 @@ export default function Header({ articles = [] }) {
           {weather && (
             <div className="msn-weather">
               <span>{weatherIcon(weather.weather_code)}</span>
-              <span className="temp">{Math.round((weather.temperature_2m - 32) * 5 / 9)}Â°C</span>
+              <span className="temp">{Math.round((weather.temperature_2m - 32) * 5 / 9)}°C</span>
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Miami</span>
             </div>
           )}
           <div className="msn-rates">
             {rates.usd && (
               <div className="rate-pill">
-                <span className="flag">ðºð¸</span>
+                <span className="flag">🇺🇸</span>
                 <span className="code">USD</span>
                 <span className="val">{fmtRate(rates.usd)}</span>
                 {rates.usdChange && (
                   <span className={'chg ' + (parseFloat(rates.usdChange) >= 0 ? 'rate-up' : 'rate-dn')}>
-                    {parseFloat(rates.usdChange) >= 0 ? 'â²' : 'â¼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
+                    {parseFloat(rates.usdChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
                   </span>
                 )}
               </div>
             )}
             {rates.eur && (
               <div className="rate-pill">
-                <span className="flag">ðªðº</span>
+                <span className="flag">🇪🇺</span>
                 <span className="code">EUR</span>
                 <span className="val">{fmtRate(rates.eur)}</span>
                 {rates.eurChange && (
                   <span className={'chg ' + (parseFloat(rates.eurChange) >= 0 ? 'rate-up' : 'rate-dn')}>
-                    {parseFloat(rates.eurChange) >= 0 ? 'â²' : 'â¼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
+                    {parseFloat(rates.eurChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
                   </span>
                 )}
               </div>
             )}
           </div>
           <button className="dark-toggle" onClick={toggleTheme} aria-label="Alternar tema" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
-            {theme === 'dark' ? 'âï¸' : 'ð'}
+            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
         </div>
       </div>
@@ -148,7 +148,7 @@ export default function Header({ articles = [] }) {
       </nav>
 
       {articles.length > 0 && (
-        <div className="ticker" role="marquee" aria-label="Ãltimas notÃ­cias">
+        <div className="ticker" role="marquee" aria-label="Últimas notícias">
           <div className="ticker-label">Ao Vivo</div>
           <div className="ticker-wrapper">
             <div className="ticker-track">
