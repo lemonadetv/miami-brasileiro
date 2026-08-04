@@ -2,13 +2,13 @@
 import { useState, useEffect } from 'react'
 
 const CATEGORIES = [
-  { label: 'ð  InÃ­cio', href: '/' },
-  { label: 'ðï¸ Comunidade', href: '/categoria/comunidade' },
-  { label: 'âï¸ ImigraÃ§Ã£o', href: '/categoria/imigracao' },
-  { label: 'ð¼ NegÃ³cios', href: '/categoria/negocios' },
-  { label: 'ð¥ SaÃºde', href: '/categoria/saude' },
-  { label: 'â½ Esportes', href: '/esportes' },
-  { label: 'ð­ Cultura', href: '/categoria/cultura-e-lazer' },
+  { label: '🏠 Início', href: '/' },
+  { label: '🏙️ Comunidade', href: '/categoria/comunidade' },
+  { label: '✈️ Imigração', href: '/categoria/imigracao' },
+  { label: '💼 Negócios', href: '/categoria/negocios' },
+  { label: '🥗 Saúde', href: '/categoria/saude' },
+  { label: '⚽ Esportes', href: '/esportes' },
+  { label: '🎭 Cultura', href: '/categoria/cultura-e-lazer' },
 ]
 
 function weatherIcon(code) {
