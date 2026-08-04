@@ -9,9 +9,9 @@ const client = new Anthropic()
 
 const QUERIES = [
   { query: 'miami brazil', category: 'Comunidade' },
-  { query: 'florida immigration visa', category: 'ImigraÃÂ§ÃÂ£o' },
-  { query: 'miami business florida', category: 'NegÃÂ³cios' },
-  { query: 'florida health insurance', category: 'SaÃÂºde' },
+  { query: 'florida immigration visa', category: 'Imigração' },
+  { query: 'miami business florida', category: 'Negócios' },
+  { query: 'florida health insurance', category: 'Saúde' },
   { query: 'inter miami soccer mls', category: 'Esportes' },
   { query: 'miami restaurants events', category: 'Cultura e Lazer' },
 ]
@@ -245,12 +245,13 @@ Escreva SOMENTE o artigo completo, sem comentÃÂÃÂÃÂÃÂ¡rio
     title,
     category,
     date: new Date().toISOString().split('T')[0],
+    publishedAt: new Date().toISOString(),
     author: 'Redacao Miami Brasileira',
     imageUrl: heroImage,
     image: heroImage,
     excerpt: body.replace(/^#.+\n/, '').replace(/#{1,3}[^\n]+\n/g, '').trim().substring(0, 200) + '...',
     content: body,
-    source: article.url || '',
+    source: (() => { try { return new URL(article.url || '').hostname.replace(/^www\./, ''); } catch { return ''; } })(),
   }
 }
 
