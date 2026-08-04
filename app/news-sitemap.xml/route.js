@@ -8,7 +8,7 @@ export async function GET() {
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
 
   // Get articles from last 2 days (or last 10 if none are that recent)
-  let recent = articles.filter(a => new Date(a.publishedAt) >= twoDaysAgo)
+  let recent = articles.filter(a => new Date(a.publishedAt || a.date) >= twoDaysAgo)
   if (recent.length === 0) recent = articles.slice(0, 10)
 
   const urls = recent.map(a => `
@@ -19,7 +19,7 @@ export async function GET() {
         <news:name>Miami Brasileira</news:name>
         <news:language>pt</news:language>
       </news:publication>
-      <news:publication_date>${new Date(a.publishedAt).toISOString()}</news:publication_date>
+      <news:publication_date>${new Date(a.publishedAt || a.date || new Date()).toISOString()}</news:publication_date>
       <news:title><![CDATA[${a.title}]]></news:title>
     </news:news>
     ${a.imageUrl ? `<image:image><image:loc>${a.imageUrl}</image:loc></image:image>` : ''}
