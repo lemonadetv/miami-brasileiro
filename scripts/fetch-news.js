@@ -8,12 +8,12 @@ const path = require('path')
 const client = new Anthropic()
 
 const QUERIES = [
-  { query: 'brazil miami florida community 2026', category: 'Comunidade' },
-  { query: 'immigration visa green card uscis brazil usa 2026', category: 'ImigraÃ§Ã£o' },
-  { query: 'brazil business entrepreneur florida miami 2026', category: 'NegÃ³cios' },
-  { query: 'health insurance medicaid florida immigrants 2026', category: 'SaÃºde' },
-  { query: 'soccer copa mundo inter miami mls 2026', category: 'Esportes' },
-  { query: 'miami culture restaurants events nightlife 2026', category: 'Cultura e Lazer' },
+  { query: 'brazil miami florida community', category: 'Comunidade' },
+  { query: 'immigration visa green card uscis brazil usa', category: 'ImigraÃÂ§ÃÂ£o' },
+  { query: 'brazil business entrepreneur florida miami', category: 'NegÃÂ³cios' },
+  { query: 'health insurance medicaid florida immigrants', category: 'SaÃÂºde' },
+  { query: 'soccer copa mundo inter miami mls', category: 'Esportes' },
+  { query: 'miami culture restaurants events nightlife', category: 'Cultura e Lazer' },
 ]
 
 const TOPIC_IMAGES = [
@@ -39,9 +39,9 @@ const TOPIC_IMAGES = [
 
 const CATEGORY_FALLBACK = {
   'Comunidade':      'photo-1529156069898-49953e39b3ac',
-  'ImigraÃ§Ã£o':       'photo-1436491865332-7a61a109cc05',
-  'NegÃ³cios':        'photo-1507003211169-0a1dd7228f2d',
-  'SaÃºde':           'photo-1576091160399-112ba8d25d1d',
+  'ImigraÃÂ§ÃÂ£o':       'photo-1436491865332-7a61a109cc05',
+  'NegÃÂ³cios':        'photo-1507003211169-0a1dd7228f2d',
+  'SaÃÂºde':           'photo-1576091160399-112ba8d25d1d',
   'Esportes':        'photo-1574629810360-7efbbe195018',
   'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
   'default':         'photo-1533929736458-ca588d08c8be',
@@ -71,7 +71,7 @@ function validateImage(url) {
           if (cl !== undefined && parseInt(cl, 10) === 0) return resolve(false)
           return resolve(true)
         }
-        // HEAD failed (non-2xx or not image content-type) â retry with GET
+        // HEAD failed (non-2xx or not image content-type) Ã¢ÂÂ retry with GET
         tryGet()
       })
       headReq.on('error', () => tryGet())
@@ -158,7 +158,7 @@ function extractOgImage(articleUrl) {
 function generateSlug(title) {
   return title
     .toLowerCase()
-    .normalize('NFD').replace(/[Ì-Í¯]/g, '')
+    .normalize('NFD').replace(/[ÃÂ-ÃÂ¯]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -171,7 +171,8 @@ function fetchNews(query) {
   return new Promise((resolve) => {
     if (!process.env.NEWS_API_KEY) { resolve([]); return }
     const q = encodeURIComponent(query)
-    const url = 'https://newsapi.org/v2/everything?q=' + q + '&language=en&sortBy=publishedAt&pageSize=3&apiKey=' + process.env.NEWS_API_KEY
+    const from = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0]
+    const url = `https://newsapi.org/v2/everything?q=${q}&apiKey=${process.env.NEWS_API_KEY}&language=en&sortBy=publishedAt&pageSize=10&from=${from}`
     https.get(url, (res) => {
       let body = ''
       res.on('data', d => body += d)
@@ -183,45 +184,45 @@ function fetchNews(query) {
 }
 
 async function rewrite(article, category, heroImage) {
-  const prompt = `Você é um jornalista sênior do portal Miami Brasileira, o maior portal de notícias em português para brasileiros em Miami e na Flórida. Seu estilo é claro, envolvente e profissional — como os melhores portais brasileiros de jornalismo digital.
+  const prompt = `VocÃª Ã© um jornalista sÃªnior do portal Miami Brasileira, o maior portal de notÃ­cias em portuguÃªs para brasileiros em Miami e na FlÃ³rida. Seu estilo Ã© claro, envolvente e profissional â como os melhores portais brasileiros de jornalismo digital.
 
-Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em português brasileiro.
+Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em portuguÃªs brasileiro.
 
-TÍTULO ORIGINAL: ${article.title}
+TÃTULO ORIGINAL: ${article.title}
 RESUMO: ${article.description || article.title}
 CATEGORIA: ${category}
 
-INSTRUÇÕES DE ESTILO:
-- Mínimo 850 palavras, bem desenvolvidas
-- Use **negrito** para destacar informações-chave, números importantes e termos relevantes
-- Parágrafo de abertura forte: contextualize o tema com dados ou fato impactante
-- Analise o impacto específico para brasileiros em Miami/Flórida
-- Inclua contexto local (legislação americana, vida prática em Miami, comunidade brasileira)
-- Tom jornalístico: informativo, objetivo, mas humano e próximo do leitor
-- Termine com perspectiva prática: o que o leitor pode fazer ou esperar
+INSTRUÃÃES DE ESTILO:
+- MÃ­nimo 850 palavras, bem desenvolvidas
+- Use **negrito** para destacar informaÃ§Ãµes-chave, nÃºmeros importantes e termos relevantes
+- ParÃ¡grafo de abertura forte: contextualize o tema com dados ou fato impactante
+- Analise o impacto especÃ­fico para brasileiros em Miami/FlÃ³rida
+- Inclua contexto local (legislaÃ§Ã£o americana, vida prÃ¡tica em Miami, comunidade brasileira)
+- Tom jornalÃ­stico: informativo, objetivo, mas humano e prÃ³ximo do leitor
+- Termine com perspectiva prÃ¡tica: o que o leitor pode fazer ou esperar
 
-ESTRUTURA OBRIGATÓRIA:
-# [Título em português — atraente, informativo, específico]
+ESTRUTURA OBRIGATÃRIA:
+# [TÃ­tulo em portuguÃªs â atraente, informativo, especÃ­fico]
 
-[Parágrafo de abertura forte — dado, fato ou contexto impactante — 3-4 frases]
+[ParÃ¡grafo de abertura forte â dado, fato ou contexto impactante â 3-4 frases]
 
-## 🔍 [Subtítulo 1 — O que aconteceu e por quê importa]
-[2-3 parágrafos ricos com análise aprofundada, contexto histórico e dados quando possível]
+## ð [SubtÃ­tulo 1 â O que aconteceu e por quÃª importa]
+[2-3 parÃ¡grafos ricos com anÃ¡lise aprofundada, contexto histÃ³rico e dados quando possÃ­vel]
 
-## 🇧🇷 [Subtítulo 2 — O que muda para brasileiros em Miami]
-[2-3 parágrafos com perspectiva direta para a comunidade brasileira na Flórida]
+## ð§ð· [SubtÃ­tulo 2 â O que muda para brasileiros em Miami]
+[2-3 parÃ¡grafos com perspectiva direta para a comunidade brasileira na FlÃ³rida]
 
-## 📋 [Subtítulo 3 — O que você precisa saber e fazer]
-[2-3 parágrafos com informações práticas e acionáveis para o leitor]
+## ð [SubtÃ­tulo 3 â O que vocÃª precisa saber e fazer]
+[2-3 parÃ¡grafos com informaÃ§Ãµes prÃ¡ticas e acionÃ¡veis para o leitor]
 
-## 🔮 [Subtítulo 4 — Próximos passos e perspectivas]
-[2-3 parágrafos com análise do que vem por aí e como se preparar]
+## ð® [SubtÃ­tulo 4 â PrÃ³ximos passos e perspectivas]
+[2-3 parÃ¡grafos com anÃ¡lise do que vem por aÃ­ e como se preparar]
 
 ---
 
-*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na Flórida. Fique por dentro.*
+*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na FlÃ³rida. Fique por dentro.*
 
-Escreva SOMENTE o artigo completo, sem comentários ou explicações extras.`
+Escreva SOMENTE o artigo completo, sem comentÃ¡rios ou explicaÃ§Ãµes extras.`
 
   const msg = await client.messages.create({
     model: 'claude-sonnet-4-6',
@@ -264,7 +265,7 @@ async function main() {
       let processed = 0
 
       for (const art of articles) {
-        if (processed >= 2) break
+        if (processed >= 3) break
         if (!art.title || !art.description) continue
         const tmpSlug = generateSlug(art.title)
         if (existingSlugs.has(tmpSlug)) continue
