@@ -9,9 +9,9 @@ const client = new Anthropic()
 
 const QUERIES = [
   { query: 'miami brazil', category: 'Comunidade' },
-  { query: 'florida immigration visa', category: 'Imigração' },
-  { query: 'miami business florida', category: 'Negócios' },
-  { query: 'florida health insurance', category: 'Saúde' },
+  { query: 'florida immigration visa', category: 'ImigraÃ§Ã£o' },
+  { query: 'miami business florida', category: 'NegÃ³cios' },
+  { query: 'florida health insurance', category: 'SaÃºde' },
   { query: 'inter miami soccer mls', category: 'Esportes' },
   { query: 'miami restaurants events', category: 'Cultura e Lazer' },
 ]
@@ -39,9 +39,9 @@ const TOPIC_IMAGES = [
 
 const CATEGORY_FALLBACK = {
   'Comunidade':      'photo-1529156069898-49953e39b3ac',
-  'ImigraÃÂÃÂ§ÃÂÃÂ£o':       'photo-1436491865332-7a61a109cc05',
-  'NegÃÂÃÂ³cios':        'photo-1507003211169-0a1dd7228f2d',
-  'SaÃÂÃÂºde':           'photo-1576091160399-112ba8d25d1d',
+  'ImigraÃÂÃÂÃÂÃÂ§ÃÂÃÂÃÂÃÂ£o':       'photo-1436491865332-7a61a109cc05',
+  'NegÃÂÃÂÃÂÃÂ³cios':        'photo-1507003211169-0a1dd7228f2d',
+  'SaÃÂÃÂÃÂÃÂºde':           'photo-1576091160399-112ba8d25d1d',
   'Esportes':        'photo-1574629810360-7efbbe195018',
   'Cultura e Lazer': 'photo-1506905925346-21bda4d32df4',
   'default':         'photo-1533929736458-ca588d08c8be',
@@ -71,7 +71,7 @@ function validateImage(url) {
           if (cl !== undefined && parseInt(cl, 10) === 0) return resolve(false)
           return resolve(true)
         }
-        // HEAD failed (non-2xx or not image content-type) ÃÂ¢ÃÂÃÂ retry with GET
+        // HEAD failed (non-2xx or not image content-type) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ retry with GET
         tryGet()
       })
       headReq.on('error', () => tryGet())
@@ -158,7 +158,7 @@ function extractOgImage(articleUrl) {
 function generateSlug(title) {
   return title
     .toLowerCase()
-    .normalize('NFD').replace(/[ÃÂÃÂ-ÃÂÃÂ¯]/g, '')
+    .normalize('NFD').replace(/[ÃÂÃÂÃÂÃÂ-ÃÂÃÂÃÂÃÂ¯]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .trim()
     .replace(/\s+/g, '-')
@@ -173,7 +173,7 @@ function fetchNews(query) {
     const q = encodeURIComponent(query)
     const from = new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0]
     const url = `https://newsapi.org/v2/everything?q=${q}&apiKey=${process.env.NEWS_API_KEY}&language=en&sortBy=publishedAt&pageSize=10&from=${from}`
-    https.get(url, (res) => {
+    https.get(url, { headers: { 'User-Agent': 'MiamiBrasileira/1.0 (miami-brasileiro.vercel.app)' } }, (res) => {
       let body = ''
       res.on('data', d => body += d)
       res.on('end', () => {
@@ -188,45 +188,45 @@ function fetchNews(query) {
 }
 
 async function rewrite(article, category, heroImage) {
-  const prompt = `VocÃÂª ÃÂ© um jornalista sÃÂªnior do portal Miami Brasileira, o maior portal de notÃÂ­cias em portuguÃÂªs para brasileiros em Miami e na FlÃÂ³rida. Seu estilo ÃÂ© claro, envolvente e profissional Ã¢ÂÂ como os melhores portais brasileiros de jornalismo digital.
+  const prompt = `VocÃÂÃÂª ÃÂÃÂ© um jornalista sÃÂÃÂªnior do portal Miami Brasileira, o maior portal de notÃÂÃÂ­cias em portuguÃÂÃÂªs para brasileiros em Miami e na FlÃÂÃÂ³rida. Seu estilo ÃÂÃÂ© claro, envolvente e profissional ÃÂ¢ÃÂÃÂ como os melhores portais brasileiros de jornalismo digital.
 
-Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em portuguÃÂªs brasileiro.
+Baseado APENAS no resumo abaixo, escreva um artigo ORIGINAL, COMPLETO e PROFISSIONAL em portuguÃÂÃÂªs brasileiro.
 
-TÃÂTULO ORIGINAL: ${article.title}
+TÃÂÃÂTULO ORIGINAL: ${article.title}
 RESUMO: ${article.description || article.title}
 CATEGORIA: ${category}
 
-INSTRUÃÂÃÂES DE ESTILO:
-- MÃÂ­nimo 850 palavras, bem desenvolvidas
-- Use **negrito** para destacar informaÃÂ§ÃÂµes-chave, nÃÂºmeros importantes e termos relevantes
-- ParÃÂ¡grafo de abertura forte: contextualize o tema com dados ou fato impactante
-- Analise o impacto especÃÂ­fico para brasileiros em Miami/FlÃÂ³rida
-- Inclua contexto local (legislaÃÂ§ÃÂ£o americana, vida prÃÂ¡tica em Miami, comunidade brasileira)
-- Tom jornalÃÂ­stico: informativo, objetivo, mas humano e prÃÂ³ximo do leitor
-- Termine com perspectiva prÃÂ¡tica: o que o leitor pode fazer ou esperar
+INSTRUÃÂÃÂÃÂÃÂES DE ESTILO:
+- MÃÂÃÂ­nimo 850 palavras, bem desenvolvidas
+- Use **negrito** para destacar informaÃÂÃÂ§ÃÂÃÂµes-chave, nÃÂÃÂºmeros importantes e termos relevantes
+- ParÃÂÃÂ¡grafo de abertura forte: contextualize o tema com dados ou fato impactante
+- Analise o impacto especÃÂÃÂ­fico para brasileiros em Miami/FlÃÂÃÂ³rida
+- Inclua contexto local (legislaÃÂÃÂ§ÃÂÃÂ£o americana, vida prÃÂÃÂ¡tica em Miami, comunidade brasileira)
+- Tom jornalÃÂÃÂ­stico: informativo, objetivo, mas humano e prÃÂÃÂ³ximo do leitor
+- Termine com perspectiva prÃÂÃÂ¡tica: o que o leitor pode fazer ou esperar
 
-ESTRUTURA OBRIGATÃÂRIA:
-# [TÃÂ­tulo em portuguÃÂªs Ã¢ÂÂ atraente, informativo, especÃÂ­fico]
+ESTRUTURA OBRIGATÃÂÃÂRIA:
+# [TÃÂÃÂ­tulo em portuguÃÂÃÂªs ÃÂ¢ÃÂÃÂ atraente, informativo, especÃÂÃÂ­fico]
 
-[ParÃÂ¡grafo de abertura forte Ã¢ÂÂ dado, fato ou contexto impactante Ã¢ÂÂ 3-4 frases]
+[ParÃÂÃÂ¡grafo de abertura forte ÃÂ¢ÃÂÃÂ dado, fato ou contexto impactante ÃÂ¢ÃÂÃÂ 3-4 frases]
 
-## Ã°ÂÂÂ [SubtÃÂ­tulo 1 Ã¢ÂÂ O que aconteceu e por quÃÂª importa]
-[2-3 parÃÂ¡grafos ricos com anÃÂ¡lise aprofundada, contexto histÃÂ³rico e dados quando possÃÂ­vel]
+## ÃÂ°ÃÂÃÂÃÂ [SubtÃÂÃÂ­tulo 1 ÃÂ¢ÃÂÃÂ O que aconteceu e por quÃÂÃÂª importa]
+[2-3 parÃÂÃÂ¡grafos ricos com anÃÂÃÂ¡lise aprofundada, contexto histÃÂÃÂ³rico e dados quando possÃÂÃÂ­vel]
 
-## Ã°ÂÂÂ§Ã°ÂÂÂ· [SubtÃÂ­tulo 2 Ã¢ÂÂ O que muda para brasileiros em Miami]
-[2-3 parÃÂ¡grafos com perspectiva direta para a comunidade brasileira na FlÃÂ³rida]
+## ÃÂ°ÃÂÃÂÃÂ§ÃÂ°ÃÂÃÂÃÂ· [SubtÃÂÃÂ­tulo 2 ÃÂ¢ÃÂÃÂ O que muda para brasileiros em Miami]
+[2-3 parÃÂÃÂ¡grafos com perspectiva direta para a comunidade brasileira na FlÃÂÃÂ³rida]
 
-## Ã°ÂÂÂ [SubtÃÂ­tulo 3 Ã¢ÂÂ O que vocÃÂª precisa saber e fazer]
-[2-3 parÃÂ¡grafos com informaÃÂ§ÃÂµes prÃÂ¡ticas e acionÃÂ¡veis para o leitor]
+## ÃÂ°ÃÂÃÂÃÂ [SubtÃÂÃÂ­tulo 3 ÃÂ¢ÃÂÃÂ O que vocÃÂÃÂª precisa saber e fazer]
+[2-3 parÃÂÃÂ¡grafos com informaÃÂÃÂ§ÃÂÃÂµes prÃÂÃÂ¡ticas e acionÃÂÃÂ¡veis para o leitor]
 
-## Ã°ÂÂÂ® [SubtÃÂ­tulo 4 Ã¢ÂÂ PrÃÂ³ximos passos e perspectivas]
-[2-3 parÃÂ¡grafos com anÃÂ¡lise do que vem por aÃÂ­ e como se preparar]
+## ÃÂ°ÃÂÃÂÃÂ® [SubtÃÂÃÂ­tulo 4 ÃÂ¢ÃÂÃÂ PrÃÂÃÂ³ximos passos e perspectivas]
+[2-3 parÃÂÃÂ¡grafos com anÃÂÃÂ¡lise do que vem por aÃÂÃÂ­ e como se preparar]
 
 ---
 
-*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na FlÃÂ³rida. Fique por dentro.*
+*A **Miami Brasileira** acompanha de perto todos os desenvolvimentos que impactam a comunidade brasileira na FlÃÂÃÂ³rida. Fique por dentro.*
 
-Escreva SOMENTE o artigo completo, sem comentÃÂ¡rios ou explicaÃÂ§ÃÂµes extras.`
+Escreva SOMENTE o artigo completo, sem comentÃÂÃÂ¡rios ou explicaÃÂÃÂ§ÃÂÃÂµes extras.`
 
   const msg = await client.messages.create({
     model: 'claude-sonnet-4-6',
