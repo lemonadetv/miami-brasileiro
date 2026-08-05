@@ -1,4 +1,4 @@
-// ElevenLabs TTS — voice: Bella (EXAVITQu4vr4xnSDxMaL), model: eleven_multilingual_v2
+// ElevenLabs TTS with Claude AI summarization — voice: Bella (EXAVITQu4vr4xnSDxMaL)
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
@@ -9,9 +9,38 @@ export async function POST(req) {
     const apiKey = process.env.ELEVENLABS_API_KEY
     if (!apiKey) return NextResponse.json({ error: 'TTS not configured' }, { status: 503 })
 
-    // Truncate to ~2000 chars to stay within reasonable token limits
-    const truncated = text.substring(0, 2000)
+    // Step 1: AI summarization via Claude Haiku
+    let ttsText = text
+    const anthropicKey = process.env.ANTHROPIC_API_KEY
+    if (anthropicKey && text.length > 200) {
+      try {
+        const summaryRes = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': anthropicKey,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 150,
+            messages: [{
+              role: 'user',
+              content: `Resuma este artigo em 2 frases curtas em português, adequado para leitura em voz alta. Foque nos destaques mais importantes. Sem listas, apenas texto corrido.\n\n${text.substring(0, 3000)}`
+            }]
+          })
+        })
+        if (summaryRes.ok) {
+          const data = await summaryRes.json()
+          const summary = data.content?.[0]?.text?.trim()
+          if (summary) ttsText = summary
+        }
+      } catch (_) {
+        // fallback to original text
+      }
+    }
 
+    // Step 2: ElevenLabs TTS
     const response = await fetch(
       'https://api.elevenlabs.io/v1/text-to-speech/EXAVITQu4vr4xnSDxMaL',
       {
@@ -21,7 +50,7 @@ export async function POST(req) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: truncated,
+          text: ttsText.substring(0, 2000),
           model_id: 'eleven_multilingual_v2',
           voice_settings: {
             stability: 0.5,
@@ -43,7 +72,7 @@ export async function POST(req) {
       status: 200,
       headers: {
         'Content-Type': 'audio/mpeg',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'no-store',
       },
     })
   } catch (e) {
