@@ -303,7 +303,7 @@ export default function ArtigoPage(props) {
 
               {/* Audio Player */}
               <AudioPlayer
-                text={`${article.title}. ${article.excerpt} ${(article.content || '').substring(0, 1500)}`}
+                text={`${article.title}. ${article.excerpt}`}
                 title={article.title}
               />
               {/* Content */}
