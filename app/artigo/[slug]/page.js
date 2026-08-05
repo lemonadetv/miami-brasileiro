@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Footer from '../../../components/Footer'
 import Sidebar from '../../../components/Sidebar'
 import ShareButtons from '../../../components/ShareButtons'
+import AudioPlayer from '../../../components/AudioPlayer'
 import Link from 'next/link'
 import { getAllArticles, getArticleBySlug, formatDate, readingTime } from '../../../lib/articles'
 
@@ -300,6 +301,11 @@ export default function ArtigoPage(props) {
                 )}
               </div>
 
+              {/* Audio Player */}
+              <AudioPlayer
+                text={`${article.title}. ${article.excerpt} ${(article.content || '').substring(0, 1500)}`}
+                title={article.title}
+              />
               {/* Content */}
               <ArticleContent content={article.content} relacionados={relacionados} catColor={catColor} />
 
