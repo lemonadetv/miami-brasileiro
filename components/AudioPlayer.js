@@ -76,7 +76,7 @@ export default function AudioPlayer({ text, title }) {
   }
 
   const labels = {
-    idle:    'Escute a notícia',
+    idle:    'Ouvir resumo',
     loading: 'Gerando áudio…',
     playing: 'Pausar',
     paused:  'Continuar',
@@ -123,7 +123,7 @@ export default function AudioPlayer({ text, title }) {
           </span>
         )}
         <span style={{ color: '#666', fontSize: '12px', marginLeft: 'auto' }}>
-          🤖 Voz gerada por IA
+          🤖 Resumo em áudio
         </span>
       </div>
       {(state === 'playing' || state === 'paused') && (
