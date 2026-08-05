@@ -77,7 +77,7 @@ export default function AudioPlayer({ text, title }) {
 
   const labels = {
     idle:    'Ouvir resumo',
-    loading: 'Gerando áudio…',
+    loading: 'Preparando destaques…',
     playing: 'Pausar',
     paused:  'Continuar',
     error:   'Erro — tentar novamente',
