@@ -316,24 +316,24 @@ const COPA_BR = [
 ]
 
 const F1_DRIVERS = [
-  { pos: 1, driver: 'Max Verstappen', country: '🇳🇱', team: 'Red Bull Racing', pts: 195 },
-  { pos: 2, driver: 'Lewis Hamilton', country: '🇬🇧', team: 'Ferrari', pts: 178 },
-  { pos: 3, driver: 'Lando Norris', country: '🇬🇧', team: 'McLaren', pts: 162 },
-  { pos: 4, driver: 'Charles Leclerc', country: '🇲🇨', team: 'Ferrari', pts: 155 },
-  { pos: 5, driver: 'George Russell', country: '🇬🇧', team: 'Mercedes', pts: 142 },
-  { pos: 6, driver: 'Carlos Sainz', country: '🇪🇸', team: 'Williams', pts: 118 },
-  { pos: 7, driver: 'Oscar Piastri', country: '🇦🇺', team: 'McLaren', pts: 112 },
-  { pos: 8, driver: 'Fernando Alonso', country: '🇪🇸', team: 'Aston Martin', pts: 86 },
-  { pos: 9, driver: 'Gabriel Bortoleto', country: '🇧🇷', team: 'Sauber/Kick Sauber', pts: 52, highlight: true },
-  { pos: 10, driver: 'Lance Stroll', country: '🇨🇦', team: 'Aston Martin', pts: 45 },
+  { pos: 1, driver: 'Kimi Antonelli', country: '🇮🇹', team: 'Mercedes', pts: 219 },
+  { pos: 2, driver: 'Lewis Hamilton', country: '🇬🇧', team: 'Ferrari', pts: 169 },
+  { pos: 3, driver: 'George Russell', country: '🇬🇧', team: 'Mercedes', pts: 160 },
+  { pos: 4, driver: 'Charles Leclerc', country: '🇲🇨', team: 'Ferrari', pts: 138 },
+  { pos: 5, driver: 'Lando Norris', country: '🇬🇧', team: 'McLaren', pts: 128 },
+  { pos: 6, driver: 'Max Verstappen', country: '🇳🇱', team: 'Red Bull Racing', pts: 109 },
+  { pos: 7, driver: 'Oscar Piastri', country: '🇦🇺', team: 'McLaren', pts: 92 },
+  { pos: 8, driver: 'Isack Hadjar', country: '🇫🇷', team: 'Red Bull Racing', pts: 68 },
+  { pos: 9, driver: 'Pierre Gasly', country: '🇫🇷', team: 'Alpine', pts: 42 },
+  { pos: 10, driver: 'Liam Lawson', country: '🇳🇿', team: 'Racing Bulls', pts: 39 },
 ]
 
 const F1_CONSTRUCTORS = [
-  { pos: 1, team: 'Red Bull Racing', pts: 340 },
-  { pos: 2, team: 'Ferrari', pts: 333 },
-  { pos: 3, team: 'McLaren', pts: 274 },
-  { pos: 4, team: 'Mercedes', pts: 188 },
-  { pos: 5, team: 'Williams', pts: 130 },
+  { pos: 1, team: 'Mercedes', pts: 379 },
+  { pos: 2, team: 'Ferrari', pts: 307 },
+  { pos: 3, team: 'McLaren', pts: 220 },
+  { pos: 4, team: 'Red Bull Racing', pts: 177 },
+  { pos: 5, team: 'Racing Bulls', pts: 66 },
 ]
 
 const WSL_MEN = [
@@ -1358,7 +1358,7 @@ export default function EsportesPage() {
 
       {/* Footer note */}
       <div style={{ borderTop: '1px solid var(--border)', textAlign: 'center', padding: '16px 24px', color: '#444', fontSize: '0.75rem' }}>
-        Portal de Esportes Miami Brasileira · Dados atualizados em Junho 2026 · Resultados podem variar conforme competições em andamento
+        Portal de Esportes Miami Brasileira · Dados atualizados: GP da Hungria (Rodada 13, 26/07/2026) · Resultados podem variar conforme competições em andamento
       </div>
 
       <Footer />
