@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { MortgageCalc, InvestmentCalc, CarCalc } from '../app/components/Toolbox'
 
 const CATEGORIES = [
   { label: '🏠 Início', href: '/' },
@@ -9,6 +10,14 @@ const CATEGORIES = [
   { label: '🥗 Saúde', href: '/categoria/saude' },
   { label: '⚽ Esportes', href: '/esportes' },
   { label: '🎭 Cultura', href: '/categoria/cultura-e-lazer' },
+  { label: '🏘️ Morando em Miami', href: '/morando-em-miami', highlight: true },
+  { label: '🏡 Comprando Imóvel', href: '/comprando-imovel', highlight: true },
+]
+
+const TOOLS = [
+  { key: 'mortgage', icon: '🏠', label: 'Financiamento' },
+  { key: 'investment', icon: '📈', label: 'Investimentos' },
+  { key: 'car', icon: '🚗', label: 'Veículos' },
 ]
 
 function weatherIcon(code) {
@@ -50,6 +59,7 @@ export default function Header({ articles = [] }) {
   const [weather, setWeather] = useState(null)
   const [rates, setRates] = useState({})
   const [activePath, setActivePath] = useState('/')
+  const [tool, setTool] = useState(null)
 
   useEffect(() => {
     const saved = localStorage.getItem('mb-theme') || 'dark'
@@ -82,85 +92,107 @@ export default function Header({ articles = [] }) {
   }
 
   return (
-    <header className="msn-header">
-      <div className="msn-header-top">
-        <a href="/" className="msn-logo" style={{ textDecoration: 'none' }}>
-          <Logo />
-        </a>
+    <>
+      <header className="msn-header">
+        <div className="msn-header-top">
+          <a href="/" className="msn-logo" style={{ textDecoration: 'none' }}>
+            <Logo />
+          </a>
 
-        <div className="msn-search">
-          <span className="msn-search-icon">🔍</span>
-          <input type="search" placeholder="Buscar notícias…" aria-label="Buscar" />
-        </div>
-
-        <div className="msn-header-right">
-          {weather && (
-            <div className="msn-weather">
-              <span>{weatherIcon(weather.weather_code)}</span>
-              <span className="temp">{Math.round((weather.temperature_2m - 32) * 5 / 9)}°C</span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Miami</span>
-            </div>
-          )}
-          <div className="msn-rates">
-            {rates.usd && (
-              <div className="rate-pill">
-                <span className="flag">🇺🇸</span>
-                <span className="code">USD</span>
-                <span className="val">{fmtRate(rates.usd)}</span>
-                {rates.usdChange && (
-                  <span className={'chg ' + (parseFloat(rates.usdChange) >= 0 ? 'rate-up' : 'rate-dn')}>
-                    {parseFloat(rates.usdChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
-                  </span>
-                )}
-              </div>
-            )}
-            {rates.eur && (
-              <div className="rate-pill">
-                <span className="flag">🇪🇺</span>
-                <span className="code">EUR</span>
-                <span className="val">{fmtRate(rates.eur)}</span>
-                {rates.eurChange && (
-                  <span className={'chg ' + (parseFloat(rates.eurChange) >= 0 ? 'rate-up' : 'rate-dn')}>
-                    {parseFloat(rates.eurChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
-                  </span>
-                )}
-              </div>
-            )}
+          <div className="msn-search">
+            <span className="msn-search-icon">🔍</span>
+            <input type="search" placeholder="Buscar notícias…" aria-label="Buscar" />
           </div>
-          <button className="dark-toggle" onClick={toggleTheme} aria-label="Alternar tema" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-        </div>
-      </div>
 
-      <nav className="msn-nav" aria-label="Categorias">
-        <div className="msn-nav-inner">
-          {CATEGORIES.map(cat => (
-            <a
-              key={cat.href}
-              href={cat.href}
-              className={`msn-nav-link${activePath === cat.href || (cat.href !== '/' && activePath.startsWith(cat.href)) ? ' active' : ''}`}
-            >
-              {cat.label}
-            </a>
-          ))}
+          <div className="msn-header-right">
+            {weather && (
+              <div className="msn-weather">
+                <span>{weatherIcon(weather.weather_code)}</span>
+                <span className="temp">{Math.round((weather.temperature_2m - 32) * 5 / 9)}°C</span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Miami</span>
+              </div>
+            )}
+            <div className="msn-rates">
+              {rates.usd && (
+                <div className="rate-pill">
+                  <span className="flag">🇺🇸</span>
+                  <span className="code">USD</span>
+                  <span className="val">{fmtRate(rates.usd)}</span>
+                  {rates.usdChange && (
+                    <span className={'chg ' + (parseFloat(rates.usdChange) >= 0 ? 'rate-up' : 'rate-dn')}>
+                      {parseFloat(rates.usdChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.usdChange)).toFixed(2)}%
+                    </span>
+                  )}
+                </div>
+              )}
+              {rates.eur && (
+                <div className="rate-pill">
+                  <span className="flag">🇪🇺</span>
+                  <span className="code">EUR</span>
+                  <span className="val">{fmtRate(rates.eur)}</span>
+                  {rates.eurChange && (
+                    <span className={'chg ' + (parseFloat(rates.eurChange) >= 0 ? 'rate-up' : 'rate-dn')}>
+                      {parseFloat(rates.eurChange) >= 0 ? '▲' : '▼'} {Math.abs(parseFloat(rates.eurChange)).toFixed(2)}%
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+            <button className="dark-toggle" onClick={toggleTheme} aria-label="Alternar tema" title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+          </div>
         </div>
-      </nav>
 
-      {articles.length > 0 && (
-        <div className="ticker" role="marquee" aria-label="Últimas notícias">
-          <div className="ticker-label">Ao Vivo</div>
-          <div className="ticker-wrapper">
-            <div className="ticker-track">
-              {[...articles.slice(0, 8), ...articles.slice(0, 8)].map((art, i) => (
-                <a key={i} href={`/artigo/${art.slug}`} className="ticker-link">
-                  {art.title}
-                </a>
+        <nav className="msn-nav" aria-label="Categorias">
+          <div className="msn-nav-inner">
+            {CATEGORIES.map(cat => (
+              <a
+                key={cat.href}
+                href={cat.href}
+                className={`msn-nav-link${cat.highlight ? ' nav-highlight' : ''}${activePath === cat.href || (cat.href !== '/' && activePath.startsWith(cat.href)) ? ' active' : ''}`}
+              >
+                {cat.label}
+              </a>
+            ))}
+
+            <div className="msn-nav-tools" role="group" aria-label="Ferramentas financeiras">
+              <span className="tools-label">🧰</span>
+              {TOOLS.map(t => (
+                <button
+                  key={t.key}
+                  className="nav-tool-btn"
+                  onClick={() => setTool(t.key)}
+                  title={t.label}
+                  aria-label={t.label}
+                >
+                  <span className="tool-icon">{t.icon}</span>
+                  <span className="tool-lbl">{t.label}</span>
+                </button>
               ))}
             </div>
           </div>
-        </div>
-      )}
-    </header>
+        </nav>
+
+        {articles.length > 0 && (
+          <div className="ticker" role="marquee" aria-label="Últimas notícias">
+            <div className="ticker-label">Ao Vivo</div>
+            <div className="ticker-wrapper">
+              <div className="ticker-track">
+                {[...articles.slice(0, 8), ...articles.slice(0, 8)].map((art, i) => (
+                  <a key={i} href={`/artigo/${art.slug}`} className="ticker-link">
+                    {art.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {tool === 'mortgage'   && <MortgageCalc   onClose={() => setTool(null)} />}
+      {tool === 'investment' && <InvestmentCalc onClose={() => setTool(null)} />}
+      {tool === 'car'        && <CarCalc        onClose={() => setTool(null)} />}
+    </>
   )
 }

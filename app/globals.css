@@ -424,3 +424,15 @@ footer { background: var(--bg-header); border-top: 1px solid var(--border); marg
 @media (max-width: 520px) {
   .mosaic-bot { grid-template-columns: 1fr; }
 }
+
+/* ===== TOOLBOX NAV BUTTONS ===== */
+.nav-highlight { background: linear-gradient(135deg, #1a6b3c, #2e9e5b); color: #fff !important; border-radius: 6px; padding: 3px 10px !important; font-weight: 700; }
+.nav-highlight:hover { background: linear-gradient(135deg, #2e9e5b, #1a6b3c); color: #fff !important; }
+.msn-nav-tools { display: flex; align-items: center; gap: 4px; margin-left: 4px; }
+.tools-sep { color: var(--border); margin: 0 4px; font-size: 16px; }
+.tools-label { font-size: 16px; }
+.nav-tool-btn { display: flex; align-items: center; gap: 4px; background: var(--card-bg, #f5f5f5); border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; transition: background .2s, border-color .2s; white-space: nowrap; }
+.nav-tool-btn:hover { background: var(--accent, #1a6b3c); color: #fff; border-color: var(--accent, #1a6b3c); }
+.tool-icon { font-size: 14px; }
+.tool-lbl { font-size: 11px; }
+@media (max-width: 860px) { .msn-nav-tools { display: none; } }
