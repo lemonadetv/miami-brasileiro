@@ -34,10 +34,10 @@ export default function AnunciePage() {
               Solicite uma Proposta
             </h2>
 
-            <form action="https://formsubmit.co/contato@miamibrasileiro.com" method="POST">
+            <form action="https://formsubmit.co/rhhellbrugge@gmail.com" method="POST">
               <input type="hidden" name="_subject" value="Solicitação de Anúncio - Miami Brasileiro" />
               <input type="hidden" name="_captcha" value="false" />
-              <input type="hidden" name="_next" value="https://miami-brasileiro.vercel.app/anuncie" />
+              <input type="hidden" name="_next" value="https://miamibrasileiro.com/anuncie" />
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                 <div>
