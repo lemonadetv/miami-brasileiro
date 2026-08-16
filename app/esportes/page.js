@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Footer from '../../components/Footer'
 
 const S = {
@@ -539,7 +539,7 @@ function StandingsTable({ columns, rows, accentColor }) {
   )
 }
 
-function FutebolTab() {
+function FutebolTab({ data = {} }) {
   return (
     <div>
       <SectionHeader title="⚽ Futebol Brasileiro" sub="Brasileirão Série A 2026 · Copa do Brasil" color="#00c97a" />
@@ -563,7 +563,7 @@ function FutebolTab() {
               </tr>
             </thead>
             <tbody>
-              {BRASILEIRAO.map((row) => (
+              {(data.brasileirao || BRASILEIRAO).map((row) => (
                 <tr key={row.pos} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                   <td style={{ ...S.td, width: 40 }}>
                     <span style={{ display: 'inline-flex', width: 24, height: 24, borderRadius: '50%', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 800, background: getPosStyle(row.pos) }}>
@@ -639,7 +639,7 @@ function FutebolTab() {
   )
 }
 
-function F1Tab() {
+function F1Tab({ data = {} }) {
   return (
     <div>
       <SectionHeader title="🏎️ Fórmula 1" sub="Campeonato Mundial 2026" color="#ef4444" />
@@ -734,7 +734,7 @@ function F1Tab() {
   )
 }
 
-function SurfeTab() {
+function SurfeTab({ data = {} }) {
   return (
     <div>
       <SectionHeader title="🏄 Surfe WSL" sub="Championship Tour 2026 — Brasil Domina o Mundo" color="#06b6d4" />
@@ -766,7 +766,7 @@ function SurfeTab() {
               </tr>
             </thead>
             <tbody>
-              {WSL_MEN.map((row) => (
+              {(data.wsl_men || WSL_MEN).map((row) => (
                 <tr key={row.pos} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: row.highlight ? 'rgba(0,180,80,0.07)' : 'transparent' }}>
                   <td style={{ ...S.td, width: 40 }}>
                     <span style={{ display: 'inline-flex', width: 24, height: 24, borderRadius: '50%', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 800, background: row.pos === 1 ? 'rgba(255,210,0,0.3)' : row.pos <= 3 ? 'rgba(6,182,212,0.3)' : 'rgba(80,80,80,0.4)' }}>
@@ -798,7 +798,7 @@ function SurfeTab() {
               </tr>
             </thead>
             <tbody>
-              {WSL_WOMEN.map((row) => (
+              {(data.wsl_women || WSL_WOMEN).map((row) => (
                 <tr key={row.pos} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: row.highlight ? 'rgba(0,180,80,0.07)' : 'transparent' }}>
                   <td style={{ ...S.td, width: 40 }}>
                     <span style={{ display: 'inline-flex', width: 24, height: 24, borderRadius: '50%', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 800, background: row.pos === 1 ? 'rgba(255,210,0,0.3)' : row.pos <= 3 ? 'rgba(236,72,153,0.3)' : 'rgba(80,80,80,0.4)' }}>
@@ -1302,12 +1302,21 @@ function OutrosTab() {
 
 export default function EsportesPage() {
   const [activeTab, setActiveTab] = useState('futebol')
+  const [dynData, setDynData] = useState({})
+  const [updatedDate, setUpdatedDate] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/sports-tables')
+      .then(r => r.json())
+      .then(d => { setDynData(d); setUpdatedDate(d.updatedDate) })
+      .catch(() => {})
+  }, [])
 
   const renderTab = () => {
     switch (activeTab) {
-      case 'futebol': return <FutebolTab />
-      case 'f1': return <F1Tab />
-      case 'surfe': return <SurfeTab />
+      case 'futebol': return <FutebolTab data={dynData} />
+      case 'f1': return <F1Tab data={dynData} />
+      case 'surfe': return <SurfeTab data={dynData} />
       case 'sup': return <SUPTab />
       case 'ski': return <SkiTab />
       case 'mma': return <MMATab />

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { MortgageCalc, InvestmentCalc, CarCalc } from '../app/components/Toolbox'
 
-const CATEGORIES = [
+const CATEGORIES_ROW1 = [
   { label: '🏠 Início', href: '/' },
   { label: '🏙️ Comunidade', href: '/categoria/comunidade' },
   { label: '✈️ Imigração', href: '/categoria/imigracao' },
@@ -10,6 +10,9 @@ const CATEGORIES = [
   { label: '🥗 Saúde', href: '/categoria/saude' },
   { label: '⚽ Esportes', href: '/esportes' },
   { label: '🎭 Cultura', href: '/categoria/cultura-e-lazer' },
+]
+
+const CATEGORIES_ROW2 = [
   { label: '🏘️ Morando em Miami', href: '/morando-em-miami', highlight: true },
   { label: '🏡 Comprando Imóvel', href: '/comprando-imovel', highlight: true },
 ]
@@ -91,6 +94,8 @@ export default function Header({ articles = [] }) {
     return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
 
+  const isActive = (href) => activePath === href || (href !== '/' && activePath.startsWith(href))
+
   return (
     <>
       <header className="msn-header">
@@ -144,35 +149,50 @@ export default function Header({ articles = [] }) {
           </div>
         </div>
 
-        <nav className="msn-nav" aria-label="Categorias">
+        {/* NAV ROW 1 — main categories */}
+        <nav className="msn-nav msn-nav-row1" aria-label="Categorias">
           <div className="msn-nav-inner">
-            {CATEGORIES.map(cat => (
+            {CATEGORIES_ROW1.map(cat => (
               <a
                 key={cat.href}
                 href={cat.href}
-                className={`msn-nav-link${cat.highlight ? ' nav-highlight' : ''}${activePath === cat.href || (cat.href !== '/' && activePath.startsWith(cat.href)) ? ' active' : ''}`}
+                className={`msn-nav-link${isActive(cat.href) ? ' active' : ''}`}
+              >
+                {cat.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+
+        {/* NAV ROW 2 — highlighted + tools */}
+        <div className="msn-nav-row2">
+          <div className="msn-nav-row2-inner">
+            {CATEGORIES_ROW2.map(cat => (
+              <a
+                key={cat.href}
+                href={cat.href}
+                className={`msn-nav-link nav-highlight${isActive(cat.href) ? ' nav-highlight-active' : ''}`}
               >
                 {cat.label}
               </a>
             ))}
 
-            <div className="msn-nav-tools" role="group" aria-label="Ferramentas financeiras">
-              <span className="tools-label">🧰</span>
-              {TOOLS.map(t => (
-                <button
-                  key={t.key}
-                  className="nav-tool-btn"
-                  onClick={() => setTool(t.key)}
-                  title={t.label}
-                  aria-label={t.label}
-                >
-                  <span className="tool-icon">{t.icon}</span>
-                  <span className="tool-lbl">{t.label}</span>
-                </button>
-              ))}
-            </div>
+            <span className="tools-sep">|</span>
+            <span className="tools-label">🧰</span>
+            {TOOLS.map(t => (
+              <button
+                key={t.key}
+                className="nav-tool-btn"
+                onClick={() => setTool(t.key)}
+                title={t.label}
+                aria-label={t.label}
+              >
+                <span className="tool-icon">{t.icon}</span>
+                <span className="tool-lbl">{t.label}</span>
+              </button>
+            ))}
           </div>
-        </nav>
+        </div>
 
         {articles.length > 0 && (
           <div className="ticker" role="marquee" aria-label="Últimas notícias">
