@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-08-17T13:33:43.971Z",
-  "updatedDate": "17 de agosto de 2026",
+  "updatedAt": "2026-08-18T13:36:34.616Z",
+  "updatedDate": "18 de agosto de 2026",
   "brasileirao": [
     {
       "pos": 1,
@@ -58,8 +58,8 @@
       "v": 11,
       "e": 5,
       "d": 6,
-      "gf": 33,
-      "ga": 24,
+      "gf": 34,
+      "ga": 25,
       "sg": 9
     },
     {
@@ -82,9 +82,9 @@
       "v": 10,
       "e": 6,
       "d": 6,
-      "gf": 29,
-      "ga": 23,
-      "sg": 6
+      "gf": 33,
+      "ga": 26,
+      "sg": 7
     },
     {
       "pos": 8,
@@ -94,72 +94,60 @@
       "v": 10,
       "e": 5,
       "d": 7,
-      "gf": 28,
+      "gf": 29,
       "ga": 24,
-      "sg": 4
+      "sg": 5
     },
     {
       "pos": 9,
       "team": "Fluminense",
-      "pts": 34,
-      "pj": 22,
-      "v": 9,
-      "e": 7,
-      "d": 6,
-      "gf": 27,
-      "ga": 23,
-      "sg": 4
-    },
-    {
-      "pos": 10,
-      "team": "Grêmio",
       "pts": 33,
       "pj": 22,
       "v": 9,
       "e": 6,
       "d": 7,
-      "gf": 30,
-      "ga": 26,
-      "sg": 4
+      "gf": 28,
+      "ga": 25,
+      "sg": 3
+    },
+    {
+      "pos": 10,
+      "team": "Grêmio",
+      "pts": 32,
+      "pj": 22,
+      "v": 9,
+      "e": 5,
+      "d": 8,
+      "gf": 31,
+      "ga": 28,
+      "sg": 3
     },
     {
       "pos": 11,
-      "team": "Corinthians",
+      "team": "Bahia",
       "pts": 31,
       "pj": 22,
       "v": 8,
       "e": 7,
       "d": 7,
-      "gf": 26,
-      "ga": 25,
+      "gf": 27,
+      "ga": 26,
       "sg": 1
     },
     {
       "pos": 12,
-      "team": "Vasco da Gama",
+      "team": "Vasco",
       "pts": 30,
       "pj": 22,
       "v": 8,
       "e": 6,
       "d": 8,
-      "gf": 25,
+      "gf": 26,
       "ga": 27,
-      "sg": -2
+      "sg": -1
     },
     {
       "pos": 13,
-      "team": "Bahia",
-      "pts": 29,
-      "pj": 22,
-      "v": 8,
-      "e": 5,
-      "d": 9,
-      "gf": 28,
-      "ga": 30,
-      "sg": -2
-    },
-    {
-      "pos": 14,
       "team": "Athletico-PR",
       "pts": 28,
       "pj": 22,
@@ -171,28 +159,40 @@
       "sg": -2
     },
     {
-      "pos": 15,
-      "team": "Santos",
+      "pos": 14,
+      "team": "Corinthians",
       "pts": 27,
       "pj": 22,
       "v": 7,
       "e": 6,
       "d": 9,
+      "gf": 25,
+      "ga": 29,
+      "sg": -4
+    },
+    {
+      "pos": 15,
+      "team": "Santos",
+      "pts": 26,
+      "pj": 22,
+      "v": 7,
+      "e": 5,
+      "d": 10,
       "gf": 23,
-      "ga": 28,
-      "sg": -5
+      "ga": 30,
+      "sg": -7
     },
     {
       "pos": 16,
       "team": "Bragantino",
-      "pts": 25,
+      "pts": 24,
       "pj": 22,
       "v": 6,
-      "e": 7,
-      "d": 9,
+      "e": 6,
+      "d": 10,
       "gf": 22,
-      "ga": 29,
-      "sg": -7
+      "ga": 31,
+      "sg": -9
     },
     {
       "pos": 17,
@@ -203,8 +203,8 @@
       "e": 7,
       "d": 10,
       "gf": 20,
-      "ga": 31,
-      "sg": -11
+      "ga": 32,
+      "sg": -12
     },
     {
       "pos": 18,
@@ -215,8 +215,8 @@
       "e": 5,
       "d": 12,
       "gf": 19,
-      "ga": 34,
-      "sg": -15
+      "ga": 35,
+      "sg": -16
     },
     {
       "pos": 19,
@@ -227,8 +227,8 @@
       "e": 6,
       "d": 12,
       "gf": 18,
-      "ga": 35,
-      "sg": -17
+      "ga": 36,
+      "sg": -18
     },
     {
       "pos": 20,
@@ -239,42 +239,42 @@
       "e": 7,
       "d": 12,
       "gf": 16,
-      "ga": 36,
-      "sg": -20
+      "ga": 38,
+      "sg": -22
     }
   ],
   "copaBrasil": {
     "oitavas": [
       [
         "Flamengo",
-        "Palmeiras"
-      ],
-      [
-        "São Paulo",
         "Atlético-MG"
       ],
       [
-        "Botafogo",
-        "Cruzeiro"
-      ],
-      [
-        "Internacional",
-        "Fortaleza"
-      ],
-      [
-        "Grêmio",
-        "Fluminense"
-      ],
-      [
-        "Corinthians",
+        "Palmeiras",
         "Bahia"
       ],
       [
-        "Vasco da Gama",
-        "Athletico-PR"
+        "São Paulo",
+        "Grêmio"
       ],
       [
-        "Santos",
+        "Botafogo",
+        "Fortaleza"
+      ],
+      [
+        "Cruzeiro",
+        "Fluminense"
+      ],
+      [
+        "Internacional",
+        "Corinthians"
+      ],
+      [
+        "Athletico-PR",
+        "Santos"
+      ],
+      [
+        "Vasco",
         "Bragantino"
       ]
     ],
@@ -285,89 +285,89 @@
       "pos": 1,
       "team": "Inter Miami CF",
       "pts": 52,
-      "pj": 27,
+      "pj": 26,
       "v": 15,
       "e": 7,
-      "d": 5,
-      "gf": 48,
+      "d": 4,
+      "gf": 51,
       "ga": 28
     },
     {
       "pos": 2,
       "team": "FC Cincinnati",
       "pts": 48,
-      "pj": 27,
+      "pj": 26,
       "v": 14,
       "e": 6,
-      "d": 7,
-      "gf": 44,
-      "ga": 32
+      "d": 6,
+      "gf": 45,
+      "ga": 30
     },
     {
       "pos": 3,
       "team": "Columbus Crew",
-      "pts": 46,
-      "pj": 27,
+      "pts": 45,
+      "pj": 26,
       "v": 13,
-      "e": 7,
+      "e": 6,
       "d": 7,
-      "gf": 40,
-      "ga": 30
+      "gf": 42,
+      "ga": 32
     },
     {
       "pos": 4,
       "team": "New York Red Bulls",
-      "pts": 44,
-      "pj": 27,
+      "pts": 42,
+      "pj": 26,
       "v": 12,
-      "e": 8,
-      "d": 7,
+      "e": 6,
+      "d": 8,
       "gf": 38,
-      "ga": 29
+      "ga": 33
     },
     {
       "pos": 5,
       "team": "Charlotte FC",
-      "pts": 42,
-      "pj": 27,
-      "v": 12,
-      "e": 6,
-      "d": 9,
+      "pts": 40,
+      "pj": 26,
+      "v": 11,
+      "e": 7,
+      "d": 8,
       "gf": 35,
-      "ga": 32
+      "ga": 31
     },
     {
       "pos": 6,
       "team": "Orlando City SC",
-      "pts": 40,
-      "pj": 27,
-      "v": 11,
-      "e": 7,
-      "d": 9,
+      "pts": 38,
+      "pj": 26,
+      "v": 10,
+      "e": 8,
+      "d": 8,
       "gf": 36,
-      "ga": 33
+      "ga": 34
     },
     {
       "pos": 7,
       "team": "Philadelphia Union",
-      "pts": 38,
-      "pj": 27,
+      "pts": 36,
+      "pj": 26,
       "v": 10,
-      "e": 8,
-      "d": 9,
-      "gf": 32,
-      "ga": 30
+      "e": 6,
+      "d": 10,
+      "gf": 33,
+      "ga": 35
     },
     {
       "pos": 8,
       "team": "New York City FC",
-      "pts": 36,
-      "pj": 27,
-      "v": 10,
-      "e": 6,
-      "d": 11,
-      "gf": 34,
-      "ga": 35
+      "pts": 34,
+      "pj": 26,
+      "v": 9,
+      "e": 7,
+      "d": 10,
+      "gf": 32,
+      "ga": 36
     }
   ],
   "mls_west": [
@@ -375,89 +375,89 @@
       "pos": 1,
       "team": "LAFC",
       "pts": 50,
-      "pj": 27,
-      "v": 14,
-      "e": 8,
-      "d": 5,
-      "gf": 46,
-      "ga": 26
+      "pj": 26,
+      "v": 15,
+      "e": 5,
+      "d": 6,
+      "gf": 48,
+      "ga": 29
     },
     {
       "pos": 2,
-      "team": "LA Galaxy",
-      "pts": 48,
-      "pj": 27,
+      "team": "Real Salt Lake",
+      "pts": 47,
+      "pj": 26,
       "v": 14,
-      "e": 6,
+      "e": 5,
       "d": 7,
       "gf": 44,
-      "ga": 30
+      "ga": 32
     },
     {
       "pos": 3,
-      "team": "Seattle Sounders FC",
+      "team": "LA Galaxy",
       "pts": 45,
-      "pj": 27,
+      "pj": 26,
       "v": 13,
       "e": 6,
-      "d": 8,
-      "gf": 40,
-      "ga": 32
+      "d": 7,
+      "gf": 46,
+      "ga": 35
     },
     {
       "pos": 4,
-      "team": "Real Salt Lake",
-      "pts": 44,
-      "pj": 27,
+      "team": "Seattle Sounders FC",
+      "pts": 43,
+      "pj": 26,
       "v": 12,
-      "e": 8,
+      "e": 7,
       "d": 7,
-      "gf": 42,
-      "ga": 34
+      "gf": 40,
+      "ga": 31
     },
     {
       "pos": 5,
-      "team": "Colorado Rapids",
-      "pts": 42,
-      "pj": 27,
+      "team": "Houston Dynamo FC",
+      "pts": 41,
+      "pj": 26,
       "v": 12,
-      "e": 6,
+      "e": 5,
       "d": 9,
       "gf": 38,
-      "ga": 33
-    },
-    {
-      "pos": 6,
-      "team": "Houston Dynamo FC",
-      "pts": 40,
-      "pj": 27,
-      "v": 11,
-      "e": 7,
-      "d": 9,
-      "gf": 36,
-      "ga": 32
-    },
-    {
-      "pos": 7,
-      "team": "Portland Timbers",
-      "pts": 38,
-      "pj": 27,
-      "v": 10,
-      "e": 8,
-      "d": 9,
-      "gf": 35,
       "ga": 34
     },
     {
-      "pos": 8,
-      "team": "Minnesota United FC",
-      "pts": 36,
-      "pj": 27,
-      "v": 10,
+      "pos": 6,
+      "team": "Colorado Rapids",
+      "pts": 39,
+      "pj": 26,
+      "v": 11,
       "e": 6,
+      "d": 9,
+      "gf": 36,
+      "ga": 33
+    },
+    {
+      "pos": 7,
+      "team": "Minnesota United FC",
+      "pts": 37,
+      "pj": 26,
+      "v": 10,
+      "e": 7,
+      "d": 9,
+      "gf": 34,
+      "ga": 32
+    },
+    {
+      "pos": 8,
+      "team": "Portland Timbers",
+      "pts": 35,
+      "pj": 26,
+      "v": 10,
+      "e": 5,
       "d": 11,
       "gf": 33,
-      "ga": 36
+      "ga": 37
     }
   ],
   "copa2026": {
@@ -484,7 +484,7 @@
       "driver": "Lando Norris",
       "team": "McLaren",
       "country": "🇬🇧",
-      "pts": 242
+      "pts": 241
     },
     {
       "pos": 3,
@@ -512,14 +512,14 @@
       "driver": "Carlos Sainz",
       "team": "Williams",
       "country": "🇪🇸",
-      "pts": 165
+      "pts": 175
     },
     {
       "pos": 7,
       "driver": "George Russell",
       "team": "Mercedes",
       "country": "🇬🇧",
-      "pts": 158
+      "pts": 168
     },
     {
       "pos": 8,
@@ -533,14 +533,14 @@
       "driver": "Fernando Alonso",
       "team": "Aston Martin",
       "country": "🇪🇸",
-      "pts": 98
+      "pts": 118
     },
     {
       "pos": 10,
       "driver": "Andrea Kimi Antonelli",
       "team": "Mercedes",
       "country": "🇮🇹",
-      "pts": 85
+      "pts": 95
     }
   ],
   "f1_constructors": [
@@ -552,7 +552,7 @@
     {
       "pos": 2,
       "team": "McLaren",
-      "pts": 440
+      "pts": 439
     },
     {
       "pos": 3,
@@ -562,12 +562,12 @@
     {
       "pos": 4,
       "team": "Mercedes",
-      "pts": 243
+      "pts": 263
     },
     {
       "pos": 5,
       "team": "Aston Martin",
-      "pts": 125
+      "pts": 145
     }
   ],
   "wsl_men": [
@@ -575,123 +575,123 @@
       "pos": 1,
       "surfer": "John John Florence",
       "country": "🇺🇸",
-      "pts": 52840
+      "pts": 54890
     },
     {
       "pos": 2,
-      "surfer": "Filipe Toledo",
+      "surfer": "Italo Ferreira",
       "country": "🇧🇷",
-      "pts": 49650
+      "pts": 51240
     },
     {
       "pos": 3,
-      "surfer": "Italo Ferreira",
-      "country": "🇧🇷",
-      "pts": 47820
+      "surfer": "Griffin Colapinto",
+      "country": "🇺🇸",
+      "pts": 48760
     },
     {
       "pos": 4,
-      "surfer": "Griffin Colapinto",
-      "country": "🇺🇸",
-      "pts": 45390
+      "surfer": "Filipe Toledo",
+      "country": "🇧🇷",
+      "pts": 46320
     },
     {
       "pos": 5,
-      "surfer": "Gabriel Medina",
-      "country": "🇧🇷",
-      "pts": 44150
+      "surfer": "Ethan Ewing",
+      "country": "🇦🇺",
+      "pts": 44180
     },
     {
       "pos": 6,
-      "surfer": "Ethan Ewing",
+      "surfer": "Jack Robinson",
       "country": "🇦🇺",
-      "pts": 42780
+      "pts": 42650
     },
     {
       "pos": 7,
-      "surfer": "Jack Robinson",
-      "country": "🇦🇺",
-      "pts": 41200
+      "surfer": "Gabriel Medina",
+      "country": "🇧🇷",
+      "pts": 40890
     },
     {
       "pos": 8,
       "surfer": "Kanoa Igarashi",
       "country": "🇯🇵",
-      "pts": 38950
+      "pts": 38420
     },
     {
       "pos": 9,
-      "surfer": "Jordy Smith",
-      "country": "🇿🇦",
-      "pts": 36420
+      "surfer": "Joao Chianca",
+      "country": "🇧🇷",
+      "pts": 36150
     },
     {
       "pos": 10,
-      "surfer": "Caio Ibelli",
-      "country": "🇧🇷",
-      "pts": 34180
+      "surfer": "Connor O'Leary",
+      "country": "🇦🇺",
+      "pts": 33780
     }
   ],
   "wsl_women": [
     {
       "pos": 1,
-      "surfer": "Carissa Moore",
+      "surfer": "Caroline Marks",
       "country": "🇺🇸",
-      "pts": 51200
+      "pts": 52340
     },
     {
       "pos": 2,
-      "surfer": "Caroline Marks",
+      "surfer": "Caitlin Simmers",
       "country": "🇺🇸",
-      "pts": 48750
+      "pts": 49870
     },
     {
       "pos": 3,
-      "surfer": "Tatiana Weston-Webb",
-      "country": "🇧🇷",
-      "pts": 46320
+      "surfer": "Carissa Moore",
+      "country": "🇺🇸",
+      "pts": 47250
     },
     {
       "pos": 4,
-      "surfer": "Molly Picklum",
-      "country": "🇦🇺",
-      "pts": 44890
+      "surfer": "Tatiana Weston-Webb",
+      "country": "🇧🇷",
+      "pts": 44680
     },
     {
       "pos": 5,
-      "surfer": "Brisa Hennessy",
-      "country": "🇨🇷",
-      "pts": 42150
+      "surfer": "Molly Picklum",
+      "country": "🇦🇺",
+      "pts": 42130
     },
     {
       "pos": 6,
-      "surfer": "Tyler Wright",
-      "country": "🇦🇺",
-      "pts": 40680
+      "surfer": "Brisa Hennessy",
+      "country": "🇨🇷",
+      "pts": 39560
     },
     {
       "pos": 7,
-      "surfer": "Johanne Defay",
-      "country": "🇫🇷",
-      "pts": 38420
+      "surfer": "Tyler Wright",
+      "country": "🇦🇺",
+      "pts": 37240
     },
     {
       "pos": 8,
-      "surfer": "Stephanie Gilmore",
-      "country": "🇦🇺",
-      "pts": 36190
+      "surfer": "Gabriela Bryan",
+      "country": "🇺🇸",
+      "pts": 34890
     },
     {
       "pos": 9,
-      "surfer": "Lakey Peterson",
-      "country": "🇺🇸",
-      "pts": 34750
+      "surfer": "Johanne Defay",
+      "country": "🇫🇷",
+      "pts": 32450
     },
     {
       "pos": 10,
-      "surfer": "Caitlin Simmers",
+      "surfer": "Lakey Peterson",
       "country": "🇺🇸",
-      "pts": 33280
+      "pts": 30120
     }
   ]
 }
